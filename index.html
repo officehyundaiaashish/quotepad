@@ -26,7 +26,6 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* High DPI Text Rendering & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100dvh; overscroll-behavior-y: contain; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
@@ -49,8 +48,6 @@
         /* Animations */
         @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .animate-entry { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
-        /* Cart Logo Animation */
         @keyframes driveCart { 0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); } 25% { transform: translateX(3px) translateY(-1px) rotate(3deg); } 50% { transform: translateX(5px) translateY(0) rotate(0deg); } 75% { transform: translateX(3px) translateY(-1px) rotate(-3deg); } }
         .animated-cart { animation: driveCart 2.5s infinite ease-in-out; display: inline-block; }
 
@@ -74,8 +71,9 @@
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
-        .grid-3-action { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; } 
-        .grid-3-mobile { display: flex; gap: 1rem; } 
+        
+        /* Side by Side Buttons on Desktop */
+        .grid-3-mobile { display: flex; gap: 1rem; flex-direction: row; } 
         .grid-3-mobile button { flex: 1; }
 
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
@@ -127,26 +125,33 @@
         input[type="checkbox"]:checked + .toggle-switch { background: var(--accent); }
         input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(20px); }
 
-        /* ORGANIZED COMPACT TABLES (Cart specific + general) */
-        .table-responsive { width: 100%; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; background: #fff;}
+        /* ---------------------------------------------------------------------------------
+           YAHAN HAI TERA TABLE KA JADOO (ORGANIZED BORDERS, SHADES & TEXT WRAP) 
+        --------------------------------------------------------------------------------- */
+        .table-responsive { width: 100%; margin-top: 1rem; border-radius: 8px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1; }
         table { width: 100%; border-collapse: collapse; background: #fff; table-layout: auto; }
         
-        /* THE NEW BORDERS & SHADES FOR TABLES */
-        th, td { padding: 1rem 0.8rem; text-align: left; border: 1px solid var(--border); vertical-align: middle; font-size: 0.95rem;}
-        th { font-weight: 600; color: var(--text-main); font-size: 0.8rem; background: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #cbd5e1; }
-        tbody tr:nth-child(even) { background-color: #f8fafc; } /* Shades for rows */
+        /* Solid borders for all cells */
+        th, td { padding: 1rem 0.8rem; text-align: left; border: 1px solid #cbd5e1; vertical-align: middle; font-size: 0.95rem; }
+        th { font-weight: 600; color: var(--text-main); font-size: 0.8rem; background: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #94a3b8; }
+        
+        /* Alternating Row Shades (Zebra Stripes) */
+        tbody tr:nth-child(even) { background-color: #f1f5f9; } 
+        tbody tr:nth-child(odd) { background-color: #ffffff; } 
         
         td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
         
-        /* TEXT WRAPPING FOR ITEM NAME */
+        /* Text Wrapping for First Column (Item Name) */
         td:first-child, th:first-child { width: 100%; line-height: 1.4; white-space: normal; word-wrap: break-word; word-break: break-word; max-width: 200px;} 
         
         .action-cell { display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center; }
         .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 700; padding: 1.2rem 1rem; margin-top: 1rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-        /* QUANTITY BUTTON CONTROLS (+/-) */
-        .qty-controls { display: inline-flex; align-items: center; gap: 0.4rem; background: #f1f5f9; padding: 3px 6px; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .qty-btn { width: 28px; height: 28px; padding: 0; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* ---------------------------------------------------------------------------------
+           QUANTITY BUTTON CONTROLS (+/-) IN THE CART 
+        --------------------------------------------------------------------------------- */
+        .qty-controls { display: inline-flex; align-items: center; gap: 0.4rem; background: #ffffff; padding: 3px 6px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .qty-btn { width: 28px; height: 28px; padding: 0; background: #f8fafc; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .qty-btn:hover { background: var(--accent-light); color: var(--accent-hover); border-color: var(--accent); }
         .qty-btn:active { transform: scale(0.9); }
         .qty-value { font-weight: 700; min-width: 2rem; text-align: center; color: var(--text-main); }
@@ -166,15 +171,14 @@
             .card { padding: 1rem; }
             .grid-3 { grid-template-columns: 1fr; gap: 0.75rem;}
             .grid-2 { grid-template-columns: 1fr; }
-            .grid-3-action { grid-template-columns: 1fr; } 
             .grid-3-mobile { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
             
-            /* Tight Mobile Table Layout */
+            /* Tight Mobile Table Layout for Wraps */
             th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; }
             td:first-child, th:first-child { max-width: 140px; } /* Ensures text wraps perfectly on small screens */
             .qty-controls { gap: 0.2rem; padding: 2px 4px; }
             .qty-btn { width: 22px; height: 22px; font-size: 1rem; border-radius: 4px; }
-            .qty-value { min-width: 1.5rem; font-size: 0.9rem; }
+            .qty-value { min-width: 1.5rem; font-size: 0.85rem; }
             
             .btn-small { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
             input, select, .custom-select__trigger { padding: 0.6rem; font-size: 0.9rem; height: 42px;}
@@ -617,13 +621,13 @@
             renderCart();
         }
 
-        // QTY + / - LOGIC
+        // YAHAN HAIN QTY (+ / -) CONTROLS KE LOGIC
         function updateQty(idx, change) {
             const newQty = cart[idx].qty + change;
             if (newQty <= 0) {
                 removeCartItem(idx);
             } else {
-                cart[idx].qty = Math.round(newQty * 100) / 100; // prevents JS decimal errors
+                cart[idx].qty = Math.round(newQty * 100) / 100;
                 renderCart();
             }
         }
@@ -660,7 +664,7 @@
             cart.forEach((item, idx) => {
                 const amt = item.rate * item.qty; total += amt;
                 
-                // Unified Qty Control Buttons Block
+                // + / - Buttons HTML
                 const qtyControls = `
                     <div class="qty-controls">
                         <button class="qty-btn no-print" onclick="updateQty(${idx}, -1)">-</button>
@@ -781,7 +785,7 @@
                     appData.units.forEach(u => { selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`; });
                     selectHtml += `</select>`;
                     tbody.innerHTML += `
-                        <tr style="background:#f0fdf4;">
+                        <tr style="background:#e0f2fe;">
                             <td><input type="text" id="edit-name-${item.id}" value="${item.name}" style="padding:0.4rem; font-size:0.85rem; height:35px; width:100%;"></td>
                             <td>${selectHtml}</td>
                             <td class="num"><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:65px; padding:0.4rem; text-align:right; height:35px;"></td>
