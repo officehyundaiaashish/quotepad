@@ -10,7 +10,8 @@
 
         :root {
             --bg: #f0fdf4; 
-            --surface: #ffffff;
+            --surface: rgba(255, 255, 255, 0.85); /* Slightly transparent for blur */
+            --solid-surface: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
@@ -23,15 +24,28 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        /* High DPI Text Rendering */
+        * { 
+            box-sizing: border-box; margin: 0; padding: 0; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+        }
+        body { 
+            background-color: var(--bg); color: var(--text-main); 
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+            text-rendering: optimizeLegibility;
+        }
 
         /* Animations */
         @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .animate-entry { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Top Bar */
-        .top-bar { background-color: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; }
+        /* Top Bar (Glassmorphism) */
+        .top-bar { 
+            background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; 
+        }
         .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-right: auto; display: flex; align-items: center; gap: 0.5rem; }
         .desktop-nav { display: flex; gap: 0.5rem; }
         .nav-btn { background: transparent; border: none; padding: 0.6rem 1rem; border-radius: 8px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;}
@@ -44,7 +58,7 @@
         .view-section.active { display: block; animation: fadeSlideUp 0.3s ease forwards; }
 
         /* Cards & Forms */
-        .card { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; transition: var(--transition); }
+        .card { background: var(--solid-surface); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; transition: var(--transition); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         h2 { font-size: 1.25rem; font-weight: 600; }
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
@@ -107,12 +121,16 @@
         .file-upload-wrapper:hover .file-upload-label { background: #d1fae5; }
         .file-name { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Mobile Nav */
+        /* Mobile Nav (Glassmorphism) */
         .mobile-nav { display: none; }
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
             .main-content { padding-bottom: 6rem; padding-inline: 1rem; }
-            .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); justify-content: space-around; padding: 0.5rem 0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+            .mobile-nav { 
+                display: flex; position: fixed; bottom: 0; left: 0; width: 100%; 
+                background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                border-top: 1px solid var(--border); justify-content: space-around; padding: 0.5rem 0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); 
+            }
             .mobile-nav .nav-btn { flex-direction: column; padding: 0.4rem; font-size: 0.75rem; gap: 0.2rem; width: 70px; background: transparent; height: auto;}
             .mobile-nav .nav-btn.active { color: var(--accent); background: transparent; box-shadow: none;}
             .mobile-nav .nav-btn svg { transition: var(--transition); }
@@ -120,12 +138,42 @@
             .table-responsive { border: none; }
         }
 
+        /* CUSTOM DIALOG BOXES CSS */
+        .dialog-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 9999;
+        }
+        .dialog-overlay.active { opacity: 1; visibility: visible; }
+        .dialog-box {
+            background: var(--solid-surface); width: 90%; max-width: 400px;
+            border-radius: 16px; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            transform: scale(0.9); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dialog-overlay.active .dialog-box { transform: scale(1); }
+        .dialog-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;}
+        .dialog-message { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+        .dialog-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .dialog-actions button { height: 40px; padding: 0.5rem 1rem; font-size: 0.9rem; }
+
         /* Print Logic */
         @media print { .no-print { display: none !important; } .blank-write-space { display: block !important; border-bottom: 1px dotted #000; height: 1.5rem; width: 100px; } }
         .blank-write-space { display: none; }
     </style>
 </head>
 <body>
+
+    <div id="custom-dialog" class="dialog-overlay">
+        <div class="dialog-box">
+            <div id="dialog-title" class="dialog-title">Notice</div>
+            <div id="dialog-message" class="dialog-message">Message goes here.</div>
+            <div class="dialog-actions">
+                <button id="dialog-cancel" class="btn-outline" style="border:none; color:var(--text-muted);">Cancel</button>
+                <button id="dialog-confirm">OK</button>
+            </div>
+        </div>
+    </div>
 
     <header class="top-bar">
         <div class="logo">
@@ -309,6 +357,34 @@
     </nav>
 
     <script>
+        // --- CUSTOM IN-APP MODAL LOGIC (Replaces alert & confirm) ---
+        function showDialog(type, title, message) {
+            return new Promise((resolve) => {
+                document.getElementById('dialog-title').innerHTML = title;
+                document.getElementById('dialog-message').innerText = message;
+                const overlay = document.getElementById('custom-dialog');
+                const btnConfirm = document.getElementById('dialog-confirm');
+                const btnCancel = document.getElementById('dialog-cancel');
+
+                if (type === 'alert') {
+                    btnCancel.style.display = 'none';
+                    btnConfirm.innerText = 'OK';
+                    btnConfirm.style.backgroundColor = 'var(--accent)';
+                } else {
+                    btnCancel.style.display = 'block';
+                    btnConfirm.innerText = 'Yes, Delete';
+                    btnConfirm.style.backgroundColor = 'var(--danger)';
+                }
+
+                overlay.classList.add('active');
+
+                btnConfirm.onclick = () => { overlay.classList.remove('active'); resolve(true); };
+                btnCancel.onclick = () => { overlay.classList.remove('active'); resolve(false); };
+            });
+        }
+        window.customAlert = (msg) => showDialog('alert', '<svg width="24" height="24" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Notice', msg);
+        window.customConfirm = (msg) => showDialog('confirm', '<svg width="24" height="24" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Confirm Action', msg);
+
         // Data & State
         const defaultInventory = [
             { id: 'i1', name: 'काले चने', unit: 'kg', rate: 90 },
@@ -389,10 +465,13 @@
             saveData(); renderCart();
         }
 
-        function addToCart() {
+        async function addToCart() {
             const id = document.getElementById('item-select-value').value;
             const qty = parseFloat(document.getElementById('qty-input').value);
-            if (!id || isNaN(qty) || qty <= 0) return alert("Select an item and enter valid quantity!");
+            if (!id || isNaN(qty) || qty <= 0) {
+                await customAlert("Please select an item and enter a valid quantity!");
+                return;
+            }
 
             const item = appData.inventory.find(i => i.id === id);
             const existing = cart.find(c => c.id === item.id);
@@ -438,7 +517,7 @@
                             <td style="font-weight: 500;">${item.name}</td>
                             <td class="num" style="font-weight: 600;">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
                             <td><div class="blank-write-space"></div></td>
-                            <td class="no-print" style="text-align:center;"><button class="btn-outline btn-small" style="border:none; color:var(--danger);" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 } else {
@@ -448,7 +527,7 @@
                             <td class="num" style="color:var(--text-muted)">₹${item.rate}</td>
                             <td class="num">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
                             <td class="num" style="font-weight: 600; color:var(--text-main);">₹${amt.toFixed(2)}</td>
-                            <td class="no-print" style="text-align:center;"><button class="btn-outline btn-small" style="border:none; color:var(--danger);" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 }
@@ -456,8 +535,11 @@
             document.getElementById('grand-total').innerText = total.toFixed(2);
         }
 
-        function exportPDF() {
-            if(cart.length === 0) return alert("List is empty!");
+        async function exportPDF() {
+            if(cart.length === 0) {
+                await customAlert("The list is currently empty. Please add items first.");
+                return;
+            }
             const hideElems = document.querySelectorAll('.no-print');
             hideElems.forEach(el => el.style.display = 'none');
             const writeSpaces = document.querySelectorAll('.blank-write-space');
@@ -480,12 +562,15 @@
         // --- Inventory Edit Logic ---
         const unitOptions = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
 
-        function addNewItem() {
+        async function addNewItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value;
             const rate = parseFloat(document.getElementById('new-item-rate').value);
 
-            if (!name || isNaN(rate) || rate < 0) return alert("Please fill all fields correctly!");
+            if (!name || isNaN(rate) || rate < 0) {
+                await customAlert("Please fill all fields correctly to add a new item.");
+                return;
+            }
             appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate });
             saveData();
             
@@ -536,12 +621,15 @@
         function startEditItem(id) { editingItemId = id; renderInventoryTable(); }
         function cancelEdit() { editingItemId = null; renderInventoryTable(); }
 
-        function saveEditItem(id) {
+        async function saveEditItem(id) {
             const newName = document.getElementById(`edit-name-${id}`).value.trim();
             const newUnit = document.getElementById(`edit-unit-${id}`).value;
             const newRate = parseFloat(document.getElementById(`edit-rate-${id}`).value);
 
-            if (!newName || isNaN(newRate) || newRate < 0) return alert("Invalid inputs!");
+            if (!newName || isNaN(newRate) || newRate < 0) {
+                await customAlert("Invalid input! Rate must be a number and name cannot be empty.");
+                return;
+            }
 
             const item = appData.inventory.find(i => i.id === id);
             item.name = newName; item.unit = newUnit; item.rate = newRate;
@@ -550,8 +638,9 @@
             renderCustomDropdown(); renderInventoryTable();
         }
 
-        function deleteItem(id) {
-            if(!confirm("Are you sure you want to delete this item?")) return;
+        async function deleteItem(id) {
+            const confirmed = await customConfirm("Are you sure you want to permanently delete this item from your inventory?");
+            if(!confirmed) return;
             appData.inventory = appData.inventory.filter(i => i.id !== id);
             saveData(); renderCustomDropdown(); renderInventoryTable();
         }
@@ -579,11 +668,15 @@
             });
         }
 
-        function saveCurrentList() {
-            if (cart.length === 0) return alert("Cart is empty!");
+        async function saveCurrentList() {
+            if (cart.length === 0) {
+                await customAlert("Cart is empty! Cannot save a blank list.");
+                return;
+            }
             const total = cart.reduce((sum, item) => sum + (item.rate * item.qty), 0);
             appData.lists.push({ id: 'list_' + Date.now(), date: new Date().toLocaleString(), title: `List - ${new Date().toLocaleDateString()}`, items: [...cart], total: total });
-            saveData(); renderHistory(); alert("List Saved to History!");
+            saveData(); renderHistory(); 
+            await customAlert("List Saved to History successfully!");
             cart = []; renderCart();
         }
 
@@ -593,8 +686,9 @@
             switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
         }
 
-        function deleteList(id) {
-            if(!confirm("Delete this saved list?")) return;
+        async function deleteList(id) {
+            const confirmed = await customConfirm("Delete this saved list? This action cannot be undone.");
+            if(!confirmed) return;
             appData.lists = appData.lists.filter(l => l.id !== id);
             saveData(); renderHistory();
         }
@@ -613,18 +707,26 @@
             else { display.innerText = "No file selected"; display.style.color = "var(--text-muted)"; }
         }
 
-        function restoreBackup() {
+        async function restoreBackup() {
             const fileInput = document.getElementById('restore-file');
-            if (!fileInput.files.length) return alert("Please select a JSON backup file first.");
+            if (!fileInput.files.length) {
+                await customAlert("Please select a JSON backup file first.");
+                return;
+            }
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.inventory && parsed.lists && parsed.settings) {
-                        appData = parsed; saveData(); init(); alert("Data Restored Successfully!");
+                        appData = parsed; saveData(); init(); 
+                        await customAlert("Data Restored Successfully!");
                         fileInput.value = ""; document.getElementById('file-name-display').innerText = "No file selected";
-                    } else alert("Invalid backup file format.");
-                } catch (err) { alert("Error reading file."); }
+                    } else {
+                        await customAlert("Invalid backup file format.");
+                    }
+                } catch (err) { 
+                    await customAlert("Error reading file."); 
+                }
             };
             reader.readAsText(fileInput.files[0]);
         }
