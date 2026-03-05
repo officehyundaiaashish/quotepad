@@ -9,7 +9,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            /* Green Accent Theme */
             --bg: #f0fdf4; 
             --surface: #ffffff;
             --text-main: #0f172a;
@@ -20,6 +19,7 @@
             --danger: #ef4444;
             --radius: 12px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -33,18 +33,26 @@
             overflow: hidden;
         }
 
-        /* Top Navigation - Scrollable on mobile */
-        .top-nav {
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-entry { animation: fadeSlideUp 0.4s ease forwards; }
+        .animate-row { animation: fadeIn 0.3s ease forwards; }
+
+        /* Top Bar (Desktop) & Mobile Header */
+        .top-bar {
             background-color: var(--surface);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            padding: 1rem;
-            gap: 1rem;
-            overflow-x: auto;
-            white-space: nowrap;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            -webkit-overflow-scrolling: touch;
+            padding: 1rem 1.5rem;
+            z-index: 10;
         }
 
         .logo {
@@ -52,21 +60,29 @@
             font-weight: 700;
             color: var(--accent);
             margin-right: auto;
-            padding-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
+
+        .desktop-nav { display: flex; gap: 0.5rem; }
 
         .nav-btn {
             background: none;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
             border-radius: 8px;
             color: var(--text-muted);
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+        .nav-btn:hover { color: var(--text-main); background: #f8fafc; }
         .nav-btn.active { background-color: #d1fae5; color: var(--accent-hover); }
 
         /* Main Workspace */
@@ -74,10 +90,11 @@
             flex: 1;
             padding: 1.5rem;
             overflow-y: auto;
+            scroll-behavior: smooth;
         }
 
-        .view-section { display: none; max-width: 800px; margin: 0 auto; padding-bottom: 3rem; }
-        .view-section.active { display: block; }
+        .view-section { display: none; max-width: 900px; margin: 0 auto; padding-bottom: 3rem; }
+        .view-section.active { display: block; animation: fadeSlideUp 0.3s ease forwards; }
 
         /* Cards */
         .card {
@@ -87,27 +104,18 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             margin-bottom: 1.5rem;
+            transition: var(--transition);
         }
+        .card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        h2 { font-size: 1.25rem; font-weight: 600; color: var(--text-main); }
-        h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        h2 { font-size: 1.25rem; font-weight: 600; }
+        h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
 
         /* Forms & Inputs */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
-        
-        @media (max-width: 600px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
         label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
@@ -119,10 +127,14 @@
             font-size: 0.95rem;
             background: #f8fafc;
             outline: none;
-            transition: 0.2s;
+            transition: var(--transition);
             width: 100%;
         }
-        select:focus, input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        select:focus, input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); transform: translateY(-1px); }
+
+        /* Inline Edit Inputs for Inventory */
+        .inline-input { padding: 0.4rem; font-size: 0.9rem; margin: 0; background: transparent; border-color: transparent; }
+        .inline-input:focus { background: #fff; border-color: var(--accent); }
 
         button {
             padding: 0.75rem 1.5rem;
@@ -132,15 +144,16 @@
             border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
         }
-        button:hover { background-color: var(--accent-hover); }
+        button:hover { background-color: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(16,185,129,0.2); }
+        button:active { transform: translateY(0); }
         
         .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-        .btn-outline:hover { background: #d1fae5; }
+        .btn-outline:hover { background: #d1fae5; color: var(--accent-hover); box-shadow: none; }
         .btn-danger { background: #fee2e2; color: var(--danger); }
-        .btn-danger:hover { background: #fca5a5; color: white; }
+        .btn-danger:hover { background: #fca5a5; color: white; box-shadow: none; }
 
         /* Toggle Switch */
         .toggle-container { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; color: var(--text-muted); }
@@ -150,61 +163,106 @@
         input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(20px); }
 
         /* Tables */
-        .table-responsive { overflow-x: auto; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th, td { padding: 1rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
-        th { font-weight: 500; color: var(--text-muted); font-size: 0.85rem; }
+        .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; background: #fff; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; background: #f8fafc; }
         td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-        .delete-btn { background: none; color: var(--danger); padding: 0.5rem; cursor: pointer; font-size: 1.2rem; }
+        .delete-btn { background: none; color: var(--danger); padding: 0.4rem; cursor: pointer; border-radius: 6px; }
+        .delete-btn:hover { background: #fee2e2; transform: scale(1.05); }
 
-        .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; padding-top: 1.5rem; margin-top: 1rem; border-top: 2px dashed var(--border); color: var(--text-main); }
+        .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; padding: 1.5rem; margin-top: 1rem; background: #fff; border-radius: 8px; border: 1px solid var(--border); }
         
         .list-only-mode .rate-col { display: none !important; }
         .list-only-mode .total-row { display: none !important; }
 
-        /* History Cards */
-        .history-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-        .history-card { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--surface); }
-        .history-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-        .history-title { font-weight: 600; margin-bottom: 0.5rem; }
-        .history-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
-        .history-actions button { flex: 1; padding: 0.5rem; font-size: 0.85rem; }
+        /* Modern File Upload */
+        .file-upload-wrapper { position: relative; width: 100%; }
+        .file-upload-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-upload-label { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; border: 2px dashed var(--accent); border-radius: 8px; background: #f0fdf4; color: var(--accent-hover); transition: var(--transition); cursor: pointer; }
+        .file-upload-wrapper:hover .file-upload-label { background: #d1fae5; }
+        .file-name { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
 
+        /* Mobile Bottom Navigation Layout */
+        .mobile-nav { display: none; }
+
+        @media (max-width: 768px) {
+            .desktop-nav { display: none; } /* Hide top nav items */
+            .main-content { padding-bottom: 6rem; padding-inline: 1rem; }
+            
+            /* Bottom App Bar */
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: var(--surface);
+                border-top: 1px solid var(--border);
+                justify-content: space-around;
+                padding: 0.5rem 0;
+                z-index: 100;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+
+            .mobile-nav .nav-btn {
+                flex-direction: column;
+                padding: 0.4rem;
+                font-size: 0.75rem;
+                gap: 0.2rem;
+                border-radius: 8px;
+                width: 70px;
+                background: transparent;
+            }
+
+            .mobile-nav .nav-btn.active { color: var(--accent); background: transparent; }
+            .mobile-nav .nav-btn svg { stroke: currentColor; transition: var(--transition); }
+            .mobile-nav .nav-btn.active svg { transform: translateY(-2px); stroke-width: 2.5; }
+            .table-responsive { border: none; } /* Fix mobile table scroll visual */
+        }
     </style>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="logo">GroceryPro</div>
-        <button class="nav-btn active" onclick="switchTab('maker')">List Maker</button>
-        <button class="nav-btn" onclick="switchTab('inventory')">Inventory & Rates</button>
-        <button class="nav-btn" onclick="switchTab('history')">Saved Lists</button>
-        <button class="nav-btn" onclick="switchTab('backup')">Backup Data</button>
-    </nav>
+    <header class="top-bar">
+        <div class="logo">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            GroceryPro
+        </div>
+        <nav class="desktop-nav">
+            <button class="nav-btn active" onclick="switchTab('maker', this)">List Maker</button>
+            <button class="nav-btn" onclick="switchTab('inventory', this)">Inventory</button>
+            <button class="nav-btn" onclick="switchTab('history', this)">History</button>
+            <button class="nav-btn" onclick="switchTab('backup', this)">Data</button>
+        </nav>
+    </header>
 
     <main class="main-content">
         
         <section id="maker-view" class="view-section active">
-            <div class="card">
+            <div class="card animate-entry">
                 <div class="card-header">
                     <h2>Create New List</h2>
                     <label class="toggle-container">
                         <input type="checkbox" id="mode-toggle" onchange="toggleMode()" style="display: none;">
                         <div class="toggle-switch"></div>
-                        Hide Rates (List Only)
+                        Hide Rates (Print Only)
                     </label>
                 </div>
                 
                 <div class="grid-3 no-print" style="margin-bottom: 1.5rem;">
                     <div class="input-group">
-                        <label>Item</label>
+                        <label>Select Item</label>
                         <select id="item-select" onchange="updateUnit()"></select>
                     </div>
                     <div class="input-group">
                         <label id="qty-label">Quantity</label>
-                        <input type="number" id="qty-input" step="0.01" min="0.01" placeholder="Qty">
+                        <input type="number" id="qty-input" step="0.01" min="0.01" placeholder="Qty" onkeypress="handleEnter(event, addToCart)">
                     </div>
-                    <button onclick="addToCart()">Add Item</button>
+                    <button onclick="addToCart()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                        Add
+                    </button>
                 </div>
 
                 <div id="print-area">
@@ -228,7 +286,7 @@
                     </div>
                 </div>
 
-                <div class="grid-2 no-print" style="margin-top: 2rem;">
+                <div class="grid-2 no-print" style="margin-top: 1.5rem;">
                     <button class="btn-outline" onclick="saveCurrentList()">Save to History</button>
                     <button onclick="exportPDF()">Download PDF</button>
                 </div>
@@ -236,7 +294,7 @@
         </section>
 
         <section id="inventory-view" class="view-section">
-            <div class="card">
+            <div class="card animate-entry">
                 <h3>Add New Item</h3>
                 <div class="grid-3">
                     <div class="input-group">
@@ -256,15 +314,15 @@
                     </div>
                     <div class="input-group">
                         <label>Rate (₹)</label>
-                        <input type="number" id="new-item-rate" placeholder="e.g. 50">
+                        <input type="number" id="new-item-rate" placeholder="e.g. 50" onkeypress="handleEnter(event, addNewItem)">
                     </div>
                 </div>
-                <button onclick="addNewItem()" style="margin-top: 1rem; width: 100%;">Save New Item to Inventory</button>
+                <button onclick="addNewItem()" style="margin-top: 1rem; width: 100%;">Save Item</button>
             </div>
 
-            <div class="card">
+            <div class="card animate-entry" style="animation-delay: 0.1s;">
                 <h3>Manage Current Inventory</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Update existing rates here. Changes save automatically.</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">You can directly edit Names, Units, and Rates below. Hits 'Enter' to confirm or just click away.</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -272,7 +330,7 @@
                                 <th>Item Name</th>
                                 <th>Unit</th>
                                 <th class="num">Rate (₹)</th>
-                                <th>Action</th>
+                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-body"></tbody>
@@ -282,44 +340,68 @@
         </section>
 
         <section id="history-view" class="view-section">
-            <div class="card">
+            <div class="card animate-entry">
                 <div class="card-header">
-                    <h2>Saved Quotations & Lists</h2>
+                    <h2>Saved Quotations</h2>
                 </div>
-                <div id="history-container" class="history-grid">
+                <div id="history-container" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
                     </div>
             </div>
         </section>
 
         <section id="backup-view" class="view-section">
-            <div class="card">
+            <div class="card animate-entry">
                 <h2>Data Management</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">
-                    Download your inventory and saved lists to keep a safe backup, or to transfer them to another device.
-                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">Secure your data or transfer it to another device.</p>
                 
                 <div class="grid-2">
-                    <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                        <svg style="margin: 0 auto 1rem; color: var(--accent);" width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         <h3 style="margin-bottom: 0.5rem;">Backup Data</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Export your data as a JSON file.</p>
-                        <button onclick="downloadBackup()" style="width: 100%;">Download Backup</button>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">Export everything to a JSON file.</p>
+                        <button onclick="downloadBackup()" style="width: 100%;">Download JSON</button>
                     </div>
 
-                    <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
                         <h3 style="margin-bottom: 0.5rem;">Restore Data</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Upload a previously saved JSON file.</p>
-                        <input type="file" id="restore-file" accept=".json" style="margin-bottom: 1rem;">
-                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%;">Restore Data</button>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Upload a previously saved backup.</p>
+                        
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
+                            <div class="file-upload-label">
+                                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <span style="margin-top: 0.5rem; font-weight: 500;">Click or Drag File</span>
+                            </div>
+                        </div>
+                        <div id="file-name-display" class="file-name">No file selected</div>
+                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%; margin-top: 1rem;">Restore Now</button>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
+
+    <nav class="mobile-nav">
+        <button class="nav-btn active" onclick="switchTab('maker', this)">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            List
+        </button>
+        <button class="nav-btn" onclick="switchTab('inventory', this)">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            Inventory
+        </button>
+        <button class="nav-btn" onclick="switchTab('history', this)">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            History
+        </button>
+        <button class="nav-btn" onclick="switchTab('backup', this)">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+            Data
+        </button>
+    </nav>
 
     <script>
         // --- State Management ---
-        // Here is your FULL original list restored with 1-unit base rates!
         const defaultInventory = [
             { id: 'i1', name: 'काले चने', unit: 'kg', rate: 90 },
             { id: 'i2', name: 'राजमा (लाल छोटा)', unit: 'kg', rate: 140 },
@@ -338,10 +420,8 @@
             inventory: JSON.parse(localStorage.getItem('gp_inventory')) || defaultInventory,
             lists: JSON.parse(localStorage.getItem('gp_lists')) || []
         };
-        
         let cart = [];
 
-        // --- Initialization ---
         function init() {
             renderInventoryDropdown();
             renderInventoryTable();
@@ -353,12 +433,33 @@
             localStorage.setItem('gp_lists', JSON.stringify(appData.lists));
         }
 
+        // --- Utils: Keyboard Interaction ---
+        function handleEnter(e, callback) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                callback();
+            }
+        }
+
         // --- Navigation ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+                // reset animation
+                el.style.animation = 'none';
+                el.offsetHeight; 
+                el.style.animation = null;
+            });
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
             document.getElementById(`${tabId}-view`).classList.add('active');
-            event.target.classList.add('active');
+            
+            // Sync active state for both mobile and desktop nav buttons
+            const tabIndex = Array.from(btnElement.parentElement.children).indexOf(btnElement);
+            document.querySelectorAll('.desktop-nav .nav-btn')[tabIndex].classList.add('active');
+            document.querySelectorAll('.mobile-nav .nav-btn')[tabIndex].classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // --- List Maker Logic ---
@@ -380,6 +481,7 @@
             const id = document.getElementById('item-select').value;
             const item = appData.inventory.find(i => i.id === id);
             document.getElementById('qty-label').innerText = item ? `Qty (${item.unit})` : 'Quantity';
+            document.getElementById('qty-input').focus(); // Auto focus qty input
         }
 
         function addToCart() {
@@ -396,6 +498,7 @@
             document.getElementById('qty-input').value = "";
             document.getElementById('qty-label').innerText = 'Quantity';
             renderCart();
+            document.getElementById('item-select').focus(); // Bring focus back to start
         }
 
         function removeCartItem(idx) { cart.splice(idx, 1); renderCart(); }
@@ -415,12 +518,12 @@
                 const amt = item.rate * item.qty;
                 total += amt;
                 tbody.innerHTML += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td class="num rate-col">₹${item.rate}</td>
-                        <td class="num">${item.qty} ${item.unit}</td>
-                        <td class="num rate-col">₹${amt.toFixed(2)}</td>
-                        <td class="no-print"><button class="delete-btn" onclick="removeCartItem(${idx})">×</button></td>
+                    <tr class="animate-row">
+                        <td style="font-weight: 500;">${item.name}</td>
+                        <td class="num rate-col" style="color:var(--text-muted)">₹${item.rate}</td>
+                        <td class="num">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
+                        <td class="num rate-col" style="font-weight: 600;">₹${amt.toFixed(2)}</td>
+                        <td class="no-print" style="text-align:center;"><button class="delete-btn" onclick="removeCartItem(${idx})"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>
                     </tr>
                 `;
             });
@@ -451,7 +554,6 @@
             hideElems.forEach(el => el.style.display = 'none');
             const printArea = document.getElementById('print-area');
             
-            // Add Title for PDF
             const title = document.createElement('h2');
             title.id = 'temp-title';
             title.innerText = document.getElementById('mode-toggle').checked ? 'Grocery List' : 'Quotation';
@@ -469,7 +571,7 @@
             });
         }
 
-        // --- Inventory Logic ---
+        // --- Inventory Logic (FULLY EDITABLE) ---
         function addNewItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value;
@@ -480,37 +582,65 @@
             appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate });
             saveData();
             
-            // Clear inputs
             document.getElementById('new-item-name').value = '';
             document.getElementById('new-item-rate').value = '';
             
             renderInventoryDropdown();
             renderInventoryTable();
-            alert("Item Added!");
+            document.getElementById('new-item-name').focus();
         }
+
+        const unitOptions = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
 
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-body');
             tbody.innerHTML = '';
             appData.inventory.forEach(item => {
+                
+                // Build options for select dropdown
+                let selectHtml = `<select class="inline-input" onchange="updateInventoryItem('${item.id}', 'unit', this.value)">`;
+                unitOptions.forEach(u => {
+                    selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`;
+                });
+                selectHtml += `</select>`;
+
                 tbody.innerHTML += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.unit}</td>
-                        <td class="num"><input type="number" value="${item.rate}" onchange="updateRate('${item.id}', this.value)" style="width:80px; text-align:right; padding:0.4rem;"></td>
-                        <td><button class="btn-danger" style="padding:0.4rem 0.8rem;" onclick="deleteItem('${item.id}')">Delete</button></td>
+                    <tr class="animate-row">
+                        <td>
+                            <input type="text" class="inline-input" value="${item.name}" 
+                                onchange="updateInventoryItem('${item.id}', 'name', this.value)"
+                                style="width: 100%; font-weight: 500;">
+                        </td>
+                        <td>${selectHtml}</td>
+                        <td class="num">
+                            <input type="number" class="inline-input num" value="${item.rate}" 
+                                onchange="updateInventoryItem('${item.id}', 'rate', this.value)" 
+                                style="width: 80px; text-align: right;">
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="delete-btn" onclick="deleteItem('${item.id}')" title="Delete">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
         }
 
-        function updateRate(id, newRate) {
-            const rate = parseFloat(newRate);
-            if (isNaN(rate) || rate < 0) return;
+        function updateInventoryItem(id, field, value) {
             const item = appData.inventory.find(i => i.id === id);
-            item.rate = rate;
+            if (!item) return;
+
+            if (field === 'rate') {
+                const rate = parseFloat(value);
+                if (isNaN(rate) || rate < 0) return;
+                item.rate = rate;
+            } else {
+                item[field] = value;
+            }
+            
             saveData();
-            renderInventoryDropdown(); // Refresh dropdown prices
+            renderInventoryDropdown(); 
         }
 
         function deleteItem(id) {
@@ -526,19 +656,21 @@
             const container = document.getElementById('history-container');
             container.innerHTML = '';
             if (appData.lists.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted);">No saved lists yet.</p>`;
+                container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet. Create one in the List Maker!</p>`;
                 return;
             }
 
             appData.lists.slice().reverse().forEach(list => {
                 container.innerHTML += `
-                    <div class="history-card">
-                        <div class="history-date">${list.date}</div>
-                        <div class="history-title">${list.title}</div>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">${list.items.length} Items | Total: ₹${list.total.toFixed(2)}</p>
-                        <div class="history-actions">
-                            <button class="btn-outline" onclick="loadList('${list.id}')">Load List</button>
-                            <button class="btn-danger" onclick="deleteList('${list.id}')">Delete</button>
+                    <div class="card" style="margin-bottom:0; display:flex; flex-direction:column;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">${list.date}</div>
+                        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">${list.title}</div>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 1rem;">${list.items.length} Items | Total: <span style="color:var(--text-main); font-weight:600;">₹${list.total.toFixed(2)}</span></p>
+                        <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+                            <button class="btn-outline" style="flex:1; padding:0.5rem;" onclick="loadList('${list.id}')">Load</button>
+                            <button class="btn-danger" style="padding:0.5rem;" onclick="deleteList('${list.id}')">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -547,9 +679,9 @@
 
         function loadList(id) {
             const listObj = appData.lists.find(l => l.id === id);
-            cart = JSON.parse(JSON.stringify(listObj.items)); // Deep copy
+            cart = JSON.parse(JSON.stringify(listObj.items)); 
             renderCart();
-            switchTab('maker');
+            switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
         }
 
         function deleteList(id) {
@@ -568,6 +700,17 @@
             dlAnchorElem.click();
         }
 
+        function handleFileSelect(input) {
+            const fileNameDisplay = document.getElementById('file-name-display');
+            if (input.files && input.files[0]) {
+                fileNameDisplay.innerText = "Selected: " + input.files[0].name;
+                fileNameDisplay.style.color = "var(--accent)";
+            } else {
+                fileNameDisplay.innerText = "No file selected";
+                fileNameDisplay.style.color = "var(--text-muted)";
+            }
+        }
+
         function restoreBackup() {
             const fileInput = document.getElementById('restore-file');
             if (!fileInput.files.length) return alert("Please select a JSON backup file first.");
@@ -582,6 +725,8 @@
                         saveData();
                         init();
                         alert("Data Restored Successfully!");
+                        fileInput.value = ""; // reset
+                        document.getElementById('file-name-display').innerText = "No file selected";
                     } else {
                         alert("Invalid backup file format.");
                     }
