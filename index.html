@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#10b981"> <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>GroceryPro - Minimalist Planner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -28,7 +27,46 @@
 
         /* High DPI Text Rendering & Base */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+        
+        /* FIXED FOR SWIPE TO RELOAD: Removed strict overflow hidden from body */
+        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100dvh; overscroll-behavior-y: contain; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+
+        /* --- NEW LAUNCH/SPLASH SCREEN CSS --- */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100dvh;
+            background-color: var(--accent); /* Green Background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .splash-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ffffff; /* White Logo/Text */
+            font-size: 2.5rem;
+            font-weight: 700;
+            animation: splashPulse 1.5s infinite alternate ease-in-out;
+        }
+        .splash-content svg {
+            width: 50px;
+            height: 50px;
+            stroke-width: 2.5;
+        }
+        @keyframes splashPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+        /* ------------------------------------ */
 
         /* Animations */
         @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -39,7 +77,7 @@
         .animated-cart { animation: driveCart 2.5s infinite ease-in-out; display: inline-block; }
 
         /* Top Bar */
-        .top-bar { background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; }
+        .top-bar { background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; position: sticky; top: 0; }
         .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-right: auto; display: flex; align-items: center; gap: 0.5rem; }
         .desktop-nav { display: flex; gap: 0.5rem; }
         .nav-btn { background: transparent; border: none; padding: 0.6rem 1rem; border-radius: 8px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;}
@@ -47,7 +85,7 @@
         .nav-btn.active { background-color: var(--accent-light); color: var(--accent-hover); }
 
         /* Main Workspace */
-        .main-content { flex: 1; padding: 1.5rem; overflow-y: auto; scroll-behavior: smooth; }
+        .main-content { flex: 1; padding: 1.5rem; overflow-y: auto; scroll-behavior: smooth; overscroll-behavior-y: auto; }
         .view-section { display: none; max-width: 900px; margin: 0 auto; padding-bottom: 4rem; }
         .view-section.active { display: block; animation: fadeSlideUp 0.3s ease forwards; }
 
@@ -60,7 +98,7 @@
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
         .grid-3-action { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; } 
         
-        /* FIXED: Action Buttons row for Desktop (Side by side) */
+        /* Action Buttons row for Desktop (Side by side) */
         .grid-3-mobile { display: flex; gap: 1rem; } 
         .grid-3-mobile button { flex: 1; }
 
@@ -140,12 +178,12 @@
             .card { padding: 1rem; }
             .grid-3 { grid-template-columns: 1fr; gap: 0.75rem;}
             
-            /* FIXED: Backup/Restore Stack on Mobile */
+            /* Backup/Restore Stack on Mobile */
             .grid-2 { grid-template-columns: 1fr; }
             
             .grid-3-action { grid-template-columns: 1fr; } 
             
-            /* FIXED: Grid-3-Mobile switches to grid on mobile, flex on desktop */
+            /* Grid-3-Mobile switches to grid on mobile, flex on desktop */
             .grid-3-mobile { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
             
             th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; }
@@ -179,6 +217,15 @@
     </style>
 </head>
 <body>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            GroceryPro
+        </div>
+    </div>
 
     <div id="custom-dialog" class="dialog-overlay">
         <div class="dialog-box">
@@ -387,6 +434,16 @@
     </nav>
 
     <script>
+        // --- SPLASH SCREEN REMOVAL LOGIC ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('hidden');
+                // Remove from DOM after fade-out transition (0.5s) to clean up memory
+                setTimeout(() => splash.remove(), 500); 
+            }, 1200); // Wait 1.2 seconds before fading out
+        });
+
         // --- CUSTOM IN-APP MODAL LOGIC ---
         function showDialog(type, title, message) {
             return new Promise((resolve) => {
@@ -449,10 +506,9 @@
             renderCart();
             renderInventoryTable();
             renderHistory();
-            checkFirstTime(); // NEW: Hint Box Check
+            checkFirstTime(); 
         }
 
-        // --- FIXED: Onboarding Hint Logic ---
         function checkFirstTime() {
             if(!localStorage.getItem('gp_hint_shown')) {
                 const hint = document.getElementById('first-time-hint');
@@ -636,12 +692,11 @@
             document.getElementById('grand-total').innerText = total.toFixed(2);
         }
 
-        // --- FIXED: Highly Organized, Themed PDF Generator for MAKER TAB ---
+        // --- PDF Generator ---
         async function exportPDF() {
             if(cart.length === 0) { await customAlert("The list is currently empty. Please add items first."); return; }
             const isListOnly = appData.settings.listOnlyMode;
             
-            // Build a clean, styled HTML string for PDF
             const container = document.createElement('div');
             container.style.padding = '30px'; 
             container.style.background = '#ffffff'; 
@@ -783,7 +838,7 @@
             saveData(); renderCustomDropdown(); renderInventoryTable();
         }
 
-        // --- History, Data Logic & FIXED HISTORY PDF GENERATOR ---
+        // --- History & Data Logic ---
         function renderHistory() {
             const container = document.getElementById('history-container'); container.innerHTML = '';
             if (appData.lists.length === 0) { container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet.</p>`; return; }
@@ -803,7 +858,6 @@
             });
         }
 
-        // FIXED: History PDF uses the exact same premium theme as Maker PDF
         function downloadHistoryPDF(id) {
             const list = appData.lists.find(l => l.id === id); if(!list) return;
             const isListOnly = appData.settings.listOnlyMode;
@@ -887,7 +941,7 @@
             appData.lists = appData.lists.filter(l => l.id !== id); saveData(); renderHistory();
         }
 
-        // --- BLOB BASED BACKUP (Works in WebViews/APKs) ---
+        // --- BLOB BASED BACKUP ---
         function downloadBackup() {
             const jsonStr = JSON.stringify(appData);
             const blob = new Blob([jsonStr], { type: "application/json" });
@@ -916,7 +970,7 @@
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.inventory && parsed.lists && parsed.settings) {
                         appData = parsed; 
-                        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"]; // backward compat
+                        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
                         saveData(); init(); 
                         await customAlert("Data Restored Successfully!");
                         fileInput.value = ""; document.getElementById('file-name-display').innerText = "No file selected";
