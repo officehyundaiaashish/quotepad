@@ -34,18 +34,11 @@
         }
 
         /* Animations */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-entry { animation: fadeSlideUp 0.4s ease forwards; }
-        .animate-row { animation: fadeIn 0.3s ease forwards; }
 
-        /* Top Bar (Desktop) & Mobile Header */
+        /* Top Bar */
         .top-bar {
             background-color: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -54,60 +47,22 @@
             padding: 1rem 1.5rem;
             z-index: 10;
         }
-
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-right: auto;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-right: auto; display: flex; align-items: center; gap: 0.5rem; }
         .desktop-nav { display: flex; gap: 0.5rem; }
-
         .nav-btn {
-            background: none;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: none; border: none; padding: 0.6rem 1rem; border-radius: 8px; color: var(--text-muted);
+            font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;
         }
-
         .nav-btn:hover { color: var(--text-main); background: #f8fafc; }
         .nav-btn.active { background-color: #d1fae5; color: var(--accent-hover); }
 
         /* Main Workspace */
-        .main-content {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
-
+        .main-content { flex: 1; padding: 1.5rem; overflow-y: auto; scroll-behavior: smooth; }
         .view-section { display: none; max-width: 900px; margin: 0 auto; padding-bottom: 3rem; }
         .view-section.active { display: block; animation: fadeSlideUp 0.3s ease forwards; }
 
         /* Cards */
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            transition: var(--transition);
-        }
-        .card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
-
+        .card { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; transition: var(--transition); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         h2 { font-size: 1.25rem; font-weight: 600; }
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
@@ -116,44 +71,20 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
         @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
         label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-        
-        select, input {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: #f8fafc;
-            outline: none;
-            transition: var(--transition);
-            width: 100%;
-        }
-        select:focus, input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); transform: translateY(-1px); }
+        select, input { padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #f8fafc; outline: none; transition: var(--transition); width: 100%; }
+        select:focus, input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
 
-        /* Inline Edit Inputs for Inventory */
-        .inline-input { padding: 0.4rem; font-size: 0.9rem; margin: 0; background: transparent; border-color: transparent; }
-        .inline-input:focus { background: #fff; border-color: var(--accent); }
-
-        button {
-            padding: 0.75rem 1.5rem;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-        }
+        /* Buttons */
+        button { padding: 0.75rem 1.5rem; background-color: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         button:hover { background-color: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(16,185,129,0.2); }
         button:active { transform: translateY(0); }
-        
         .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
         .btn-outline:hover { background: #d1fae5; color: var(--accent-hover); box-shadow: none; }
         .btn-danger { background: #fee2e2; color: var(--danger); }
         .btn-danger:hover { background: #fca5a5; color: white; box-shadow: none; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; height: auto; }
 
         /* Toggle Switch */
         .toggle-container { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; color: var(--text-muted); }
@@ -165,17 +96,13 @@
         /* Tables */
         .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; min-width: 600px; background: #fff; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; background: #f8fafc; }
         td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-        .delete-btn { background: none; color: var(--danger); padding: 0.4rem; cursor: pointer; border-radius: 6px; }
-        .delete-btn:hover { background: #fee2e2; transform: scale(1.05); }
+        .action-cell { display: flex; gap: 0.5rem; justify-content: center; align-items: center; }
 
         .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; padding: 1.5rem; margin-top: 1rem; background: #fff; border-radius: 8px; border: 1px solid var(--border); }
         
-        .list-only-mode .rate-col { display: none !important; }
-        .list-only-mode .total-row { display: none !important; }
-
         /* Modern File Upload */
         .file-upload-wrapper { position: relative; width: 100%; }
         .file-upload-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
@@ -183,43 +110,25 @@
         .file-upload-wrapper:hover .file-upload-label { background: #d1fae5; }
         .file-name { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Mobile Bottom Navigation Layout */
+        /* Mobile Bottom Nav */
         .mobile-nav { display: none; }
-
         @media (max-width: 768px) {
-            .desktop-nav { display: none; } /* Hide top nav items */
+            .desktop-nav { display: none; }
             .main-content { padding-bottom: 6rem; padding-inline: 1rem; }
-            
-            /* Bottom App Bar */
-            .mobile-nav {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: var(--surface);
-                border-top: 1px solid var(--border);
-                justify-content: space-around;
-                padding: 0.5rem 0;
-                z-index: 100;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            }
-
-            .mobile-nav .nav-btn {
-                flex-direction: column;
-                padding: 0.4rem;
-                font-size: 0.75rem;
-                gap: 0.2rem;
-                border-radius: 8px;
-                width: 70px;
-                background: transparent;
-            }
-
+            .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); justify-content: space-around; padding: 0.5rem 0; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+            .mobile-nav .nav-btn { flex-direction: column; padding: 0.4rem; font-size: 0.75rem; gap: 0.2rem; width: 70px; background: transparent; }
             .mobile-nav .nav-btn.active { color: var(--accent); background: transparent; }
-            .mobile-nav .nav-btn svg { stroke: currentColor; transition: var(--transition); }
+            .mobile-nav .nav-btn svg { transition: var(--transition); }
             .mobile-nav .nav-btn.active svg { transform: translateY(-2px); stroke-width: 2.5; }
-            .table-responsive { border: none; } /* Fix mobile table scroll visual */
+            .table-responsive { border: none; }
         }
+
+        /* Print Utilities */
+        @media print {
+            .no-print { display: none !important; }
+            .blank-write-space { display: block !important; border-bottom: 1px dotted #000; height: 1.5rem; width: 100px; }
+        }
+        .blank-write-space { display: none; } /* Hidden on screen, shown in PDF */
     </style>
 </head>
 <body>
@@ -238,15 +147,14 @@
     </header>
 
     <main class="main-content">
-        
         <section id="maker-view" class="view-section active">
             <div class="card animate-entry">
                 <div class="card-header">
                     <h2>Create New List</h2>
                     <label class="toggle-container">
-                        <input type="checkbox" id="mode-toggle" onchange="toggleMode()" style="display: none;">
+                        <input type="checkbox" id="mode-toggle" onchange="toggleMode()">
                         <div class="toggle-switch"></div>
-                        Hide Rates (Print Only)
+                        Hide Rates (List Only)
                     </label>
                 </div>
                 
@@ -267,20 +175,13 @@
 
                 <div id="print-area">
                     <div class="table-responsive">
-                        <table>
+                        <table id="cart-table">
                             <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th class="num rate-col">Rate</th>
-                                    <th class="num">Qty</th>
-                                    <th class="num rate-col">Amount</th>
-                                    <th class="no-print" style="width: 40px;"></th>
-                                </tr>
-                            </thead>
+                                </thead>
                             <tbody id="cart-body"></tbody>
                         </table>
                     </div>
-                    <div class="total-row">
+                    <div class="total-row" id="total-row-display">
                         <span>Grand Total:</span>
                         <span>₹<span id="grand-total">0.00</span></span>
                     </div>
@@ -322,7 +223,7 @@
 
             <div class="card animate-entry" style="animation-delay: 0.1s;">
                 <h3>Manage Current Inventory</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">You can directly edit Names, Units, and Rates below. Hits 'Enter' to confirm or just click away.</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom:1rem;">Click 'Edit' to make changes, then hit 'Save'.</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -330,7 +231,7 @@
                                 <th>Item Name</th>
                                 <th>Unit</th>
                                 <th class="num">Rate (₹)</th>
-                                <th style="text-align: center;">Action</th>
+                                <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-body"></tbody>
@@ -352,20 +253,19 @@
         <section id="backup-view" class="view-section">
             <div class="card animate-entry">
                 <h2>Data Management</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">Secure your data or transfer it to another device.</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">Backup includes your Inventory, Saved Lists, and Application Settings.</p>
                 
                 <div class="grid-2">
-                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center;">
                         <svg style="margin: 0 auto 1rem; color: var(--accent);" width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         <h3 style="margin-bottom: 0.5rem;">Backup Data</h3>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">Export everything to a JSON file.</p>
                         <button onclick="downloadBackup()" style="width: 100%;">Download JSON</button>
                     </div>
 
-                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center;">
                         <h3 style="margin-bottom: 0.5rem;">Restore Data</h3>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Upload a previously saved backup.</p>
-                        
                         <div class="file-upload-wrapper">
                             <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
                             <div class="file-upload-label">
@@ -416,72 +316,62 @@
             { id: 'i11', name: 'तेल', unit: 'Piece', rate: 10 }
         ];
 
-        let appData = {
-            inventory: JSON.parse(localStorage.getItem('gp_inventory')) || defaultInventory,
-            lists: JSON.parse(localStorage.getItem('gp_lists')) || []
+        let appData = JSON.parse(localStorage.getItem('gp_appData')) || {
+            inventory: defaultInventory,
+            lists: [],
+            settings: { listOnlyMode: false }
         };
+        
         let cart = [];
+        let editingItemId = null; // Tracks which inventory item is currently being edited
 
         function init() {
+            // Apply saved settings
+            document.getElementById('mode-toggle').checked = appData.settings.listOnlyMode;
+            
             renderInventoryDropdown();
+            renderCart(); // Call this first as it handles the table headers
             renderInventoryTable();
             renderHistory();
         }
 
         function saveData() {
-            localStorage.setItem('gp_inventory', JSON.stringify(appData.inventory));
-            localStorage.setItem('gp_lists', JSON.stringify(appData.lists));
+            localStorage.setItem('gp_appData', JSON.stringify(appData));
         }
 
-        // --- Utils: Keyboard Interaction ---
         function handleEnter(e, callback) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                callback();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); callback(); }
         }
 
-        // --- Navigation ---
         function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.remove('active');
-                // reset animation
-                el.style.animation = 'none';
-                el.offsetHeight; 
-                el.style.animation = null;
-            });
+            document.querySelectorAll('.view-section').forEach(el => { el.classList.remove('active'); el.style.animation = 'none'; el.offsetHeight; el.style.animation = null; });
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            
             document.getElementById(`${tabId}-view`).classList.add('active');
             
-            // Sync active state for both mobile and desktop nav buttons
             const tabIndex = Array.from(btnElement.parentElement.children).indexOf(btnElement);
             document.querySelectorAll('.desktop-nav .nav-btn')[tabIndex].classList.add('active');
             document.querySelectorAll('.mobile-nav .nav-btn')[tabIndex].classList.add('active');
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // --- List Maker Logic ---
         function toggleMode() {
-            const isListOnly = document.getElementById('mode-toggle').checked;
-            const area = document.getElementById('print-area');
-            isListOnly ? area.classList.add('list-only-mode') : area.classList.remove('list-only-mode');
+            appData.settings.listOnlyMode = document.getElementById('mode-toggle').checked;
+            saveData();
+            renderCart(); // Re-render to swap columns
         }
 
         function renderInventoryDropdown() {
             const select = document.getElementById('item-select');
             select.innerHTML = '<option value="" disabled selected>Select Item...</option>';
-            appData.inventory.forEach(item => {
-                select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            });
+            appData.inventory.forEach(item => { select.innerHTML += `<option value="${item.id}">${item.name}</option>`; });
         }
 
         function updateUnit() {
             const id = document.getElementById('item-select').value;
             const item = appData.inventory.find(i => i.id === id);
             document.getElementById('qty-label').innerText = item ? `Qty (${item.unit})` : 'Quantity';
-            document.getElementById('qty-input').focus(); // Auto focus qty input
+            document.getElementById('qty-input').focus();
         }
 
         function addToCart() {
@@ -498,18 +388,31 @@
             document.getElementById('qty-input').value = "";
             document.getElementById('qty-label').innerText = 'Quantity';
             renderCart();
-            document.getElementById('item-select').focus(); // Bring focus back to start
+            document.getElementById('item-select').focus();
         }
 
         function removeCartItem(idx) { cart.splice(idx, 1); renderCart(); }
 
         function renderCart() {
+            const isListOnly = appData.settings.listOnlyMode;
+            const thead = document.querySelector('#cart-table thead');
             const tbody = document.getElementById('cart-body');
+            const totalRow = document.getElementById('total-row-display');
+            
+            // Set Headers Dynamically based on mode
+            if (isListOnly) {
+                thead.innerHTML = `<tr><th>Item Description</th><th class="num">Qty</th><th>Rate (Write Below)</th><th class="no-print" style="width:40px;"></th></tr>`;
+                totalRow.style.display = 'none';
+            } else {
+                thead.innerHTML = `<tr><th>Item Description</th><th class="num">Rate</th><th class="num">Qty</th><th class="num">Amount (₹)</th><th class="no-print" style="width:40px;"></th></tr>`;
+                totalRow.style.display = 'flex';
+            }
+
             tbody.innerHTML = '';
             let total = 0;
 
             if (cart.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:2rem;">Add items to build list</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:2rem;">Add items to build list</td></tr>`;
                 document.getElementById('grand-total').innerText = '0.00';
                 return;
             }
@@ -517,15 +420,29 @@
             cart.forEach((item, idx) => {
                 const amt = item.rate * item.qty;
                 total += amt;
-                tbody.innerHTML += `
-                    <tr class="animate-row">
-                        <td style="font-weight: 500;">${item.name}</td>
-                        <td class="num rate-col" style="color:var(--text-muted)">₹${item.rate}</td>
-                        <td class="num">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
-                        <td class="num rate-col" style="font-weight: 600;">₹${amt.toFixed(2)}</td>
-                        <td class="no-print" style="text-align:center;"><button class="delete-btn" onclick="removeCartItem(${idx})"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>
-                    </tr>
-                `;
+                
+                if (isListOnly) {
+                    // Layout: Item | Qty (Middle) | Manual Rate Column
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 500;">${item.name}</td>
+                            <td class="num" style="font-weight: 600;">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
+                            <td><div class="blank-write-space"></div></td>
+                            <td class="no-print" style="text-align:center;"><button class="btn-outline btn-small" style="border:none; color:var(--danger);" onclick="removeCartItem(${idx})">✕</button></td>
+                        </tr>
+                    `;
+                } else {
+                    // Standard Layout
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 500;">${item.name}</td>
+                            <td class="num" style="color:var(--text-muted)">₹${item.rate}</td>
+                            <td class="num">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
+                            <td class="num" style="font-weight: 600;">₹${amt.toFixed(2)}</td>
+                            <td class="no-print" style="text-align:center;"><button class="btn-outline btn-small" style="border:none; color:var(--danger);" onclick="removeCartItem(${idx})">✕</button></td>
+                        </tr>
+                    `;
+                }
             });
             document.getElementById('grand-total').innerText = total.toFixed(2);
         }
@@ -552,11 +469,17 @@
             if(cart.length === 0) return alert("List is empty!");
             const hideElems = document.querySelectorAll('.no-print');
             hideElems.forEach(el => el.style.display = 'none');
-            const printArea = document.getElementById('print-area');
             
+            // Show the blank write spaces explicitly for PDF when in list mode
+            const writeSpaces = document.querySelectorAll('.blank-write-space');
+            if(appData.settings.listOnlyMode) {
+                writeSpaces.forEach(el => el.style.display = 'block');
+            }
+
+            const printArea = document.getElementById('print-area');
             const title = document.createElement('h2');
             title.id = 'temp-title';
-            title.innerText = document.getElementById('mode-toggle').checked ? 'Grocery List' : 'Quotation';
+            title.innerText = appData.settings.listOnlyMode ? 'Grocery List (Manual Entry)' : 'Quotation';
             title.style.marginBottom = '20px';
             printArea.prepend(title);
 
@@ -567,11 +490,14 @@
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             }).from(printArea).save().then(() => {
                 hideElems.forEach(el => el.style.display = '');
+                writeSpaces.forEach(el => el.style.display = ''); // Revert CSS handling
                 document.getElementById('temp-title').remove();
             });
         }
 
-        // --- Inventory Logic (FULLY EDITABLE) ---
+        // --- EXPLICIT Inventory Logic ---
+        const unitOptions = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
+
         function addNewItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value;
@@ -590,57 +516,67 @@
             document.getElementById('new-item-name').focus();
         }
 
-        const unitOptions = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
-
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-body');
             tbody.innerHTML = '';
             appData.inventory.forEach(item => {
-                
-                // Build options for select dropdown
-                let selectHtml = `<select class="inline-input" onchange="updateInventoryItem('${item.id}', 'unit', this.value)">`;
-                unitOptions.forEach(u => {
-                    selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`;
-                });
-                selectHtml += `</select>`;
+                if (editingItemId === item.id) {
+                    // EDIT MODE
+                    let selectHtml = `<select id="edit-unit-${item.id}" style="padding:0.4rem; font-size:0.9rem;">`;
+                    unitOptions.forEach(u => { selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`; });
+                    selectHtml += `</select>`;
 
-                tbody.innerHTML += `
-                    <tr class="animate-row">
-                        <td>
-                            <input type="text" class="inline-input" value="${item.name}" 
-                                onchange="updateInventoryItem('${item.id}', 'name', this.value)"
-                                style="width: 100%; font-weight: 500;">
-                        </td>
-                        <td>${selectHtml}</td>
-                        <td class="num">
-                            <input type="number" class="inline-input num" value="${item.rate}" 
-                                onchange="updateInventoryItem('${item.id}', 'rate', this.value)" 
-                                style="width: 80px; text-align: right;">
-                        </td>
-                        <td style="text-align: center;">
-                            <button class="delete-btn" onclick="deleteItem('${item.id}')" title="Delete">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                    tbody.innerHTML += `
+                        <tr style="background:#f0fdf4;">
+                            <td><input type="text" id="edit-name-${item.id}" value="${item.name}" style="padding:0.4rem; font-size:0.9rem;"></td>
+                            <td>${selectHtml}</td>
+                            <td class="num"><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:80px; padding:0.4rem; text-align:right;"></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-small" onclick="saveEditItem('${item.id}')">Save</button>
+                                    <button class="btn-outline btn-small" onclick="cancelEdit()">Cancel</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // VIEW MODE
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 500;">${item.name}</td>
+                            <td>${item.unit}</td>
+                            <td class="num">₹${item.rate}</td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-outline btn-small" onclick="startEditItem('${item.id}')">Edit</button>
+                                    <button class="btn-danger btn-small" onclick="deleteItem('${item.id}')">Del</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
             });
         }
 
-        function updateInventoryItem(id, field, value) {
-            const item = appData.inventory.find(i => i.id === id);
-            if (!item) return;
+        function startEditItem(id) { editingItemId = id; renderInventoryTable(); }
+        function cancelEdit() { editingItemId = null; renderInventoryTable(); }
 
-            if (field === 'rate') {
-                const rate = parseFloat(value);
-                if (isNaN(rate) || rate < 0) return;
-                item.rate = rate;
-            } else {
-                item[field] = value;
-            }
+        function saveEditItem(id) {
+            const newName = document.getElementById(`edit-name-${id}`).value.trim();
+            const newUnit = document.getElementById(`edit-unit-${id}`).value;
+            const newRate = parseFloat(document.getElementById(`edit-rate-${id}`).value);
+
+            if (!newName || isNaN(newRate) || newRate < 0) return alert("Invalid inputs!");
+
+            const item = appData.inventory.find(i => i.id === id);
+            item.name = newName;
+            item.unit = newUnit;
+            item.rate = newRate;
             
+            editingItemId = null;
             saveData();
             renderInventoryDropdown(); 
+            renderInventoryTable();
         }
 
         function deleteItem(id) {
@@ -651,15 +587,14 @@
             renderInventoryTable();
         }
 
-        // --- History Logic ---
+        // --- History & Data Logic (Unchanged but uses unified appData) ---
         function renderHistory() {
             const container = document.getElementById('history-container');
             container.innerHTML = '';
             if (appData.lists.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet. Create one in the List Maker!</p>`;
+                container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet.</p>`;
                 return;
             }
-
             appData.lists.slice().reverse().forEach(list => {
                 container.innerHTML += `
                     <div class="card" style="margin-bottom:0; display:flex; flex-direction:column;">
@@ -668,9 +603,7 @@
                         <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 1rem;">${list.items.length} Items | Total: <span style="color:var(--text-main); font-weight:600;">₹${list.total.toFixed(2)}</span></p>
                         <div style="display: flex; gap: 0.5rem; margin-top: auto;">
                             <button class="btn-outline" style="flex:1; padding:0.5rem;" onclick="loadList('${list.id}')">Load</button>
-                            <button class="btn-danger" style="padding:0.5rem;" onclick="deleteList('${list.id}')">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
+                            <button class="btn-danger" style="padding:0.5rem;" onclick="deleteList('${list.id}')">Del</button>
                         </div>
                     </div>
                 `;
@@ -691,7 +624,6 @@
             renderHistory();
         }
 
-        // --- Backup & Restore Logic ---
         function downloadBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
             const dlAnchorElem = document.createElement('a');
@@ -720,19 +652,17 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed.inventory && parsed.lists) {
+                    if (parsed.inventory && parsed.lists && parsed.settings) {
                         appData = parsed;
                         saveData();
                         init();
                         alert("Data Restored Successfully!");
-                        fileInput.value = ""; // reset
+                        fileInput.value = ""; 
                         document.getElementById('file-name-display').innerText = "No file selected";
                     } else {
                         alert("Invalid backup file format.");
                     }
-                } catch (err) {
-                    alert("Error reading file.");
-                }
+                } catch (err) { alert("Error reading file."); }
             };
             reader.readAsText(file);
         }
