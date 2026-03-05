@@ -16,7 +16,7 @@
             --solid-surface: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border: #cbd5e1; /* Darkened border for visibility */
+            --border: #cbd5e1; 
             --accent: #10b981; 
             --accent-hover: #059669;
             --accent-light: #d1fae5;
@@ -124,50 +124,60 @@
         input[type="checkbox"]:checked + .toggle-switch { background: var(--accent); }
         input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(20px); }
 
-        /* ---------------------------------------------------------------------------------
-           [FIX 1 & 2 & 4]: STRICT ORGANIZED TABLES WITH FORCED WRAP 
-        --------------------------------------------------------------------------------- */
-        .table-responsive { width: 100%; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; overflow-x: auto; /* Prevent push completely */ }
-        table { width: 100%; border-collapse: collapse; background: #fff; table-layout: auto; }
+        /* ====================================================================
+           1. EXACT MAKER TABLE CSS (CART-TABLE) FOR WRAP, BORDER, SHADES 
+           ==================================================================== */
+        .table-responsive { width: 100%; margin-top: 1rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; overflow: hidden; }
         
-        /* Strict Borders */
-        th, td { border: 1px solid #cbd5e1; padding: 1rem 0.8rem; text-align: left; vertical-align: middle; font-size: 0.95rem; }
-        th { font-weight: 600; color: #0f172a; font-size: 0.85rem; background: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #94a3b8; }
+        #cart-table, #inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* STRICT LAYOUT: FORCES WRAP, STOPS HORIZONTAL PUSH */
+            background: #fff;
+        }
+
+        /* Column widths to prevent overflow */
+        #cart-table th:nth-child(1), #cart-table td:nth-child(1) { width: 38%; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
+        #cart-table th:nth-child(2), #cart-table td:nth-child(2) { width: 15%; text-align: center; }
+        #cart-table th:nth-child(3), #cart-table td:nth-child(3) { width: 27%; text-align: center; }
+        #cart-table th:nth-child(4), #cart-table td:nth-child(4) { width: 12%; text-align: center; }
         
-        /* Strict Zebra Stripes */
-        tbody tr:nth-child(even) td { background-color: #f1f5f9 !important; } 
-        tbody tr:nth-child(odd) td { background-color: #ffffff !important; } 
-        
-        /* FORCED WRAP: Prevents long names from pushing table out of bounds */
-        td:first-child, th:first-child { 
-            white-space: normal !important; 
-            word-wrap: break-word !important; 
-            overflow-wrap: anywhere !important; 
-            width: 45%; /* Limits width */
-            max-width: 250px;
-        } 
-        
-        .action-cell { display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center; }
+        /* Borders & Padding for all cells */
+        #cart-table th, #cart-table td, #inventory-table th, #inventory-table td {
+            border: 1px solid #cbd5e1;
+            padding: 0.8rem 0.5rem;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        #cart-table th, #inventory-table th {
+            font-weight: 600; color: #0f172a; background: #e2e8f0; text-transform: uppercase; font-size: 0.8rem; border-bottom: 2px solid #94a3b8;
+        }
+
+        /* Zebra Striping (Alternating Shades) */
+        #cart-table tbody tr:nth-child(even), #inventory-table tbody tr:nth-child(even) { background-color: #f1f5f9; }
+        #cart-table tbody tr:nth-child(odd), #inventory-table tbody tr:nth-child(odd) { background-color: #ffffff; }
+
         .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 700; padding: 1.2rem 1rem; margin-top: 1rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-        /* ---------------------------------------------------------------------------------
-           [FIX 3]: ANTI-SQUISH QUANTITY CONTROLS (+/-)
-        --------------------------------------------------------------------------------- */
+        /* ====================================================================
+           2. ANTI-SQUISH QUANTITY CONTROLS (+/-) FOR MAKER TABLE
+           ==================================================================== */
         .qty-controls { 
-            display: inline-flex; 
+            display: flex; 
             align-items: center; 
             justify-content: center;
-            gap: 0.4rem; 
+            gap: 6px; 
             background: #ffffff; 
             padding: 4px; 
             border-radius: 8px; 
             border: 1px solid #94a3b8; 
-            flex-wrap: nowrap !important; /* Forces it to stay inline */
-            min-width: max-content !important; /* Protects from getting squished by phone */
+            width: max-content; /* Prevents squishing */
+            margin: 0 auto;
         }
         .qty-btn { 
-            width: 32px; 
-            height: 32px; 
+            width: 28px; 
+            height: 28px; 
             padding: 0; 
             background: #e2e8f0; 
             color: #0f172a; 
@@ -179,12 +189,10 @@
             font-size: 1.2rem; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: all 0.2s; 
-            flex-shrink: 0 !important; /* Protects buttons from shrinking */
+            flex-shrink: 0; /* Protects buttons from shrinking */
         }
-        .qty-btn:hover { background: var(--accent); color: white; }
         .qty-btn:active { transform: scale(0.9); }
-        .qty-value { font-weight: 700; min-width: 2rem; text-align: center; color: var(--text-main); white-space: nowrap; }
+        .qty-value { font-weight: 700; min-width: 24px; text-align: center; color: var(--text-main); font-size: 0.9rem;}
 
         /* File Upload */
         .file-upload-wrapper { position: relative; width: 100%; }
@@ -203,13 +211,10 @@
             .grid-2 { grid-template-columns: 1fr; }
             .grid-3-mobile { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
             
-            /* Tight Mobile Table Layout */
-            th, td { padding: 0.5rem 0.3rem; font-size: 0.85rem; }
-            td:first-child, th:first-child { width: auto; max-width: 130px; } /* Ensures wrap */
-            
-            .qty-controls { padding: 2px; gap: 0.2rem; }
-            .qty-btn { width: 26px; height: 26px; font-size: 1.1rem; }
-            .qty-value { min-width: 1.5rem; font-size: 0.85rem; }
+            #cart-table th, #cart-table td { padding: 0.5rem 0.2rem; font-size: 0.8rem; }
+            .qty-controls { gap: 4px; padding: 2px; }
+            .qty-btn { width: 24px; height: 24px; font-size: 1.1rem; }
+            .qty-value { min-width: 16px; font-size: 0.8rem; }
             
             .btn-small { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
             input, select, .custom-select__trigger { padding: 0.6rem; font-size: 0.9rem; height: 42px;}
@@ -622,6 +627,7 @@
             renderCart();
         }
 
+        // QTY CONTROL BUTTON LOGIC
         function updateQty(idx, change) {
             const newQty = cart[idx].qty + change;
             if (newQty <= 0) removeCartItem(idx); else { cart[idx].qty = Math.round(newQty * 100) / 100; renderCart(); }
@@ -642,10 +648,10 @@
             const totalRow = document.getElementById('total-row-display');
             
             if (isListOnly) {
-                thead.innerHTML = `<tr><th>Item</th><th style="text-align:center;">Qty</th><th>Rate (Write)</th><th class="no-print" style="width:30px; text-align:center;">Del</th></tr>`;
+                thead.innerHTML = `<tr><th>Item</th><th style="text-align:center;">Qty</th><th>Rate (Fill)</th><th class="no-print" style="text-align:center;">Del</th></tr>`;
                 totalRow.style.display = 'none';
             } else {
-                thead.innerHTML = `<tr><th>Item</th><th>Rate</th><th style="text-align:center;">Qty</th><th>Amount(₹)</th><th class="no-print" style="width:30px; text-align:center;">Del</th></tr>`;
+                thead.innerHTML = `<tr><th>Item</th><th>Rate</th><th style="text-align:center;">Qty</th><th>Total(₹)</th><th class="no-print" style="text-align:center;">Del</th></tr>`;
                 totalRow.style.display = 'flex';
             }
 
@@ -658,6 +664,7 @@
             cart.forEach((item, idx) => {
                 const amt = item.rate * item.qty; total += amt;
                 
+                // + / - Buttons added straight into the Maker table row
                 const qtyControls = `
                     <div class="qty-controls">
                         <button class="qty-btn no-print" onclick="updateQty(${idx}, -1)">-</button>
@@ -670,9 +677,9 @@
                     tbody.innerHTML += `
                         <tr>
                             <td style="font-weight: 500;">${item.name}</td>
-                            <td style="text-align:center; padding: 0.5rem 0;">${qtyControls}</td>
+                            <td>${qtyControls}</td>
                             <td><div class="blank-write-space" style="display:block;"></div></td>
-                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem; margin:0 auto; display:block;" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); border:none; padding:0.2rem; cursor:pointer;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 } else {
@@ -680,9 +687,9 @@
                         <tr>
                             <td style="font-weight: 500;">${item.name}</td>
                             <td style="color:var(--text-muted)">₹${item.rate}</td>
-                            <td style="text-align:center; padding: 0.5rem 0;">${qtyControls}</td>
+                            <td>${qtyControls}</td>
                             <td style="font-weight: 600; color:var(--text-main);">₹${amt.toFixed(2)}</td>
-                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem; margin:0 auto; display:block;" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); border:none; padding:0.2rem; cursor:pointer;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 }
@@ -696,14 +703,11 @@
             const isListOnly = appData.settings.listOnlyMode;
             
             const container = document.createElement('div');
-            // FIX: Set strict max-width to fit A4 paper without cutting right side
-            container.style.padding = '30px'; 
+            container.style.padding = '20px'; 
             container.style.background = '#ffffff'; 
             container.style.color = '#0f172a'; 
             container.style.fontFamily = "'Inter', sans-serif"; 
-            container.style.width = '720px'; 
-            container.style.maxWidth = '720px'; 
-            container.style.boxSizing = 'border-box';
+            container.style.width = '100%'; // Fixed: Letting it take natural width of page, no hardcoded pixels
             
             let html = `
                 <div style="border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -716,13 +720,13 @@
                         <strong>Time:</strong> ${new Date().toLocaleTimeString()}
                     </div>
                 </div>
-                <table style="width:100%; border-collapse: collapse; margin-bottom: 25px;">
+                <table style="width:100%; table-layout:fixed; border-collapse: collapse; margin-bottom: 25px;">
                     <thead>
                         <tr style="background:#f0fdf4; text-transform:uppercase; font-size:12px; color:#059669;">
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:left;">Item Description</th>
-                            ${isListOnly ? '' : '<th style="padding:14px; border:1px solid #cbd5e1; text-align:right;">Rate</th>'}
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:right;">Quantity</th>
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Amount (Write)' : 'Total (₹)'}</th>
+                            <th style="width:40%; padding:14px; border:1px solid #cbd5e1; text-align:left;">Item Description</th>
+                            ${isListOnly ? '' : '<th style="width:15%; padding:14px; border:1px solid #cbd5e1; text-align:right;">Rate</th>'}
+                            <th style="width:25%; padding:14px; border:1px solid #cbd5e1; text-align:right;">Quantity</th>
+                            <th style="width:20%; padding:14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Amount (Write)' : 'Total (₹)'}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -735,7 +739,7 @@
                 const bg = index % 2 === 0 ? '#ffffff' : '#f1f5f9';
                 
                 html += `<tr style="background:${bg};">
-                    <td style="padding:12px 14px; border:1px solid #cbd5e1; font-weight:500; font-size: 14px; white-space: normal; word-wrap: break-word; overflow-wrap: anywhere; max-width: 250px;">${item.name}</td>
+                    <td style="padding:12px 14px; border:1px solid #cbd5e1; font-weight:500; font-size: 14px; word-wrap:break-word; overflow-wrap:break-word; white-space:normal;">${item.name}</td>
                     ${isListOnly ? '' : `<td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:right; color:#64748b; font-size: 14px;">₹${item.rate}</td>`}
                     <td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:right; font-weight:600; font-size: 14px;">${item.qty} <span style="font-size:12px; color:#64748b;">${item.unit}</span></td>
                     <td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'}; font-weight:600; font-size: 14px; color: #0f172a;">
@@ -751,11 +755,12 @@
             
             container.innerHTML = html;
             
+            // Fixed margin constraints
             html2pdf().set({ 
-                margin: 0.5, 
+                margin: [0.5, 0.5, 0.5, 0.5], 
                 filename: `GroceryPro_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`, 
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, letterRendering: true, windowWidth: 720 }, // windowWidth force fit
+                html2canvas: { scale: 2, letterRendering: true }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             }).from(container).save();
         }
@@ -862,13 +867,11 @@
             const isListOnly = appData.settings.listOnlyMode;
             
             const container = document.createElement('div');
-            container.style.padding = '30px'; 
+            container.style.padding = '20px'; 
             container.style.background = '#ffffff'; 
             container.style.color = '#0f172a'; 
             container.style.fontFamily = "'Inter', sans-serif"; 
-            container.style.width = '720px'; 
-            container.style.maxWidth = '720px'; 
-            container.style.boxSizing = 'border-box';
+            container.style.width = '100%'; 
             
             let html = `
                 <div style="border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -880,13 +883,13 @@
                         <strong>Saved On:</strong><br>${list.date}
                     </div>
                 </div>
-                <table style="width:100%; border-collapse: collapse; margin-bottom: 25px;">
+                <table style="width:100%; table-layout:fixed; border-collapse: collapse; margin-bottom: 25px;">
                     <thead>
                         <tr style="background:#f0fdf4; text-transform:uppercase; font-size:12px; color:#059669;">
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:left;">Item Description</th>
-                            ${isListOnly ? '' : '<th style="padding:14px; border:1px solid #cbd5e1; text-align:right;">Rate</th>'}
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:right;">Quantity</th>
-                            <th style="padding:14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Amount (Write)' : 'Total (₹)'}</th>
+                            <th style="width:40%; padding:14px; border:1px solid #cbd5e1; text-align:left;">Item Description</th>
+                            ${isListOnly ? '' : '<th style="width:15%; padding:14px; border:1px solid #cbd5e1; text-align:right;">Rate</th>'}
+                            <th style="width:25%; padding:14px; border:1px solid #cbd5e1; text-align:right;">Quantity</th>
+                            <th style="width:20%; padding:14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Amount (Write)' : 'Total (₹)'}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -897,7 +900,7 @@
                 const bg = index % 2 === 0 ? '#ffffff' : '#f1f5f9';
                 
                 html += `<tr style="background:${bg};">
-                    <td style="padding:12px 14px; border:1px solid #cbd5e1; font-weight:500; font-size: 14px; white-space: normal; word-wrap: break-word; overflow-wrap: anywhere; max-width: 250px;">${item.name}</td>
+                    <td style="padding:12px 14px; border:1px solid #cbd5e1; font-weight:500; font-size: 14px; word-wrap:break-word; overflow-wrap:break-word; white-space:normal;">${item.name}</td>
                     ${isListOnly ? '' : `<td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:right; color:#64748b; font-size: 14px;">₹${item.rate}</td>`}
                     <td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:right; font-weight:600; font-size: 14px;">${item.qty} <span style="font-size:12px; color:#64748b;">${item.unit}</span></td>
                     <td style="padding:12px 14px; border:1px solid #cbd5e1; text-align:${isListOnly ? 'left' : 'right'}; font-weight:600; font-size: 14px; color: #0f172a;">
@@ -914,10 +917,10 @@
             container.innerHTML = html;
             
             html2pdf().set({ 
-                margin: 0.5, 
+                margin: [0.5, 0.5, 0.5, 0.5], 
                 filename: `${list.title.replace(/\s+/g, '_')}.pdf`, 
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, letterRendering: true, windowWidth: 720 },
+                html2canvas: { scale: 2, letterRendering: true }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             }).from(container).save();
         }
