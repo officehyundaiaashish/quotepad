@@ -4,11 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#10b981" id="theme-color-meta">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="GroceryPro">
     <title>GroceryPro - Minimalist Planner</title>
+    <link rel="manifest" id="pwa-manifest-link">
+    <script>
+    // ── PWA: Inline Manifest Generator ───────────────────────────────
+    // Generates manifest dynamically so it works from any file:// or http:// path
+    (function() {
+        const manifest = {
+            name: "GroceryPro - Smart Planner",
+            short_name: "GroceryPro",
+            description: "Offline grocery list and quotation maker",
+            start_url: "./",
+            display: "standalone",
+            orientation: "portrait",
+            background_color: "#10b981",
+            theme_color: "#10b981",
+            icons: [
+                {
+                    src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%2310b981'/><path d='M38 38h24l5 20M67 130h100l40-80H54M67 130L54 50M67 130l-23 23c-6 6-2 17 7 17h170m0 0a20 20 0 100 40 20 20 0 000-40zm-80 20a20 20 0 11-40 0 20 20 0 0140 0z' fill='none' stroke='%23fff' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/></svg>`),
+                    sizes: "192x192",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                },
+                {
+                    src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%2310b981'/><path d='M96 96h60l14 56M180 346h268l107-213H144M180 346L144 134M180 346l-62 62c-17 17-5 46 19 46h454m0 0a54 54 0 100 108 54 54 0 000-108zm-214 54a54 54 0 11-108 0 54 54 0 01108 0z' fill='none' stroke='%23fff' stroke-width='36' stroke-linecap='round' stroke-linejoin='round'/></svg>`),
+                    sizes: "512x512",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                }
+            ],
+            categories: ["productivity", "utilities"],
+            screenshots: [],
+            prefer_related_applications: false
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+        document.getElementById('pwa-manifest-link').href = URL.createObjectURL(blob);
+    })();
+
+    // ── PWA: Service Worker Registration ─────────────────────────────
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+const CACHE = 'grocerypro-v1';
+const URLS  = [self.location.pathname || '/'];
+
+self.addEventListener('install', e => {
+    e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+    e.waitUntil(
+        caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+        .then(() => self.clients.claim())
+    );
+});
+self.addEventListener('fetch', e => {
+    if (e.request.method !== 'GET') return;
+    e.respondWith(
+        fetch(e.request)
+            .then(res => {
+                const clone = res.clone();
+                caches.open(CACHE).then(c => c.put(e.request, clone));
+                return res;
+            })
+            .catch(() => caches.match(e.request))
+    );
+});`;
+        const swBlob = new Blob([swCode], {type:'application/javascript'});
+        const swURL  = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swURL, {scope: './'}).catch(() => {});
+    }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         onerror="window._pdfLibMissing=true"></script>
     <style>
@@ -121,7 +189,7 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 999999;
-            transition: opacity .5s ease-in-out, visibility .5s ease-in-out;
+            transition: opacity .3s ease-in-out, visibility .3s ease-in-out;
         }
         #splash-screen.hidden { opacity:0; visibility:hidden; }
         .splash-content {
@@ -1029,19 +1097,23 @@
 
     function applyTheme() {
         document.body.classList.toggle('dark', isDark);
+        document.documentElement.classList.toggle('dark-html', isDark);
         // Set html background too — browser uses html element color for overscroll/bounce flash
         document.documentElement.style.background = isDark ? '#0d1f1a' : '#f0fdf4';
-        const icon  = document.getElementById('theme-icon');
-        const label = document.getElementById('theme-label');
-        const meta  = document.getElementById('theme-color-meta');
+        const icon   = document.getElementById('theme-icon');
+        const label  = document.getElementById('theme-label');
+        const meta   = document.getElementById('theme-color-meta');
+        const apple  = document.getElementById('apple-status-bar-meta');
         if (isDark) {
             icon.innerHTML  = `<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-9H21M3 12H2m15.07-6.07l-.71.71M6.34 17.66l-.71.71M17.66 17.66l.71.71M6.34 6.34l.71.71M12 5a7 7 0 100 14A7 7 0 0012 5z"/>`;
             label.innerText = 'Light';
             meta.content    = '#0d1f1a';
+            apple.content   = 'black';
         } else {
             icon.innerHTML  = `<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;
             label.innerText = 'Dark';
             meta.content    = '#10b981';
+            apple.content   = 'default';
         }
     }
 
@@ -1063,13 +1135,13 @@
         checkFirstTime();
     }
 
-    // Splash fade-out
+    // Splash fade-out — fast (500ms visible, 300ms fade)
     window.addEventListener('load', () => {
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
             splash.classList.add('hidden');
-            setTimeout(() => splash.remove(), 500);
-        }, 1200);
+            setTimeout(() => splash.remove(), 300);
+        }, 500);
     });
 
 
