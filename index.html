@@ -1629,22 +1629,50 @@
 
     async function renderPDF(htmlString, filename) {
         showPDFOverlay();
-        try {
-            await html2pdf()
-                .set({
-                    margin:      [8, 8, 8, 8],
-                    filename,
-                    image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 680 },
-                    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                })
-                .from(htmlString)
-                .save();
-        } catch(e) {
-            console.error('PDF error:', e);
-        } finally {
-            hidePDFOverlay();
+
+        // Method 1: html2pdf (needs internet, works in browser/Chrome)
+        if (typeof html2pdf !== 'undefined') {
+            try {
+                await html2pdf()
+                    .set({
+                        margin:      [8, 8, 8, 8],
+                        filename,
+                        image:       { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 680 },
+                        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    })
+                    .from(htmlString)
+                    .save();
+                hidePDFOverlay();
+                return;
+            } catch(e) {
+                console.warn('html2pdf failed, trying print fallback:', e);
+            }
         }
+
+        hidePDFOverlay();
+
+        // Method 2: Print dialog fallback (works in WebView & PWA)
+        const printWin = window.open('', '_blank');
+        if (printWin) {
+            printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${filename}</title>
+                <style>@media print { body { margin:0; } } body { margin: 0; }</style>
+                </head><body>${htmlString}</body></html>`);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => { printWin.print(); }, 500);
+            return;
+        }
+
+        // Method 3: Share as HTML text (last resort for locked WebViews)
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: filename, text: 'GroceryPro PDF Export', url: window.location.href });
+                return;
+            } catch(e) {}
+        }
+
+        await customAlert("PDF export requires internet (for PDF library) or Chrome browser.\n\nTip: Open this app in Chrome and try again.");
     }
 
     async function exportPDF() {
@@ -1670,15 +1698,49 @@
 
     // ── SECTION 10: DATA BACKUP / RESTORE ────────────────────────────
 
-    function downloadBackup() {
-        const blob = new Blob([JSON.stringify(appData)], { type:'application/json' });
-        const url  = URL.createObjectURL(blob);
-        const a    = Object.assign(document.createElement('a'), {
-            href:     url,
-            download: `GroceryPro_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`,
-        });
-        document.body.appendChild(a); a.click();
-        document.body.removeChild(a); URL.revokeObjectURL(url);
+    // Detect if running inside a WebView / PWA (no proper download support)
+    function isWebView() {
+        const ua = navigator.userAgent || '';
+        return (
+            /wv/.test(ua) ||                          // Android WebView flag
+            /Version\/[\d.]+.*Mobile.*Safari/.test(ua) === false && /Safari/.test(ua) === false ||
+            (typeof window.Android !== 'undefined') || // Android JS bridge
+            window.navigator.standalone === true       // iOS PWA standalone
+        );
+    }
+
+    async function downloadBackup() {
+        const jsonStr  = JSON.stringify(appData, null, 2);
+        const filename = `GroceryPro_Backup_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.json`;
+
+        // Method 1: Web Share API (works great in PWA & Android)
+        if (navigator.share && navigator.canShare) {
+            try {
+                const file = new File([jsonStr], filename, { type: 'application/json' });
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'GroceryPro Backup' });
+                    return;
+                }
+            } catch(e) { /* fall through */ }
+        }
+
+        // Method 2: Standard anchor download (works in browser)
+        try {
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url  = URL.createObjectURL(blob);
+            const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+            return;
+        } catch(e) { /* fall through */ }
+
+        // Method 3: Copy to clipboard fallback (WebView last resort)
+        try {
+            await navigator.clipboard.writeText(jsonStr);
+            await customAlert("Download not supported in this app view.\n\nYour backup data has been COPIED TO CLIPBOARD.\n\nPaste it in any notes app and save as .json file.");
+        } catch(e) {
+            await customAlert("Could not download. Please open this app in Chrome browser for backup/export features.");
+        }
     }
 
     function handleFileSelect(input) {
