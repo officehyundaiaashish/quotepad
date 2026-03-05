@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>GroceryPro - Minimalist Planner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -24,37 +26,20 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* High DPI Text Rendering */
-        * { 
-            box-sizing: border-box; margin: 0; padding: 0; 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-        }
-        body { 
-            background-color: var(--bg); color: var(--text-main); 
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden; 
-            -webkit-font-smoothing: antialiased; 
-            -moz-osx-font-smoothing: grayscale; 
-            text-rendering: optimizeLegibility;
-        }
+        /* High DPI Text Rendering & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
         /* Animations */
         @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .animate-entry { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
         /* Cart Logo Animation */
-        @keyframes driveCart {
-            0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
-            25% { transform: translateX(3px) translateY(-1px) rotate(3deg); }
-            50% { transform: translateX(5px) translateY(0) rotate(0deg); }
-            75% { transform: translateX(3px) translateY(-1px) rotate(-3deg); }
-        }
+        @keyframes driveCart { 0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); } 25% { transform: translateX(3px) translateY(-1px) rotate(3deg); } 50% { transform: translateX(5px) translateY(0) rotate(0deg); } 75% { transform: translateX(3px) translateY(-1px) rotate(-3deg); } }
         .animated-cart { animation: driveCart 2.5s infinite ease-in-out; display: inline-block; }
 
-        /* Top Bar (Glassmorphism) */
-        .top-bar { 
-            background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; 
-        }
+        /* Top Bar */
+        .top-bar { background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; }
         .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-right: auto; display: flex; align-items: center; gap: 0.5rem; }
         .desktop-nav { display: flex; gap: 0.5rem; }
         .nav-btn { background: transparent; border: none; padding: 0.6rem 1rem; border-radius: 8px; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;}
@@ -73,10 +58,10 @@
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
-        @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        .grid-3-action { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; } /* For History/Cart Action Buttons */
+        
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
         label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         input, select { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #f8fafc; outline: none; transition: var(--transition); width: 100%; }
         input:focus, select:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); transform: translateY(-1px); }
 
@@ -99,29 +84,35 @@
         button { padding: 0.75rem 1.5rem; background-color: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 45px;}
         button:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16,185,129,0.3); }
         button:active { transform: translateY(1px) scale(0.96); box-shadow: none; } 
-        .btn-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+        .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
         .btn-outline:hover { background: var(--accent); color: #fff; }
         .btn-danger { background: #fee2e2; color: var(--danger); border: none;}
         .btn-danger:hover { background: #fca5a5; color: white; }
-        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; height: auto; }
+        .btn-small { padding: 0.4rem 0.6rem; font-size: 0.8rem; height: auto; }
+
+        /* Unit Tags in Inventory */
+        .unit-pill { display: inline-flex; align-items: center; background: #f1f5f9; color: var(--text-main); font-size: 0.85rem; padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); }
+        .unit-pill button { background: transparent; border: none; padding: 0 0 0 0.5rem; color: var(--text-muted); height: auto; display: flex; align-items: center; margin: 0; box-shadow: none; }
+        .unit-pill button:hover { color: var(--danger); transform: none; background: transparent; }
 
         /* Toggle */
-        .toggle-container { display: inline-flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 12px; transition: background 0.3s; }
+        .toggle-container { display: inline-flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem; border-radius: 12px; transition: background 0.3s; }
         .toggle-container:hover { background: #f8fafc; }
         .toggle-label-text { font-size: 0.9rem; font-weight: 600; color: var(--text-main); user-select: none; }
-        .toggle-switch { position: relative; width: 50px; height: 28px; background: #cbd5e1; border-radius: 14px; transition: 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch { position: relative; width: 44px; height: 24px; background: #cbd5e1; border-radius: 12px; transition: 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         input[type="checkbox"]:checked + .toggle-switch { background: var(--accent); }
-        input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(22px); }
+        input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(20px); }
 
-        /* Tables */
-        .table-responsive { overflow-x: auto; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; background: #fff; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; background: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px; }
-        td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-        .action-cell { display: flex; gap: 0.5rem; justify-content: center; align-items: center; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; padding: 1.5rem; margin-top: 1rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        /* COMPACT TABLES FOR MOBILE (No Horizontal Scroll) */
+        .table-responsive { width: 100%; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; background: #fff;}
+        table { width: 100%; border-collapse: collapse; background: #fff; table-layout: auto; }
+        th, td { padding: 1rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.95rem;}
+        th { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; background: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px; }
+        td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        td:first-child, th:first-child { width: 100%; line-height: 1.3; } /* Allows Item Name to take max space and wrap */
+        .action-cell { display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 700; padding: 1.2rem 1rem; margin-top: 1rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
         /* File Upload */
         .file-upload-wrapper { position: relative; width: 100%; }
@@ -130,11 +121,22 @@
         .file-upload-wrapper:hover .file-upload-label { background: #d1fae5; }
         .file-name { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Mobile Nav (Glassmorphism) */
+        /* Mobile specific adjustments for true portrait compact view */
         .mobile-nav { display: none; }
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
-            .main-content { padding-bottom: 6rem; padding-inline: 1rem; }
+            .main-content { padding: 1rem; padding-bottom: 6rem; }
+            .card { padding: 1rem; }
+            .grid-3 { grid-template-columns: 1fr; gap: 0.75rem;}
+            .grid-3-action { grid-template-columns: 1fr; } /* stack buttons if needed, or keep inline */
+            .grid-3-mobile { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; } /* specialized mobile action grid */
+            
+            /* Compact table cells for portrait */
+            th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; }
+            .btn-small { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+            input, select, .custom-select__trigger { padding: 0.6rem; font-size: 0.9rem; height: 42px;}
+            button { height: 42px; font-size: 0.9rem; }
+            
             .mobile-nav { 
                 display: flex; position: fixed; bottom: 0; left: 0; width: 100%; 
                 background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -144,30 +146,20 @@
             .mobile-nav .nav-btn.active { color: var(--accent); background: transparent; box-shadow: none;}
             .mobile-nav .nav-btn svg { transition: var(--transition); }
             .mobile-nav .nav-btn.active svg { transform: translateY(-3px); stroke-width: 2.5; filter: drop-shadow(0 2px 4px rgba(16,185,129,0.3)); }
-            .table-responsive { border: none; }
         }
 
         /* CUSTOM DIALOG BOXES CSS */
-        .dialog-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 9999;
-        }
+        .dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 9999; }
         .dialog-overlay.active { opacity: 1; visibility: visible; }
-        .dialog-box {
-            background: var(--solid-surface); width: 90%; max-width: 400px;
-            border-radius: 16px; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-            transform: scale(0.9); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .dialog-box { background: var(--solid-surface); width: 90%; max-width: 350px; border-radius: 16px; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.9); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .dialog-overlay.active .dialog-box { transform: scale(1); }
-        .dialog-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;}
-        .dialog-message { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
-        .dialog-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
-        .dialog-actions button { height: 40px; padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .dialog-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;}
+        .dialog-message { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+        .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+        .dialog-actions button { height: 40px; padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; }
 
         /* Print Logic */
-        @media print { .no-print { display: none !important; } .blank-write-space { display: block !important; border-bottom: 1px dotted #000; height: 1.5rem; width: 100px; } }
+        @media print { .no-print { display: none !important; } .blank-write-space { display: block !important; border-bottom: 1px dotted #000; height: 1.2rem; width: 60px; } }
         .blank-write-space { display: none; }
     </style>
 </head>
@@ -176,7 +168,7 @@
     <div id="custom-dialog" class="dialog-overlay">
         <div class="dialog-box">
             <div id="dialog-title" class="dialog-title">Notice</div>
-            <div id="dialog-message" class="dialog-message">Message goes here.</div>
+            <div id="dialog-message" class="dialog-message">Message</div>
             <div class="dialog-actions">
                 <button id="dialog-cancel" class="btn-outline" style="border:none; color:var(--text-muted);">Cancel</button>
                 <button id="dialog-confirm">OK</button>
@@ -249,54 +241,60 @@
                     </div>
                 </div>
 
-                <div class="grid-2 no-print" style="margin-top: 1.5rem;">
-                    <button class="btn-outline" onclick="saveCurrentList()">Save to History</button>
-                    <button onclick="exportPDF()">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Download PDF
-                    </button>
+                <div class="grid-3-mobile no-print" style="margin-top: 1.5rem;">
+                    <button class="btn-outline" style="border-color: var(--danger); color: var(--danger); padding:0.5rem;" onclick="clearCart()">Clear List</button>
+                    <button class="btn-outline" style="padding:0.5rem;" onclick="saveCurrentList()">Save</button>
+                    <button onclick="exportPDF()" style="padding:0.5rem;">PDF</button>
                 </div>
             </div>
         </section>
 
         <section id="inventory-view" class="view-section">
+            
             <div class="card animate-entry">
-                <h3>Add New Item</h3>
+                <h3>Manage Unit Types</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Add new units like 'Box', 'Katta', 'Dozen' to use them globally.</p>
+                
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <input type="text" id="new-unit-input" placeholder="e.g. Box" onkeypress="handleEnter(event, addNewUnit)" style="height: 42px;">
+                    <button onclick="addNewUnit()" style="width: auto; height: 42px; padding: 0 1rem;">Add</button>
+                </div>
+
+                <div id="unit-tags-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    </div>
+            </div>
+
+            <div class="card animate-entry" style="animation-delay: 0.1s;">
+                <h3>Add New Inventory Item</h3>
                 <div class="grid-3">
                     <div class="input-group">
                         <label>Item Name</label>
                         <input type="text" id="new-item-name" placeholder="e.g. Aashirvaad Atta" onkeypress="handleEnter(event, addNewItem)">
                     </div>
                     <div class="input-group">
-                        <label>Unit Type</label>
+                        <label>Unit</label>
                         <select id="new-item-unit">
-                            <option value="kg">Per kg</option>
-                            <option value="gram">Per 100g</option>
-                            <option value="Ltr">Per Litre</option>
-                            <option value="Piece">Per Piece</option>
-                            <option value="Packet">Per Packet</option>
-                            <option value="Ladi">Per Ladi (लड़ी)</option>
-                        </select>
+                            </select>
                     </div>
                     <div class="input-group">
                         <label>Rate (₹)</label>
                         <input type="number" id="new-item-rate" placeholder="e.g. 50" onkeypress="handleEnter(event, addNewItem)">
                     </div>
                 </div>
-                <button onclick="addNewItem()" style="margin-top: 1rem; width: 100%;">Save Item to Inventory</button>
+                <button onclick="addNewItem()" style="margin-top: 1rem; width: 100%;">Save to Master Inventory</button>
             </div>
 
-            <div class="card animate-entry" style="animation-delay: 0.1s;">
-                <h3>Manage Current Inventory</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom:1rem;">Changes here will Auto-Update in your Cart and Saved History!</p>
+            <div class="card animate-entry" style="animation-delay: 0.2s;">
+                <h3>Current Master Inventory</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom:1rem;">Changes here will Auto-Update in your Cart and Saved History!</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>Item Name</th>
+                                <th>Item</th>
                                 <th>Unit</th>
-                                <th class="num">Rate (₹)</th>
-                                <th style="text-align: center;">Actions</th>
+                                <th class="num">Rate</th>
+                                <th style="text-align: right;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-body"></tbody>
@@ -318,28 +316,28 @@
         <section id="backup-view" class="view-section">
             <div class="card animate-entry">
                 <h2>Data Management</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">Secure your data (Settings, New Inventory Items, Lists) in a JSON file.</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Secure your Settings, Custom Units, Inventory, and Lists in a JSON file. 100% Offline.</p>
                 
                 <div class="grid-2">
-                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center;">
-                        <svg style="margin: 0 auto 1rem; color: var(--accent);" width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <h3 style="margin-bottom: 0.5rem;">Backup Data</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">Export everything to JSON.</p>
-                        <button onclick="downloadBackup()" style="width: 100%;">Download JSON</button>
+                    <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                        <svg style="margin: 0 auto 0.5rem; color: var(--accent);" width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Backup Data</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">Export to a secure JSON file.</p>
+                        <button onclick="downloadBackup()" style="width: 100%;">Download</button>
                     </div>
 
-                    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 12px; text-align: center;">
-                        <h3 style="margin-bottom: 0.5rem;">Restore Data</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Upload a previously saved backup.</p>
-                        <div class="file-upload-wrapper">
+                    <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Restore Data</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Upload a previously saved backup.</p>
+                        <div class="file-upload-wrapper" style="margin-bottom: 0.5rem;">
                             <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
-                            <div class="file-upload-label">
-                                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                <span style="margin-top: 0.5rem; font-weight: 500;">Click or Drag File</span>
+                            <div class="file-upload-label" style="padding: 1rem;">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <span style="margin-top: 0.2rem; font-weight: 500; font-size: 0.8rem;">Select JSON</span>
                             </div>
                         </div>
-                        <div id="file-name-display" class="file-name">No file selected</div>
-                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%; margin-top: 1rem;">Restore Now</button>
+                        <div id="file-name-display" class="file-name" style="font-size: 0.7rem;">No file selected</div>
+                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%; margin-top: 0.5rem;">Restore</button>
                     </div>
                 </div>
             </div>
@@ -366,7 +364,7 @@
     </nav>
 
     <script>
-        // --- CUSTOM IN-APP MODAL LOGIC (Replaces alert & confirm) ---
+        // --- CUSTOM IN-APP MODAL LOGIC ---
         function showDialog(type, title, message) {
             return new Promise((resolve) => {
                 document.getElementById('dialog-title').innerHTML = title;
@@ -381,20 +379,19 @@
                     btnConfirm.style.backgroundColor = 'var(--accent)';
                 } else {
                     btnCancel.style.display = 'block';
-                    btnConfirm.innerText = 'Yes, Delete';
+                    btnConfirm.innerText = 'Confirm';
                     btnConfirm.style.backgroundColor = 'var(--danger)';
                 }
 
                 overlay.classList.add('active');
-
                 btnConfirm.onclick = () => { overlay.classList.remove('active'); resolve(true); };
                 btnCancel.onclick = () => { overlay.classList.remove('active'); resolve(false); };
             });
         }
-        window.customAlert = (msg) => showDialog('alert', '<svg width="24" height="24" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Notice', msg);
-        window.customConfirm = (msg) => showDialog('confirm', '<svg width="24" height="24" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Confirm Action', msg);
+        window.customAlert = (msg) => showDialog('alert', '<svg width="22" height="22" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Notice', msg);
+        window.customConfirm = (msg) => showDialog('confirm', '<svg width="22" height="22" fill="none" stroke="var(--danger)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Confirm Action', msg);
 
-        // Data & State
+        // --- Data & State ---
         const defaultInventory = [
             { id: 'i1', name: 'काले चने', unit: 'kg', rate: 90 },
             { id: 'i2', name: 'राजमा (लाल छोटा)', unit: 'kg', rate: 140 },
@@ -412,14 +409,20 @@
         let appData = JSON.parse(localStorage.getItem('gp_appData')) || {
             inventory: defaultInventory,
             lists: [],
-            settings: { listOnlyMode: false }
+            settings: { listOnlyMode: false },
+            units: ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"] // NEW: Dynamic Units
         };
         
+        // Safety check if units array is missing from old backup
+        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
+
         let cart = [];
         let editingItemId = null; 
 
         function init() {
             document.getElementById('mode-toggle').checked = appData.settings.listOnlyMode;
+            renderUnitManager();
+            renderUnitDropdowns();
             renderCustomDropdown();
             renderCart();
             renderInventoryTable();
@@ -439,6 +442,63 @@
             document.querySelectorAll('.mobile-nav .nav-btn')[tabIndex]?.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // --- UNIT MANAGER LOGIC ---
+        function renderUnitManager() {
+            const container = document.getElementById('unit-tags-container');
+            container.innerHTML = '';
+            appData.units.forEach(u => {
+                container.innerHTML += `
+                    <div class="unit-pill">
+                        ${u}
+                        <button onclick="deleteUnit('${u}')" title="Delete Unit">✕</button>
+                    </div>
+                `;
+            });
+        }
+
+        function renderUnitDropdowns() {
+            const select = document.getElementById('new-item-unit');
+            select.innerHTML = '';
+            appData.units.forEach(u => select.innerHTML += `<option value="${u}">Per ${u}</option>`);
+        }
+
+        async function addNewUnit() {
+            const input = document.getElementById('new-unit-input');
+            const val = input.value.trim();
+            if(!val) return;
+            
+            // Check if exists case-insensitive
+            if(appData.units.map(u => u.toLowerCase()).includes(val.toLowerCase())) {
+                await customAlert("This unit already exists!");
+                return;
+            }
+
+            appData.units.push(val);
+            saveData();
+            input.value = '';
+            renderUnitManager();
+            renderUnitDropdowns();
+            renderInventoryTable(); // re-render inline edits
+        }
+
+        async function deleteUnit(unitName) {
+            const inUse = appData.inventory.some(i => i.unit === unitName);
+            if(inUse) {
+                await customAlert(`Cannot delete '${unitName}'. It is currently being used by items in your inventory. Change their units first.`);
+                return;
+            }
+            
+            const confirmed = await customConfirm(`Are you sure you want to remove '${unitName}' from your available units?`);
+            if(!confirmed) return;
+
+            appData.units = appData.units.filter(u => u !== unitName);
+            saveData();
+            renderUnitManager();
+            renderUnitDropdowns();
+            renderInventoryTable();
+        }
+
 
         // --- List Maker (Custom Dropdown & Cart) ---
         function renderCustomDropdown() {
@@ -461,26 +521,15 @@
             });
         }
 
-        document.querySelector('.custom-select__trigger').addEventListener('click', function() {
-            document.getElementById('myCustomSelect').classList.toggle('open');
-        });
-        window.addEventListener('click', function(e) {
-            const select = document.querySelector('.custom-select');
-            if (!select.contains(e.target)) select.classList.remove('open');
-        });
+        document.querySelector('.custom-select__trigger').addEventListener('click', function() { document.getElementById('myCustomSelect').classList.toggle('open'); });
+        window.addEventListener('click', function(e) { const select = document.querySelector('.custom-select'); if (!select.contains(e.target)) select.classList.remove('open'); });
 
-        function toggleMode() {
-            appData.settings.listOnlyMode = document.getElementById('mode-toggle').checked;
-            saveData(); renderCart();
-        }
+        function toggleMode() { appData.settings.listOnlyMode = document.getElementById('mode-toggle').checked; saveData(); renderCart(); }
 
         async function addToCart() {
             const id = document.getElementById('item-select-value').value;
             const qty = parseFloat(document.getElementById('qty-input').value);
-            if (!id || isNaN(qty) || qty <= 0) {
-                await customAlert("Please select an item and enter a valid quantity!");
-                return;
-            }
+            if (!id || isNaN(qty) || qty <= 0) { await customAlert("Please select an item and enter a valid quantity!"); return; }
 
             const item = appData.inventory.find(i => i.id === id);
             const existing = cart.find(c => c.id === item.id);
@@ -497,6 +546,16 @@
 
         function removeCartItem(idx) { cart.splice(idx, 1); renderCart(); }
 
+        // NEW: Clear Entire List
+        async function clearCart() {
+            if(cart.length === 0) return;
+            const confirmed = await customConfirm("Are you sure you want to clear the entire list? This will remove all added items.");
+            if(confirmed) {
+                cart = [];
+                renderCart();
+            }
+        }
+
         function renderCart() {
             const isListOnly = appData.settings.listOnlyMode;
             const thead = document.querySelector('#cart-table thead');
@@ -504,17 +563,17 @@
             const totalRow = document.getElementById('total-row-display');
             
             if (isListOnly) {
-                thead.innerHTML = `<tr><th>Item Description</th><th class="num">Qty</th><th>Rate (Fill Below)</th><th class="no-print" style="width:40px;"></th></tr>`;
+                thead.innerHTML = `<tr><th>Item</th><th class="num">Qty</th><th>Rate (Write)</th><th class="no-print" style="width:30px;"></th></tr>`;
                 totalRow.style.display = 'none';
             } else {
-                thead.innerHTML = `<tr><th>Item Description</th><th class="num">Rate</th><th class="num">Qty</th><th class="num">Amount (₹)</th><th class="no-print" style="width:40px;"></th></tr>`;
+                thead.innerHTML = `<tr><th>Item</th><th class="num">Rate</th><th class="num">Qty</th><th class="num">Amount (₹)</th><th class="no-print" style="width:30px;"></th></tr>`;
                 totalRow.style.display = 'flex';
             }
 
             tbody.innerHTML = ''; let total = 0;
 
             if (cart.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:3rem;">No items yet. Add something from above!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:3rem 1rem; font-size:0.9rem;">No items yet. Add something from above!</td></tr>`;
                 document.getElementById('grand-total').innerText = '0.00'; return;
             }
 
@@ -524,9 +583,9 @@
                     tbody.innerHTML += `
                         <tr style="animation: fadeSlideUp 0.3s ease;">
                             <td style="font-weight: 500;">${item.name}</td>
-                            <td class="num" style="font-weight: 600;">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
-                            <td><div class="blank-write-space"></div></td>
-                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="num" style="font-weight: 600;">${item.qty} <span style="font-size:0.75em; color:var(--text-muted)">${item.unit}</span></td>
+                            <td><div class="blank-write-space" style="display:block;"></div></td>
+                            <td class="no-print action-cell"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 } else {
@@ -534,9 +593,9 @@
                         <tr style="animation: fadeSlideUp 0.3s ease;">
                             <td style="font-weight: 500;">${item.name}</td>
                             <td class="num" style="color:var(--text-muted)">₹${item.rate}</td>
-                            <td class="num">${item.qty} <span style="font-size:0.8em; color:var(--text-muted)">${item.unit}</span></td>
+                            <td class="num">${item.qty} <span style="font-size:0.75em; color:var(--text-muted)">${item.unit}</span></td>
                             <td class="num" style="font-weight: 600; color:var(--text-main);">₹${amt.toFixed(2)}</td>
-                            <td class="no-print" style="text-align:center;"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
+                            <td class="no-print action-cell"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
                 }
@@ -545,66 +604,49 @@
         }
 
         async function exportPDF() {
-            if(cart.length === 0) {
-                await customAlert("The list is currently empty. Please add items first.");
-                return;
-            }
-            const hideElems = document.querySelectorAll('.no-print');
-            hideElems.forEach(el => el.style.display = 'none');
-            const writeSpaces = document.querySelectorAll('.blank-write-space');
-            if(appData.settings.listOnlyMode) writeSpaces.forEach(el => el.style.display = 'block');
+            if(cart.length === 0) { await customAlert("The list is currently empty. Please add items first."); return; }
+            const hideElems = document.querySelectorAll('.no-print'); hideElems.forEach(el => el.style.display = 'none');
 
             const printArea = document.getElementById('print-area');
-            const title = document.createElement('h2');
-            title.id = 'temp-title';
+            const title = document.createElement('h2'); title.id = 'temp-title';
             title.innerText = appData.settings.listOnlyMode ? 'Grocery List (Manual Entry)' : 'Quotation';
-            title.style.marginBottom = '20px'; title.style.color = '#0f172a';
+            title.style.marginBottom = '20px'; title.style.color = '#0f172a'; title.style.textAlign = 'center';
             printArea.prepend(title);
 
             html2pdf().set({ margin: 0.5, filename: 'Grocery_Doc.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(printArea).save().then(() => {
-                hideElems.forEach(el => el.style.display = '');
-                writeSpaces.forEach(el => el.style.display = '');
-                document.getElementById('temp-title').remove();
+                hideElems.forEach(el => el.style.display = ''); document.getElementById('temp-title').remove();
             });
         }
 
         // --- Inventory Edit Logic & GLOBAL AUTO UPDATE ---
-        const unitOptions = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
-
         async function addNewItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value;
             const rate = parseFloat(document.getElementById('new-item-rate').value);
 
-            if (!name || isNaN(rate) || rate < 0) {
-                await customAlert("Please fill all fields correctly to add a new item.");
-                return;
-            }
-            appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate });
-            saveData();
+            if (!name || isNaN(rate) || rate < 0) { await customAlert("Please fill all fields correctly to add a new item."); return; }
+            appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate }); saveData();
             
             document.getElementById('new-item-name').value = ''; document.getElementById('new-item-rate').value = '';
-            renderCustomDropdown(); renderInventoryTable();
-            document.getElementById('new-item-name').focus();
+            renderCustomDropdown(); renderInventoryTable(); document.getElementById('new-item-name').focus();
         }
 
         function renderInventoryTable() {
-            const tbody = document.getElementById('inventory-body');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('inventory-body'); tbody.innerHTML = '';
             appData.inventory.forEach(item => {
                 if (editingItemId === item.id) {
-                    let selectHtml = `<select id="edit-unit-${item.id}" style="padding:0.4rem; font-size:0.9rem;">`;
-                    unitOptions.forEach(u => { selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`; });
+                    let selectHtml = `<select id="edit-unit-${item.id}" style="padding:0.4rem; font-size:0.85rem; height:35px;">`;
+                    appData.units.forEach(u => { selectHtml += `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`; });
                     selectHtml += `</select>`;
                     tbody.innerHTML += `
                         <tr style="background:#f0fdf4;">
-                            <td><input type="text" id="edit-name-${item.id}" value="${item.name}" style="padding:0.4rem; font-size:0.9rem;"></td>
+                            <td><input type="text" id="edit-name-${item.id}" value="${item.name}" style="padding:0.4rem; font-size:0.85rem; height:35px;"></td>
                             <td>${selectHtml}</td>
-                            <td class="num"><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:80px; padding:0.4rem; text-align:right;"></td>
+                            <td class="num"><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:65px; padding:0.4rem; text-align:right; height:35px;"></td>
                             <td>
                                 <div class="action-cell">
-                                    <button class="btn-small" onclick="saveEditItem('${item.id}')">Save</button>
-                                    <button class="btn-outline btn-small" onclick="cancelEdit()">Cancel</button>
+                                    <button class="btn-small" onclick="saveEditItem('${item.id}')" style="height:30px;">Save</button>
+                                    <button class="btn-outline btn-small" onclick="cancelEdit()" style="height:30px;">X</button>
                                 </div>
                             </td>
                         </tr>
@@ -635,46 +677,22 @@
             const newUnit = document.getElementById(`edit-unit-${id}`).value;
             const newRate = parseFloat(document.getElementById(`edit-rate-${id}`).value);
 
-            if (!newName || isNaN(newRate) || newRate < 0) {
-                await customAlert("Invalid input! Rate must be a number and name cannot be empty.");
-                return;
-            }
+            if (!newName || isNaN(newRate) || newRate < 0) { await customAlert("Invalid input! Rate must be a number and name cannot be empty."); return; }
 
-            // 1. Update in Master Inventory
             const item = appData.inventory.find(i => i.id === id);
             item.name = newName; item.unit = newUnit; item.rate = newRate;
             
-            // 2. AUTO-UPDATE IN CURRENT CART
-            const cartItem = cart.find(c => c.id === id);
-            if(cartItem) {
-                cartItem.name = newName; cartItem.unit = newUnit; cartItem.rate = newRate;
-            }
-
-            // 3. AUTO-UPDATE IN ALL SAVED HISTORY LISTS
-            appData.lists.forEach(list => {
-                let listChanged = false;
-                list.items.forEach(li => {
-                    if(li.id === id) {
-                        li.name = newName; li.unit = newUnit; li.rate = newRate;
-                        listChanged = true;
-                    }
-                });
-                if(listChanged) {
-                    list.total = list.items.reduce((sum, i) => sum + (i.rate * i.qty), 0);
-                }
-            });
+            // AUTO-UPDATE CART & HISTORY
+            const cartItem = cart.find(c => c.id === id); if(cartItem) { cartItem.name = newName; cartItem.unit = newUnit; cartItem.rate = newRate; }
+            appData.lists.forEach(list => { let listChanged = false; list.items.forEach(li => { if(li.id === id) { li.name = newName; li.unit = newUnit; li.rate = newRate; listChanged = true; } }); if(listChanged) list.total = list.items.reduce((sum, i) => sum + (i.rate * i.qty), 0); });
 
             editingItemId = null; saveData();
-            
-            // Re-render everything globally
-            renderCustomDropdown(); renderInventoryTable();
-            renderCart(); renderHistory();
-            
-            await customAlert("Item Updated Successfully! Changes have been auto-synced to your current Cart and all History Lists.");
+            renderCustomDropdown(); renderInventoryTable(); renderCart(); renderHistory();
+            await customAlert("Item Updated Successfully! Synced with Cart & History.");
         }
 
         async function deleteItem(id) {
-            const confirmed = await customConfirm("Are you sure you want to permanently delete this item from your inventory?");
+            const confirmed = await customConfirm("Permanently delete this item from inventory?");
             if(!confirmed) return;
             appData.inventory = appData.inventory.filter(i => i.id !== id);
             saveData(); renderCustomDropdown(); renderInventoryTable();
@@ -682,21 +700,17 @@
 
         // --- History, Data Logic & HISTORY PDF GENERATOR ---
         function renderHistory() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = '';
-            if (appData.lists.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet.</p>`;
-                return;
-            }
+            const container = document.getElementById('history-container'); container.innerHTML = '';
+            if (appData.lists.length === 0) { container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet.</p>`; return; }
             appData.lists.slice().reverse().forEach(list => {
                 container.innerHTML += `
                     <div class="card" style="margin-bottom:0; display:flex; flex-direction:column;">
                         <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">${list.date}</div>
                         <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">${list.title}</div>
                         <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 1rem;">${list.items.length} Items | Total: <span style="color:var(--text-main); font-weight:600;">₹${list.total.toFixed(2)}</span></p>
-                        <div style="display: flex; gap: 0.4rem; margin-top: auto;">
-                            <button class="btn-outline" style="flex:1; padding:0.4rem; font-size:0.85rem;" onclick="loadList('${list.id}')">Load</button>
-                            <button class="btn-outline" style="flex:1; padding:0.4rem; font-size:0.85rem; color:var(--text-main); border-color:var(--text-muted);" onclick="downloadHistoryPDF('${list.id}')">PDF</button>
+                        <div class="grid-3-action" style="margin-top: auto;">
+                            <button class="btn-outline" style="padding:0.4rem; font-size:0.85rem;" onclick="loadList('${list.id}')">Load</button>
+                            <button class="btn-outline" style="padding:0.4rem; font-size:0.85rem; color:var(--text-main); border-color:var(--text-muted);" onclick="downloadHistoryPDF('${list.id}')">PDF</button>
                             <button class="btn-danger" style="padding:0.4rem; font-size:0.85rem;" onclick="deleteList('${list.id}')">Del</button>
                         </div>
                     </div>
@@ -704,37 +718,22 @@
             });
         }
 
-        // Generates PDF directly from a history list without loading it to cart
         function downloadHistoryPDF(id) {
-            const list = appData.lists.find(l => l.id === id);
-            if(!list) return;
-
+            const list = appData.lists.find(l => l.id === id); if(!list) return;
             const isListOnly = appData.settings.listOnlyMode;
             const container = document.createElement('div');
-            container.style.padding = '20px';
-            container.style.background = '#fff';
-            container.style.color = '#0f172a';
-            container.style.fontFamily = "'Inter', sans-serif";
-            container.style.width = '800px'; 
-
+            container.style.padding = '20px'; container.style.background = '#fff'; container.style.color = '#0f172a'; container.style.fontFamily = "'Inter', sans-serif"; container.style.width = '800px'; 
             let html = `
                 <h2 style="text-align:center; margin-bottom:20px; color:#0f172a;">${isListOnly ? 'Grocery List (Manual Entry)' : 'Quotation'}</h2>
-                <div style="margin-bottom: 20px; color: #64748b; font-size: 0.9rem;">
-                    <strong>Date:</strong> ${list.date}<br>
-                    <strong>Title:</strong> ${list.title}
-                </div>
+                <div style="margin-bottom: 20px; color: #64748b; font-size: 0.9rem;"><strong>Date:</strong> ${list.date}<br><strong>Title:</strong> ${list.title}</div>
                 <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
-                    <thead>
-                        <tr style="background:#f8fafc; text-transform:uppercase; font-size:0.85rem; color:#64748b;">
-                            <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:left;">Item Description</th>
-                            ${isListOnly ? '' : '<th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Rate</th>'}
-                            <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Qty</th>
-                            <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Rate (Fill Below)' : 'Amount (₹)'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <thead><tr style="background:#f8fafc; text-transform:uppercase; font-size:0.85rem; color:#64748b;">
+                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:left;">Item</th>
+                        ${isListOnly ? '' : '<th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Rate</th>'}
+                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Qty</th>
+                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Rate (Fill)' : 'Amount (₹)'}</th>
+                    </tr></thead><tbody>
             `;
-
             list.items.forEach(item => {
                 const amt = item.rate * item.qty;
                 html += `<tr>
@@ -746,30 +745,17 @@
                     </td>
                 </tr>`;
             });
-
             html += `</tbody></table>`;
-            if (!isListOnly) {
-                html += `<div style="text-align:right; font-size:1.25rem; font-weight:700; margin-top:20px; padding-top:20px; border-top:2px solid #e2e8f0;">Grand Total: ₹${list.total.toFixed(2)}</div>`;
-            }
+            if (!isListOnly) html += `<div style="text-align:right; font-size:1.25rem; font-weight:700; margin-top:20px; padding-top:20px; border-top:2px solid #e2e8f0;">Grand Total: ₹${list.total.toFixed(2)}</div>`;
             container.innerHTML = html;
-
-            html2pdf().set({
-                margin: 0.5,
-                filename: `${list.title.replace(/\s+/g, '_')}.pdf`,
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(container).save();
+            html2pdf().set({ margin: 0.5, filename: `${list.title.replace(/\s+/g, '_')}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(container).save();
         }
 
         async function saveCurrentList() {
-            if (cart.length === 0) {
-                await customAlert("Cart is empty! Cannot save a blank list.");
-                return;
-            }
+            if (cart.length === 0) { await customAlert("Cart is empty! Cannot save."); return; }
             const total = cart.reduce((sum, item) => sum + (item.rate * item.qty), 0);
             appData.lists.push({ id: 'list_' + Date.now(), date: new Date().toLocaleString(), title: `List - ${new Date().toLocaleDateString()}`, items: [...cart], total: total });
-            saveData(); renderHistory(); 
-            await customAlert("List Saved to History successfully!");
+            saveData(); renderHistory(); await customAlert("List Saved to History successfully!");
             cart = []; renderCart();
         }
 
@@ -782,16 +768,21 @@
         async function deleteList(id) {
             const confirmed = await customConfirm("Delete this saved list? This action cannot be undone.");
             if(!confirmed) return;
-            appData.lists = appData.lists.filter(l => l.id !== id);
-            saveData(); renderHistory();
+            appData.lists = appData.lists.filter(l => l.id !== id); saveData(); renderHistory();
         }
 
+        // --- BLOB BASED BACKUP (Works in WebViews/APKs) ---
         function downloadBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `GroceryPro_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`);
-            dlAnchorElem.click();
+            const jsonStr = JSON.stringify(appData);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `GroceryPro_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function handleFileSelect(input) {
@@ -802,24 +793,19 @@
 
         async function restoreBackup() {
             const fileInput = document.getElementById('restore-file');
-            if (!fileInput.files.length) {
-                await customAlert("Please select a JSON backup file first.");
-                return;
-            }
+            if (!fileInput.files.length) { await customAlert("Please select a JSON backup file first."); return; }
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.inventory && parsed.lists && parsed.settings) {
-                        appData = parsed; saveData(); init(); 
+                        appData = parsed; 
+                        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"]; // backward compat
+                        saveData(); init(); 
                         await customAlert("Data Restored Successfully!");
                         fileInput.value = ""; document.getElementById('file-name-display').innerText = "No file selected";
-                    } else {
-                        await customAlert("Invalid backup file format.");
-                    }
-                } catch (err) { 
-                    await customAlert("Error reading file."); 
-                }
+                    } else { await customAlert("Invalid backup file format."); }
+                } catch (err) { await customAlert("Error reading file."); }
             };
             reader.readAsText(fileInput.files[0]);
         }
