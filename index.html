@@ -38,6 +38,21 @@
         @keyframes driveCart { 0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); } 25% { transform: translateX(3px) translateY(-1px) rotate(3deg); } 50% { transform: translateX(5px) translateY(0) rotate(0deg); } 75% { transform: translateX(3px) translateY(-1px) rotate(-3deg); } }
         .animated-cart { animation: driveCart 2.5s infinite ease-in-out; display: inline-block; }
 
+        /* FIRST TIME HINT (Tooltip Box) */
+        .hint-box {
+            display: none; position: relative; background: var(--accent); color: white;
+            padding: 1rem; border-radius: 8px; font-size: 0.85rem; margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); animation: fadeSlideUp 0.5s ease;
+            line-height: 1.4;
+        }
+        .hint-box::before {
+            content: ''; position: absolute; top: -6px; left: 20px;
+            border-width: 0 8px 8px 8px; border-style: solid;
+            border-color: transparent transparent var(--accent) transparent;
+        }
+        .hint-box button { background: rgba(0,0,0,0.2); height: 30px; padding: 0 1rem; font-size: 0.8rem; margin-top: 0.5rem; border-radius: 6px; box-shadow: none; width: auto;}
+        .hint-box button:hover { background: rgba(0,0,0,0.3); transform: none;}
+
         /* Top Bar */
         .top-bar { background-color: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 1rem 1.5rem; z-index: 10; }
         .logo { font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-right: auto; display: flex; align-items: center; gap: 0.5rem; }
@@ -53,12 +68,15 @@
 
         /* Cards & Forms */
         .card { background: var(--solid-surface); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 1.5rem; transition: var(--transition); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-        h2 { font-size: 1.25rem; font-weight: 600; }
-        h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.2rem;}
+        h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.2rem; }
+        .sub-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.4; }
+        
+        /* Grid Layouts (Responsive) */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { display: grid; grid-template-columns: 2fr 1fr auto; gap: 1rem; align-items: end; }
-        .grid-3-action { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; } /* For History/Cart Action Buttons */
+        .action-bar { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; align-items: center;}
         
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
         label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -81,14 +99,16 @@
         .custom-option.selected { background-color: var(--accent); color: #fff; }
 
         /* Buttons */
-        button { padding: 0.75rem 1.5rem; background-color: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 45px;}
+        button { padding: 0.75rem 1.5rem; background-color: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 45px; white-space: nowrap;}
         button:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16,185,129,0.3); }
         button:active { transform: translateY(1px) scale(0.96); box-shadow: none; } 
         .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
         .btn-outline:hover { background: var(--accent); color: #fff; }
+        .btn-danger-outline { background: transparent; color: var(--danger); border: 1.5px solid var(--danger); }
+        .btn-danger-outline:hover { background: var(--danger); color: white; }
         .btn-danger { background: #fee2e2; color: var(--danger); border: none;}
         .btn-danger:hover { background: #fca5a5; color: white; }
-        .btn-small { padding: 0.4rem 0.6rem; font-size: 0.8rem; height: auto; }
+        .btn-small { padding: 0.4rem 0.6rem; font-size: 0.8rem; height: auto; width: auto;}
 
         /* Unit Tags in Inventory */
         .unit-pill { display: inline-flex; align-items: center; background: #f1f5f9; color: var(--text-main); font-size: 0.85rem; padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); }
@@ -96,7 +116,7 @@
         .unit-pill button:hover { color: var(--danger); transform: none; background: transparent; }
 
         /* Toggle */
-        .toggle-container { display: inline-flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem; border-radius: 12px; transition: background 0.3s; }
+        .toggle-container { display: inline-flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem; border-radius: 12px; transition: background 0.3s; margin-left: auto;}
         .toggle-container:hover { background: #f8fafc; }
         .toggle-label-text { font-size: 0.9rem; font-weight: 600; color: var(--text-main); user-select: none; }
         .toggle-switch { position: relative; width: 44px; height: 24px; background: #cbd5e1; border-radius: 12px; transition: 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
@@ -104,13 +124,13 @@
         input[type="checkbox"]:checked + .toggle-switch { background: var(--accent); }
         input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(20px); }
 
-        /* COMPACT TABLES FOR MOBILE (No Horizontal Scroll) */
+        /* COMPACT TABLES FOR MOBILE */
         .table-responsive { width: 100%; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; background: #fff;}
         table { width: 100%; border-collapse: collapse; background: #fff; table-layout: auto; }
         th, td { padding: 1rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.95rem;}
         th { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; background: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px; }
         td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-        td:first-child, th:first-child { width: 100%; line-height: 1.3; } /* Allows Item Name to take max space and wrap */
+        td:first-child, th:first-child { width: 100%; line-height: 1.3; } 
         .action-cell { display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center; }
         .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 700; padding: 1.2rem 1rem; margin-top: 1rem; background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
@@ -121,15 +141,24 @@
         .file-upload-wrapper:hover .file-upload-label { background: #d1fae5; }
         .file-name { margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Mobile specific adjustments for true portrait compact view */
+        /* Responsive Breakpoints */
         .mobile-nav { display: none; }
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
             .main-content { padding: 1rem; padding-bottom: 6rem; }
             .card { padding: 1rem; }
+            
+            /* Stack Backup/Restore & Form Grids vertically */
+            .grid-2 { grid-template-columns: 1fr; gap: 1rem; }
             .grid-3 { grid-template-columns: 1fr; gap: 0.75rem;}
-            .grid-3-action { grid-template-columns: 1fr; } /* stack buttons if needed, or keep inline */
-            .grid-3-mobile { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; } /* specialized mobile action grid */
+            
+            /* Action Bar (Save/PDF) spreads evenly on mobile */
+            .action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; justify-content: stretch; }
+            .action-bar button { width: 100%; justify-content: center;}
+            .btn-clear-mobile { grid-column: span 2; } /* Clear button takes full width on top */
+
+            /* History Buttons Stack Fix */
+            .history-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
             
             /* Compact table cells for portrait */
             th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; }
@@ -148,6 +177,12 @@
             .mobile-nav .nav-btn.active svg { transform: translateY(-3px); stroke-width: 2.5; filter: drop-shadow(0 2px 4px rgba(16,185,129,0.3)); }
         }
 
+        /* Desktop specific flex for Action Bar */
+        @media (min-width: 769px) {
+            .history-actions { display: flex; gap: 0.5rem; }
+            .history-actions button { flex: 1; }
+        }
+
         /* CUSTOM DIALOG BOXES CSS */
         .dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 9999; }
         .dialog-overlay.active { opacity: 1; visibility: visible; }
@@ -157,10 +192,9 @@
         .dialog-message { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
         .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
         .dialog-actions button { height: 40px; padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; }
-
-        /* Print Logic */
-        @media print { .no-print { display: none !important; } .blank-write-space { display: block !important; border-bottom: 1px dotted #000; height: 1.2rem; width: 60px; } }
-        .blank-write-space { display: none; }
+        
+        .no-print { display: block; }
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body>
@@ -194,15 +228,18 @@
         <section id="maker-view" class="view-section active">
             <div class="card animate-entry">
                 <div class="card-header">
-                    <h2>Create New List</h2>
+                    <div>
+                        <h2>🛒 Build Your Grocery List</h2>
+                        <p class="sub-text">Add items from your inventory to generate a quotation or a manual fill-up bill.</p>
+                    </div>
                     <label class="toggle-container">
-                        <span class="toggle-label-text">Hide Rates (For Shop)</span>
+                        <span class="toggle-label-text">Hide Rates (Print Blank Bill)</span>
                         <input type="checkbox" id="mode-toggle" onchange="toggleMode()" style="display: none;">
                         <div class="toggle-switch"></div>
                     </label>
                 </div>
                 
-                <div class="grid-3 no-print" style="margin-bottom: 1.5rem;">
+                <div class="grid-3 no-print" style="margin-bottom: 0.5rem; position: relative;">
                     <div class="input-group">
                         <label>Select Item</label>
                         <div class="custom-select-wrapper">
@@ -216,6 +253,12 @@
                             </div>
                         </div>
                         <input type="hidden" id="item-select-value">
+                        
+                        <div id="first-time-hint" class="hint-box">
+                            <strong>Item missing?</strong><br>
+                            Head over to the <b>Inventory Tab</b> below (or above) to add new custom groceries and units!
+                            <button onclick="dismissHint()">Got it!</button>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -241,10 +284,13 @@
                     </div>
                 </div>
 
-                <div class="grid-3-mobile no-print" style="margin-top: 1.5rem;">
-                    <button class="btn-outline" style="border-color: var(--danger); color: var(--danger); padding:0.5rem;" onclick="clearCart()">Clear List</button>
-                    <button class="btn-outline" style="padding:0.5rem;" onclick="saveCurrentList()">Save</button>
-                    <button onclick="exportPDF()" style="padding:0.5rem;">PDF</button>
+                <div class="action-bar no-print">
+                    <button class="btn-danger-outline btn-clear-mobile" onclick="clearCart()">Clear List</button>
+                    <button class="btn-outline" onclick="saveCurrentList()">Save List</button>
+                    <button onclick="exportPDF()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Export PDF
+                    </button>
                 </div>
             </div>
         </section>
@@ -252,20 +298,19 @@
         <section id="inventory-view" class="view-section">
             
             <div class="card animate-entry">
-                <h3>Manage Unit Types</h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Add new units like 'Box', 'Katta', 'Dozen' to use them globally.</p>
+                <h2>📏 Manage Unit Types</h2>
+                <p class="sub-text">Add custom measuring units like 'Box', 'Katta', 'Dozen' to use them globally across your inventory.</p>
                 
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
                     <input type="text" id="new-unit-input" placeholder="e.g. Box" onkeypress="handleEnter(event, addNewUnit)" style="height: 42px;">
-                    <button onclick="addNewUnit()" style="width: auto; height: 42px; padding: 0 1rem;">Add</button>
+                    <button onclick="addNewUnit()" style="width: auto; height: 42px; padding: 0 1rem;">Add Unit</button>
                 </div>
-
-                <div id="unit-tags-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    </div>
+                <div id="unit-tags-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
             </div>
 
             <div class="card animate-entry" style="animation-delay: 0.1s;">
-                <h3>Add New Inventory Item</h3>
+                <h2>➕ Add New Inventory Item</h2>
+                <p class="sub-text">Items saved here will be permanently available in your dropdown menu for making bills.</p>
                 <div class="grid-3">
                     <div class="input-group">
                         <label>Item Name</label>
@@ -273,8 +318,7 @@
                     </div>
                     <div class="input-group">
                         <label>Unit</label>
-                        <select id="new-item-unit">
-                            </select>
+                        <select id="new-item-unit"></select>
                     </div>
                     <div class="input-group">
                         <label>Rate (₹)</label>
@@ -285,8 +329,8 @@
             </div>
 
             <div class="card animate-entry" style="animation-delay: 0.2s;">
-                <h3>Current Master Inventory</h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom:1rem;">Changes here will Auto-Update in your Cart and Saved History!</p>
+                <h2>📦 Current Master Inventory</h2>
+                <p class="sub-text">Click 'Edit' to modify items directly. <b>Auto-Sync:</b> Changes here instantly update inside your Cart and Saved History!</p>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -306,7 +350,10 @@
         <section id="history-view" class="view-section">
             <div class="card animate-entry">
                 <div class="card-header">
-                    <h2>Saved Quotations</h2>
+                    <div>
+                        <h2>📂 Saved Lists & Bills</h2>
+                        <p class="sub-text">Access your previously saved lists here. You can load them back into the editor or instantly download their PDF.</p>
+                    </div>
                 </div>
                 <div id="history-container" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
                     </div>
@@ -315,29 +362,29 @@
 
         <section id="backup-view" class="view-section">
             <div class="card animate-entry">
-                <h2>Data Management</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Secure your Settings, Custom Units, Inventory, and Lists in a JSON file. 100% Offline.</p>
+                <h2>☁️ Data Management</h2>
+                <p class="sub-text">100% Offline and Secure. Keep a backup of your Settings, Custom Units, Inventory, and Lists in a single JSON file. Works beautifully across App and Web!</p>
                 
                 <div class="grid-2">
                     <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; text-align: center;">
                         <svg style="margin: 0 auto 0.5rem; color: var(--accent);" width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Backup Data</h3>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">Export to a secure JSON file.</p>
-                        <button onclick="downloadBackup()" style="width: 100%;">Download</button>
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Backup Data</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">Download your entire database to a secure file. Keep it safe!</p>
+                        <button onclick="downloadBackup()" style="width: 100%;">Download JSON</button>
                     </div>
 
                     <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; text-align: center;">
-                        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Restore Data</h3>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Upload a previously saved backup.</p>
+                        <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Restore Data</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; line-height: 1.4;">Upload a previously saved backup file to restore everything.</p>
                         <div class="file-upload-wrapper" style="margin-bottom: 0.5rem;">
                             <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
-                            <div class="file-upload-label" style="padding: 1rem;">
+                            <div class="file-upload-label" style="padding: 1.5rem 1rem;">
                                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                <span style="margin-top: 0.2rem; font-weight: 500; font-size: 0.8rem;">Select JSON</span>
+                                <span style="margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem;">Select JSON File</span>
                             </div>
                         </div>
-                        <div id="file-name-display" class="file-name" style="font-size: 0.7rem;">No file selected</div>
-                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%; margin-top: 0.5rem;">Restore</button>
+                        <div id="file-name-display" class="file-name" style="font-size: 0.75rem;">No file selected</div>
+                        <button class="btn-outline" onclick="restoreBackup()" style="width: 100%; margin-top: 1rem;">Restore Now</button>
                     </div>
                 </div>
             </div>
@@ -362,6 +409,9 @@
             Data
         </button>
     </nav>
+
+    <div id="pdf-export-container" style="display:none; padding: 40px; background: white; width: 800px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #0f172a;">
+        </div>
 
     <script>
         // --- CUSTOM IN-APP MODAL LOGIC ---
@@ -407,13 +457,8 @@
         ];
 
         let appData = JSON.parse(localStorage.getItem('gp_appData')) || {
-            inventory: defaultInventory,
-            lists: [],
-            settings: { listOnlyMode: false },
-            units: ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"] // NEW: Dynamic Units
+            inventory: defaultInventory, lists: [], settings: { listOnlyMode: false }, units: ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"]
         };
-        
-        // Safety check if units array is missing from old backup
         if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"];
 
         let cart = [];
@@ -421,12 +466,20 @@
 
         function init() {
             document.getElementById('mode-toggle').checked = appData.settings.listOnlyMode;
-            renderUnitManager();
-            renderUnitDropdowns();
-            renderCustomDropdown();
-            renderCart();
-            renderInventoryTable();
-            renderHistory();
+            renderUnitManager(); renderUnitDropdowns(); renderCustomDropdown();
+            renderCart(); renderInventoryTable(); renderHistory();
+            checkFirstTimeHint();
+        }
+
+        // Onboarding Hint Logic
+        function checkFirstTimeHint() {
+            if(!localStorage.getItem('gp_hasSeenHint')) {
+                document.getElementById('first-time-hint').style.display = 'block';
+            }
+        }
+        function dismissHint() {
+            document.getElementById('first-time-hint').style.display = 'none';
+            localStorage.setItem('gp_hasSeenHint', 'true');
         }
 
         function saveData() { localStorage.setItem('gp_appData', JSON.stringify(appData)); }
@@ -443,70 +496,38 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- UNIT MANAGER LOGIC ---
+        // --- UNIT MANAGER ---
         function renderUnitManager() {
-            const container = document.getElementById('unit-tags-container');
-            container.innerHTML = '';
+            const container = document.getElementById('unit-tags-container'); container.innerHTML = '';
             appData.units.forEach(u => {
-                container.innerHTML += `
-                    <div class="unit-pill">
-                        ${u}
-                        <button onclick="deleteUnit('${u}')" title="Delete Unit">✕</button>
-                    </div>
-                `;
+                container.innerHTML += `<div class="unit-pill">${u}<button onclick="deleteUnit('${u}')" title="Delete Unit">✕</button></div>`;
             });
         }
-
         function renderUnitDropdowns() {
-            const select = document.getElementById('new-item-unit');
-            select.innerHTML = '';
+            const select = document.getElementById('new-item-unit'); select.innerHTML = '';
             appData.units.forEach(u => select.innerHTML += `<option value="${u}">Per ${u}</option>`);
         }
-
         async function addNewUnit() {
-            const input = document.getElementById('new-unit-input');
-            const val = input.value.trim();
+            const input = document.getElementById('new-unit-input'); const val = input.value.trim();
             if(!val) return;
-            
-            // Check if exists case-insensitive
-            if(appData.units.map(u => u.toLowerCase()).includes(val.toLowerCase())) {
-                await customAlert("This unit already exists!");
-                return;
-            }
-
-            appData.units.push(val);
-            saveData();
-            input.value = '';
-            renderUnitManager();
-            renderUnitDropdowns();
-            renderInventoryTable(); // re-render inline edits
+            if(appData.units.map(u => u.toLowerCase()).includes(val.toLowerCase())) { await customAlert("This unit already exists!"); return; }
+            appData.units.push(val); saveData(); input.value = '';
+            renderUnitManager(); renderUnitDropdowns(); renderInventoryTable(); 
         }
-
         async function deleteUnit(unitName) {
             const inUse = appData.inventory.some(i => i.unit === unitName);
-            if(inUse) {
-                await customAlert(`Cannot delete '${unitName}'. It is currently being used by items in your inventory. Change their units first.`);
-                return;
-            }
-            
-            const confirmed = await customConfirm(`Are you sure you want to remove '${unitName}' from your available units?`);
+            if(inUse) { await customAlert(`Cannot delete '${unitName}'. It is currently used by items in your inventory. Change their units first.`); return; }
+            const confirmed = await customConfirm(`Remove '${unitName}' from your available units?`);
             if(!confirmed) return;
-
-            appData.units = appData.units.filter(u => u !== unitName);
-            saveData();
-            renderUnitManager();
-            renderUnitDropdowns();
-            renderInventoryTable();
+            appData.units = appData.units.filter(u => u !== unitName); saveData();
+            renderUnitManager(); renderUnitDropdowns(); renderInventoryTable();
         }
 
-
-        // --- List Maker (Custom Dropdown & Cart) ---
+        // --- List Maker Dropdown & Cart ---
         function renderCustomDropdown() {
-            const optionsContainer = document.getElementById('custom-options-list');
-            optionsContainer.innerHTML = '';
+            const optionsContainer = document.getElementById('custom-options-list'); optionsContainer.innerHTML = '';
             appData.inventory.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'custom-option';
+                const div = document.createElement('div'); div.className = 'custom-option';
                 div.innerHTML = `${item.name} <span style="color:#94a3b8; font-size:0.8em; float:right;">₹${item.rate}/${item.unit}</span>`;
                 div.onclick = function() {
                     document.getElementById('custom-select-text').innerText = item.name;
@@ -520,7 +541,6 @@
                 optionsContainer.appendChild(div);
             });
         }
-
         document.querySelector('.custom-select__trigger').addEventListener('click', function() { document.getElementById('myCustomSelect').classList.toggle('open'); });
         window.addEventListener('click', function(e) { const select = document.querySelector('.custom-select'); if (!select.contains(e.target)) select.classList.remove('open'); });
 
@@ -529,51 +549,39 @@
         async function addToCart() {
             const id = document.getElementById('item-select-value').value;
             const qty = parseFloat(document.getElementById('qty-input').value);
-            if (!id || isNaN(qty) || qty <= 0) { await customAlert("Please select an item and enter a valid quantity!"); return; }
-
+            if (!id || isNaN(qty) || qty <= 0) { await customAlert("Please select an item and enter a valid quantity."); return; }
             const item = appData.inventory.find(i => i.id === id);
             const existing = cart.find(c => c.id === item.id);
-            if (existing) existing.qty += qty;
-            else cart.push({ ...item, qty });
+            if (existing) existing.qty += qty; else cart.push({ ...item, qty });
 
-            document.getElementById('item-select-value').value = "";
-            document.getElementById('custom-select-text').innerText = "Select an item...";
+            document.getElementById('item-select-value').value = ""; document.getElementById('custom-select-text').innerText = "Select an item...";
             document.querySelectorAll('.custom-option').forEach(el => el.classList.remove('selected'));
-            document.getElementById('qty-input').value = "";
-            document.getElementById('qty-label').innerText = 'Quantity';
+            document.getElementById('qty-input').value = ""; document.getElementById('qty-label').innerText = 'Quantity';
             renderCart();
         }
 
         function removeCartItem(idx) { cart.splice(idx, 1); renderCart(); }
-
-        // NEW: Clear Entire List
         async function clearCart() {
             if(cart.length === 0) return;
-            const confirmed = await customConfirm("Are you sure you want to clear the entire list? This will remove all added items.");
-            if(confirmed) {
-                cart = [];
-                renderCart();
-            }
+            const confirmed = await customConfirm("Are you sure you want to completely clear your current list?");
+            if(confirmed) { cart = []; renderCart(); }
         }
 
         function renderCart() {
             const isListOnly = appData.settings.listOnlyMode;
-            const thead = document.querySelector('#cart-table thead');
-            const tbody = document.getElementById('cart-body');
+            const thead = document.querySelector('#cart-table thead'); const tbody = document.getElementById('cart-body');
             const totalRow = document.getElementById('total-row-display');
             
             if (isListOnly) {
-                thead.innerHTML = `<tr><th>Item</th><th class="num">Qty</th><th>Rate (Write)</th><th class="no-print" style="width:30px;"></th></tr>`;
+                thead.innerHTML = `<tr><th>Item</th><th class="num">Qty</th><th>Rate (Fill Below)</th><th class="no-print" style="width:30px;"></th></tr>`;
                 totalRow.style.display = 'none';
             } else {
                 thead.innerHTML = `<tr><th>Item</th><th class="num">Rate</th><th class="num">Qty</th><th class="num">Amount (₹)</th><th class="no-print" style="width:30px;"></th></tr>`;
                 totalRow.style.display = 'flex';
             }
-
             tbody.innerHTML = ''; let total = 0;
-
             if (cart.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:3rem 1rem; font-size:0.9rem;">No items yet. Add something from above!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:3rem 1rem; font-size:0.95rem;">No items yet. Select something from the dropdown to begin!</td></tr>`;
                 document.getElementById('grand-total').innerText = '0.00'; return;
             }
 
@@ -584,7 +592,7 @@
                         <tr style="animation: fadeSlideUp 0.3s ease;">
                             <td style="font-weight: 500;">${item.name}</td>
                             <td class="num" style="font-weight: 600;">${item.qty} <span style="font-size:0.75em; color:var(--text-muted)">${item.unit}</span></td>
-                            <td><div class="blank-write-space" style="display:block;"></div></td>
+                            <td><div style="border-bottom: 1px dotted #cbd5e1; height: 1.5rem; width: 80px;"></div></td>
                             <td class="no-print action-cell"><button style="background:transparent; color:var(--danger); padding:0.2rem;" onclick="removeCartItem(${idx})">✕</button></td>
                         </tr>
                     `;
@@ -603,30 +611,88 @@
             document.getElementById('grand-total').innerText = total.toFixed(2);
         }
 
-        async function exportPDF() {
-            if(cart.length === 0) { await customAlert("The list is currently empty. Please add items first."); return; }
-            const hideElems = document.querySelectorAll('.no-print'); hideElems.forEach(el => el.style.display = 'none');
+        // PERFECT PDF GENERATOR THEME ENGINE
+        function generatePerfectPDF(titleText, dateStr, itemsArray, totalAmount, isListOnly) {
+            const container = document.getElementById('pdf-export-container');
+            container.style.display = 'block';
+            
+            let html = `
+                <div style="border-bottom: 3px solid #10b981; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1 style="margin: 0; color: #10b981; font-size: 28px;">GroceryPro</h1>
+                        <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">${titleText}</p>
+                    </div>
+                    <div style="text-align: right; color: #64748b; font-size: 13px;">
+                        <strong>Generated:</strong><br>${dateStr}
+                    </div>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+                    <thead>
+                        <tr style="background-color: #f8fafc; color: #64748b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">
+                            <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: left;">Item Description</th>
+                            ${isListOnly ? '' : '<th style="padding: 12px; border: 1px solid #e2e8f0; text-align: right;">Rate</th>'}
+                            <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: right;">Qty</th>
+                            <th style="padding: 12px; border: 1px solid #e2e8f0; text-align: ${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Rate (Manual)' : 'Amount (₹)'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
-            const printArea = document.getElementById('print-area');
-            const title = document.createElement('h2'); title.id = 'temp-title';
-            title.innerText = appData.settings.listOnlyMode ? 'Grocery List (Manual Entry)' : 'Quotation';
-            title.style.marginBottom = '20px'; title.style.color = '#0f172a'; title.style.textAlign = 'center';
-            printArea.prepend(title);
+            itemsArray.forEach((item, index) => {
+                const bg = index % 2 === 0 ? '#ffffff' : '#fcfcfc';
+                const amt = item.rate * item.qty;
+                html += `<tr style="background-color: ${bg};">
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; font-weight: 500;">${item.name}</td>
+                    ${isListOnly ? '' : `<td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #64748b;">₹${item.rate}</td>`}
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${item.qty} <span style="font-size: 11px; color: #64748b;">${item.unit}</span></td>
+                    <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: ${isListOnly ? 'left' : 'right'}; font-weight: 600;">
+                        ${isListOnly ? '<div style="border-bottom: 1px dotted #94a3b8; height: 18px; width: 120px; margin-top: 5px;"></div>' : `₹${amt.toFixed(2)}`}
+                    </td>
+                </tr>`;
+            });
 
-            html2pdf().set({ margin: 0.5, filename: 'Grocery_Doc.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(printArea).save().then(() => {
-                hideElems.forEach(el => el.style.display = ''); document.getElementById('temp-title').remove();
+            html += `</tbody></table>`;
+            if (!isListOnly) {
+                html += `<div style="text-align: right; font-size: 20px; font-weight: 700; margin-top: 25px; color: #0f172a;">Grand Total: ₹${totalAmount.toFixed(2)}</div>`;
+            }
+            
+            container.innerHTML = html;
+
+            const opt = {
+                margin: 0.5,
+                filename: `${titleText.replace(/\s+/g, '_')}_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                container.style.display = 'none'; // Hide it back after export
             });
         }
 
-        // --- Inventory Edit Logic & GLOBAL AUTO UPDATE ---
+        async function exportPDF() {
+            if(cart.length === 0) { await customAlert("The list is currently empty. Please add items to export."); return; }
+            const isListOnly = appData.settings.listOnlyMode;
+            const title = isListOnly ? 'Grocery List (Manual Fill)' : 'Grocery Quotation';
+            const total = cart.reduce((sum, item) => sum + (item.rate * item.qty), 0);
+            const dateStr = new Date().toLocaleString();
+            generatePerfectPDF(title, dateStr, cart, total, isListOnly);
+        }
+
+        function downloadHistoryPDF(id) {
+            const list = appData.lists.find(l => l.id === id); if(!list) return;
+            const isListOnly = appData.settings.listOnlyMode;
+            generatePerfectPDF(list.title, list.date, list.items, list.total, isListOnly);
+        }
+
+        // --- Inventory Edit & Auto-Sync ---
         async function addNewItem() {
             const name = document.getElementById('new-item-name').value.trim();
             const unit = document.getElementById('new-item-unit').value;
             const rate = parseFloat(document.getElementById('new-item-rate').value);
-
             if (!name || isNaN(rate) || rate < 0) { await customAlert("Please fill all fields correctly to add a new item."); return; }
             appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate }); saveData();
-            
             document.getElementById('new-item-name').value = ''; document.getElementById('new-item-rate').value = '';
             renderCustomDropdown(); renderInventoryTable(); document.getElementById('new-item-name').focus();
         }
@@ -676,19 +742,18 @@
             const newName = document.getElementById(`edit-name-${id}`).value.trim();
             const newUnit = document.getElementById(`edit-unit-${id}`).value;
             const newRate = parseFloat(document.getElementById(`edit-rate-${id}`).value);
-
             if (!newName || isNaN(newRate) || newRate < 0) { await customAlert("Invalid input! Rate must be a number and name cannot be empty."); return; }
 
             const item = appData.inventory.find(i => i.id === id);
             item.name = newName; item.unit = newUnit; item.rate = newRate;
             
-            // AUTO-UPDATE CART & HISTORY
+            // AUTO-SYNC TO CART AND HISTORY
             const cartItem = cart.find(c => c.id === id); if(cartItem) { cartItem.name = newName; cartItem.unit = newUnit; cartItem.rate = newRate; }
             appData.lists.forEach(list => { let listChanged = false; list.items.forEach(li => { if(li.id === id) { li.name = newName; li.unit = newUnit; li.rate = newRate; listChanged = true; } }); if(listChanged) list.total = list.items.reduce((sum, i) => sum + (i.rate * i.qty), 0); });
 
             editingItemId = null; saveData();
             renderCustomDropdown(); renderInventoryTable(); renderCart(); renderHistory();
-            await customAlert("Item Updated Successfully! Synced with Cart & History.");
+            await customAlert("Item Updated! Auto-Synced to your Cart and Saved History.");
         }
 
         async function deleteItem(id) {
@@ -698,7 +763,7 @@
             saveData(); renderCustomDropdown(); renderInventoryTable();
         }
 
-        // --- History, Data Logic & HISTORY PDF GENERATOR ---
+        // --- History & Data Logic ---
         function renderHistory() {
             const container = document.getElementById('history-container'); container.innerHTML = '';
             if (appData.lists.length === 0) { container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center; padding: 2rem;">No saved lists yet.</p>`; return; }
@@ -708,7 +773,7 @@
                         <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">${list.date}</div>
                         <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">${list.title}</div>
                         <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 1rem;">${list.items.length} Items | Total: <span style="color:var(--text-main); font-weight:600;">₹${list.total.toFixed(2)}</span></p>
-                        <div class="grid-3-action" style="margin-top: auto;">
+                        <div class="history-actions" style="margin-top: auto;">
                             <button class="btn-outline" style="padding:0.4rem; font-size:0.85rem;" onclick="loadList('${list.id}')">Load</button>
                             <button class="btn-outline" style="padding:0.4rem; font-size:0.85rem; color:var(--text-main); border-color:var(--text-muted);" onclick="downloadHistoryPDF('${list.id}')">PDF</button>
                             <button class="btn-danger" style="padding:0.4rem; font-size:0.85rem;" onclick="deleteList('${list.id}')">Del</button>
@@ -718,44 +783,11 @@
             });
         }
 
-        function downloadHistoryPDF(id) {
-            const list = appData.lists.find(l => l.id === id); if(!list) return;
-            const isListOnly = appData.settings.listOnlyMode;
-            const container = document.createElement('div');
-            container.style.padding = '20px'; container.style.background = '#fff'; container.style.color = '#0f172a'; container.style.fontFamily = "'Inter', sans-serif"; container.style.width = '800px'; 
-            let html = `
-                <h2 style="text-align:center; margin-bottom:20px; color:#0f172a;">${isListOnly ? 'Grocery List (Manual Entry)' : 'Quotation'}</h2>
-                <div style="margin-bottom: 20px; color: #64748b; font-size: 0.9rem;"><strong>Date:</strong> ${list.date}<br><strong>Title:</strong> ${list.title}</div>
-                <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
-                    <thead><tr style="background:#f8fafc; text-transform:uppercase; font-size:0.85rem; color:#64748b;">
-                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:left;">Item</th>
-                        ${isListOnly ? '' : '<th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Rate</th>'}
-                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">Qty</th>
-                        <th style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:${isListOnly ? 'left' : 'right'};">${isListOnly ? 'Rate (Fill)' : 'Amount (₹)'}</th>
-                    </tr></thead><tbody>
-            `;
-            list.items.forEach(item => {
-                const amt = item.rate * item.qty;
-                html += `<tr>
-                    <td style="padding:10px; border-bottom:1px solid #e2e8f0; font-weight:500;">${item.name}</td>
-                    ${isListOnly ? '' : `<td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right; color:#64748b;">₹${item.rate}</td>`}
-                    <td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:600;">${item.qty} <span style="font-size:0.8em; color:#64748b;">${item.unit}</span></td>
-                    <td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:${isListOnly ? 'left' : 'right'}; font-weight:600;">
-                        ${isListOnly ? '<div style="border-bottom:1px dotted #000; height:1.5rem; width:100px;"></div>' : `₹${amt.toFixed(2)}`}
-                    </td>
-                </tr>`;
-            });
-            html += `</tbody></table>`;
-            if (!isListOnly) html += `<div style="text-align:right; font-size:1.25rem; font-weight:700; margin-top:20px; padding-top:20px; border-top:2px solid #e2e8f0;">Grand Total: ₹${list.total.toFixed(2)}</div>`;
-            container.innerHTML = html;
-            html2pdf().set({ margin: 0.5, filename: `${list.title.replace(/\s+/g, '_')}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(container).save();
-        }
-
         async function saveCurrentList() {
             if (cart.length === 0) { await customAlert("Cart is empty! Cannot save."); return; }
             const total = cart.reduce((sum, item) => sum + (item.rate * item.qty), 0);
-            appData.lists.push({ id: 'list_' + Date.now(), date: new Date().toLocaleString(), title: `List - ${new Date().toLocaleDateString()}`, items: [...cart], total: total });
-            saveData(); renderHistory(); await customAlert("List Saved to History successfully!");
+            appData.lists.push({ id: 'list_' + Date.now(), date: new Date().toLocaleString(), title: `Bill - ${new Date().toLocaleDateString()}`, items: [...cart], total: total });
+            saveData(); renderHistory(); await customAlert("List saved to History!");
             cart = []; renderCart();
         }
 
@@ -771,18 +803,13 @@
             appData.lists = appData.lists.filter(l => l.id !== id); saveData(); renderHistory();
         }
 
-        // --- BLOB BASED BACKUP (Works in WebViews/APKs) ---
+        // --- BLOB BASED BACKUP (App/Web Safe) ---
         function downloadBackup() {
             const jsonStr = JSON.stringify(appData);
             const blob = new Blob([jsonStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `GroceryPro_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const a = document.createElement('a'); a.href = url; a.download = `GroceryPro_Backup_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function handleFileSelect(input) {
@@ -800,12 +827,12 @@
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.inventory && parsed.lists && parsed.settings) {
                         appData = parsed; 
-                        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"]; // backward compat
+                        if(!appData.units) appData.units = ["kg", "gram", "Ltr", "Piece", "Packet", "Ladi"]; 
                         saveData(); init(); 
                         await customAlert("Data Restored Successfully!");
                         fileInput.value = ""; document.getElementById('file-name-display').innerText = "No file selected";
                     } else { await customAlert("Invalid backup file format."); }
-                } catch (err) { await customAlert("Error reading file."); }
+                } catch (err) { await customAlert("Error reading file. Data may be corrupted."); }
             };
             reader.readAsText(fileInput.files[0]);
         }
