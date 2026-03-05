@@ -1202,10 +1202,24 @@ self.addEventListener('fetch', e => {
 
     function checkFirstTime() {
         const hint = document.getElementById('first-time-hint');
-        if (hint) hint.style.display = 'block';
+        if (!hint) return;
+        hint.style.display    = 'block';
+        hint.style.opacity    = '1';
+        hint.style.visibility = 'visible';
+        // Auto-hide after 4 seconds with smooth fade
+        setTimeout(() => {
+            hint.style.transition = 'opacity 0.6s ease, visibility 0.6s ease';
+            hint.style.opacity    = '0';
+            hint.style.visibility = 'hidden';
+            setTimeout(() => { hint.style.display = 'none'; }, 650);
+        }, 4000);
     }
     function closeHint() {
-        document.getElementById('first-time-hint').style.display = 'none';
+        const hint = document.getElementById('first-time-hint');
+        hint.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
+        hint.style.opacity    = '0';
+        hint.style.visibility = 'hidden';
+        setTimeout(() => { hint.style.display = 'none'; }, 320);
     }
 
 
@@ -1651,7 +1665,10 @@ self.addEventListener('fetch', e => {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td>
-              <div style="color:#ffffff; font-size:24px; font-weight:800; letter-spacing:0.5px; line-height:1.2;">&#128722; GroceryPro</div>
+              <div style="color:#ffffff; font-size:24px; font-weight:800; letter-spacing:0.5px; line-height:1.2; display:flex; align-items:center; gap:10px;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyOCcgaGVpZ2h0PScyOCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmZmZmYnIHN0cm9rZS13aWR0aD0nMi4yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnPjxwYXRoIGQ9J00zIDNoMmwuNCAyTTcgMTNoMTBsNC04SDUuNE03IDEzTDUuNCA1TTcgMTNsLTIuMjkzIDIuMjkzYy0uNjMuNjMtLjE4NCAxLjcwNy43MDcgMS43MDdIMTdtMCAwYTIgMiAwIDEwMCA0IDIgMiAwIDAwMC00em0tOCAyYTIgMiAwIDExLTQgMCAyIDIgMCAwMTQgMHonLz48L3N2Zz4=" width="28" height="28" style="vertical-align:middle; margin-top:-2px;">
+                GroceryPro
+              </div>
               <div style="color:rgba(255,255,255,0.88); font-size:12px; margin-top:4px; font-weight:500;">${titleLine}</div>
             </td>
             <td style="text-align:right; vertical-align:top;">
