@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#10b981" id="theme-color-meta">
+    <meta name="theme-color" content="#ffffff" id="theme-color-meta">
     <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -18,6 +18,7 @@
             document.querySelector('meta[name="theme-color"]').content = '#0d1f1a';
             document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content = 'black';
         }
+        // Light mode keeps default white (#ffffff) — already set in meta tag
     })();
     </script>
     <title>GroceryPro - Minimalist Planner</title>
@@ -262,8 +263,7 @@ self.addEventListener('fetch', e => {
         @keyframes fadeSlideUp   { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeSlideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeIn        { from { opacity:0; } to { opacity:1; } }
-        @keyframes splashIn      { 0% { opacity:0; transform:scale(.7); } 60% { transform:scale(1.08); } 100% { opacity:1; transform:scale(1); } }
-        @keyframes splashPulse   { 0% { transform:scale(1); } 50% { transform:scale(1.04); } 100% { transform:scale(1); } }
+        @keyframes splashPulse   { 0% { transform:scale(.95); opacity:.8; } 100% { transform:scale(1.05); opacity:1; } }
         @keyframes driveCart     {
             0%,100% { transform:translateX(0)   translateY(0)  rotate(0deg);  }
             25%     { transform:translateX(3px)  translateY(-1px) rotate(3deg);  }
@@ -291,16 +291,15 @@ self.addEventListener('fetch', e => {
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 999999;
-            transition: opacity .4s cubic-bezier(0.4,0,0.2,1), visibility .4s cubic-bezier(0.4,0,0.2,1);
+            transition: opacity .4s ease-in-out, visibility .4s ease-in-out;
         }
         #splash-screen.hidden { opacity:0; visibility:hidden; }
         .splash-content {
-            display: flex; align-items: center; gap: 14px;
+            display: flex; align-items: center; gap: 12px;
             color: #fff; font-size: 2.5rem; font-weight: 700;
-            animation: splashIn .55s cubic-bezier(0.16,1,0.3,1) both, splashPulse 2s 0.6s ease-in-out infinite;
-            will-change: transform, opacity;
+            animation: splashPulse 2.2s infinite alternate ease-in-out;
         }
-        .splash-content svg { width:52px; height:52px; stroke-width:2.5; filter: drop-shadow(0 4px 12px rgba(0,0,0,.2)); }
+        .splash-content svg { width:50px; height:50px; stroke-width:2.5; }
 
         /* ── TOP BAR ────────────────────────────────────────────────── */
         .top-bar {
@@ -1344,7 +1343,7 @@ self.addEventListener('fetch', e => {
         } else {
             icon.innerHTML  = `<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;
             label.innerText = 'Dark';
-            meta.content    = '#10b981';
+            meta.content    = '#ffffff';
             apple.content   = 'default';
         }
     }
