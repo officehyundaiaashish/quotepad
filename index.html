@@ -141,16 +141,16 @@ const URLS  = [self.location.pathname || '/'];
 
 // ── Sarcastic nudge messages ──────────────────────────────────────
 const NUDGES = [
-    { title: 'Arre bhai...', body: 'Quotation banana tha na? Ya bas sochte rehna hai?' },
-    { title: 'QuotePad yahan hai', body: 'Items toh bahut hai list mein, rate toh daal do yaar.' },
-    { title: 'Paisa hi paisa hoga', body: 'Bas ek quotation banana baaki hai. Haan, wahi wala.' },
-    { title: 'Reminder hai ya award?', body: 'List bani nahi abhi tak. QuotePad wait kar raha hai — patiently.' },
-    { title: 'Socha toh hoga', body: 'Quotation bhi kabhi bana lena bhai. App khali pada hai.' },
-    { title: 'Samay aa gaya', body: 'Nahi nahi, jaldi nahi. Bas... quotation.' },
-    { title: 'Invoice nahi, quotation', body: 'Chhota sa kaam hai. QuotePad mein 2 minute lagte hain.' },
-    { title: 'Koi nahi poochh raha', body: 'Bas yaad dilana tha ki list banaao. Bas.' },
-    { title: 'Shopping list bhi chalega', body: 'Rates nahi chahiye toh Hide Rates wala button hai. Jaao!' },
-    { title: 'App install hai yahan', body: 'Kaam aata toh hai, use bhi karo kabhi.' },
+    { title: 'Still thinking?', body: 'That quotation is not going to make itself.' },
+    { title: 'QuotePad is ready', body: 'Items are waiting. Rates are not going to fill themselves.' },
+    { title: 'Money, money, money', body: 'Just one quotation left to make. Yes, that one.' },
+    { title: 'Is this a reminder or a trophy?', body: 'List not done yet. QuotePad is waiting — patiently.' },
+    { title: 'You must have thought about it', body: 'Make a quotation sometime. The app is just sitting here.' },
+    { title: 'The time has come', body: 'No rush. Just... the quotation.' },
+    { title: 'Not an invoice, a quotation', body: 'Small task. Takes 2 minutes in QuotePad.' },
+    { title: 'Nobody is asking', body: 'Just a gentle reminder to make that list. That is all.' },
+    { title: 'Shopping list works too', body: 'No rates needed — there is a Hide Rates button for that.' },
+    { title: 'The app is installed', body: 'It is actually useful. Give it a try.' },
 ];
 
 self.addEventListener('install', e => {
@@ -179,7 +179,7 @@ self.addEventListener('fetch', e => {
 self.addEventListener('message', e => {
     if (e.data?.type === 'SHOW_BACKUP_NOTIF') {
         self.registration.showNotification('QuotePad Backup', {
-            body: e.data.body || 'Aaj ka auto backup le liya gaya. Data safe hai!',
+            body: e.data.body || 'Auto backup completed. Your data is safe.',
             icon: e.data.icon || '',
             badge: e.data.icon || '',
             tag: 'qp-backup',
@@ -1322,7 +1322,7 @@ self.addEventListener('notificationclick', e => {
                             <svg width="18" height="18" fill="none" stroke="var(--accent-hover)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <div>
                                 <div style="font-size:.88rem; font-weight:700; color:var(--accent-hover);">Hide Rates</div>
-                                <div style="font-size:.72rem; color:var(--muted); margin-top:1px;">Shopping list mode — rates chhupa do</div>
+                                <div style="font-size:.72rem; color:var(--muted); margin-top:1px;">Shopping list mode — hide prices from view</div>
                             </div>
                         </div>
                         <input type="checkbox" id="mode-toggle" onchange="toggleMode()" style="display:none;">
@@ -1433,7 +1433,7 @@ self.addEventListener('notificationclick', e => {
                     </div>
                     <div>
                         <div style="font-size:1rem; font-weight:700; color:var(--text);">Auto Backup</div>
-                        <div style="font-size:.75rem; color:var(--muted);">Roz subah 7 baje apne aap save hoga</div>
+                        <div style="font-size:.75rem; color:var(--muted);">Auto-saves every day at 7 AM</div>
                     </div>
                     <div id="auto-backup-badge" style="margin-left:auto; font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:20px; background:#dcfce7; color:#166534;">ON</div>
                 </div>
@@ -1443,11 +1443,9 @@ self.addEventListener('notificationclick', e => {
                     <div style="display:flex; align-items:flex-start; gap:.6rem;">
                         <svg width="20" height="20" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
                         <div>
-                            <div style="font-size:.82rem; font-weight:700; color:#065f46; margin-bottom:.3rem;">Backup kahaan save hota hai?</div>
-                            <div style="font-size:.78rem; color:#047857; line-height:1.6;">
-                                Android mein backup yahan milega:<br>
-                                <span style="font-family:monospace; background:rgba(255,255,255,.7); padding:.1rem .4rem; border-radius:5px; font-size:.74rem;">Downloads / QuotePad_Backup_*.json</span><br>
-                                <span style="font-size:.72rem; color:#059669; margin-top:.3rem; display:flex; align-items:center; gap:.3rem;"><svg width="11" height="11" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M12 6a6 6 0 100 12A6 6 0 0012 6z"/></svg> File Manager → Downloads folder mein dekho</span>
+                            <div style="font-size:.82rem; font-weight:700; color:#065f46; margin-bottom:.3rem;">Where are backups saved?</div>
+                            <div style="font-size:.78rem; color:#047857; line-height:1.7;">
+                                File Manager &rarr; Downloads &rarr; <span style="font-family:monospace; background:rgba(255,255,255,.8); padding:.1rem .4rem; border-radius:5px; font-weight:700;">QuotePad</span> folder
                             </div>
                         </div>
                     </div>
@@ -1465,7 +1463,7 @@ self.addEventListener('notificationclick', e => {
                     border:none; border-radius:14px; padding:.75rem; font-size:.88rem; font-weight:700;
                     box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; transition:transform .15s;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Abhi Backup Lo
+                    Backup Now
                 </button>
             </div>
 
@@ -1476,44 +1474,42 @@ self.addEventListener('notificationclick', e => {
                         <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
                     </div>
                     <div>
-                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Restore Backup</div>
-                        <div style="font-size:.75rem; color:var(--muted);">Latest backup se restore karo — ya khud choose karo</div>
+                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Restore</div>
+                        <div style="font-size:.75rem; color:var(--muted);">One tap to restore — or pick a file manually</div>
                     </div>
                 </div>
 
-                <!-- Latest backup highlight -->
-                <div id="latest-backup-box" style="background:var(--accent-light); border:1.5px solid var(--accent); border-radius:14px; padding:.85rem 1rem; margin-bottom:.75rem; display:none;">
-                    <div style="font-size:.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.3rem; display:flex; align-items:center; gap:.3rem;"><svg width="11" height="11" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Latest Backup</div>
-                    <div id="latest-backup-name" style="font-size:.88rem; font-weight:700; color:var(--accent-hover);"></div>
-                    <div id="latest-backup-date" style="font-size:.75rem; color:var(--muted); margin-top:.15rem;"></div>
+                <!-- Latest backup + restore in one row -->
+                <div id="latest-backup-box" style="display:none; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:14px; padding:.85rem 1rem; margin-bottom:.75rem;">
+                    <div style="font-size:.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.35rem; display:flex; align-items:center; gap:.3rem;">
+                        <svg width="11" height="11" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Latest Backup
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:.75rem;">
+                        <div style="min-width:0;">
+                            <div id="latest-backup-name" style="font-size:.85rem; font-weight:700; color:var(--accent-hover); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                            <div id="latest-backup-date" style="font-size:.72rem; color:var(--muted); margin-top:.1rem;"></div>
+                        </div>
+                        <button id="restore-latest-btn" onclick="restoreLatestBackup()" style="
+                            flex-shrink:0; display:flex; align-items:center; gap:.35rem;
+                            background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+                            border:none; border-radius:10px; padding:.5rem .85rem;
+                            font-size:.8rem; font-weight:700; cursor:pointer; white-space:nowrap;">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                            Restore
+                        </button>
+                    </div>
                 </div>
 
-                <button id="restore-latest-btn" onclick="restoreLatestBackup()" style="
-                    width:100%; display:flex; align-items:center; justify-content:center; gap:.5rem;
-                    background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
-                    border:none; border-radius:14px; padding:.75rem; font-size:.88rem; font-weight:700;
-                    box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; transition:transform .15s;
-                    margin-bottom:.6rem; display:none;">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                    Latest Backup Restore Karo
-                </button>
-
-                <!-- Divider -->
-                <div style="display:flex; align-items:center; gap:.5rem; margin:.5rem 0;">
-                    <div style="flex:1; height:1px; background:var(--border-light);"></div>
-                    <span style="font-size:.72rem; color:var(--muted); font-weight:600;">YA KHUD CHOOSE KARO</span>
-                    <div style="flex:1; height:1px; background:var(--border-light);"></div>
-                </div>
-
-                <div class="file-upload-wrapper" style="margin-top:.4rem;">
+                <!-- Browse manually -->
+                <div class="file-upload-wrapper">
                     <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
-                    <div class="file-upload-label" style="padding:.85rem; border-radius:12px;">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <span style="margin-top:.2rem; font-weight:600; font-size:.82rem;">Browse karke JSON select karo</span>
+                    <div class="file-upload-label" style="padding:.75rem; border-radius:12px;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <span style="margin-top:.15rem; font-weight:600; font-size:.82rem;">Select a backup file manually</span>
                     </div>
                 </div>
-                <div id="file-name-display" class="file-name" style="font-size:.75rem; margin:.4rem 0 .5rem; text-align:center;">Koi file select nahi ki</div>
-                <button class="btn-outline w-100" onclick="restoreBackup()" style="border-radius:12px; padding:.65rem;">Is File Se Restore Karo</button>
+                <div id="file-name-display" class="file-name" style="font-size:.75rem; margin:.35rem 0 .5rem; text-align:center;">No file selected</div>
+                <button class="btn-outline w-100" onclick="restoreBackup()" style="border-radius:12px; padding:.65rem;">Restore From This File</button>
             </div>
 
             <!-- WEBSITE MODE: original simple backup/restore -->
@@ -2311,8 +2307,8 @@ self.addEventListener('notificationclick', e => {
 
     function buildPDFHTML(items, isListOnly, titleLine, dateLine, discIn, gstIn) {
         const now   = new Date();
-        const date  = dateLine || now.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
-        const time  = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+        const date  = dateLine || now.toLocaleDateString('en-US', { day:'2-digit', month:'long', year:'numeric' });
+        const time  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
         const sym   = appData.currency;
         const disc  = discIn !== undefined ? discIn : (parseFloat(document.getElementById('discount-input')?.value) || 0);
         const gst   = gstIn  !== undefined ? gstIn  : (parseFloat(document.getElementById('gst-input')?.value)      || 0);
@@ -2523,7 +2519,7 @@ self.addEventListener('notificationclick', e => {
         const isListOnly = appData.settings.listOnlyMode;
         const nameInput  = document.getElementById('list-name-input').value.trim();
         const title      = nameInput || (isListOnly ? 'Shopping List' : 'Quotation / Estimate');
-        const fname      = `${(nameInput || 'QuotePad').replace(/\s+/g,'_')}_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.pdf`;
+        const fname      = `${(nameInput || 'QuotePad').replace(/\s+/g,'_')}_${new Date().toLocaleDateString('en-US').replace(/\//g,'-')}.pdf`;
         const html       = buildPDFHTML(cart, isListOnly, title, null);
         renderPDF(html, fname);
     }
@@ -2646,7 +2642,7 @@ self.addEventListener('notificationclick', e => {
         navigator.serviceWorker.ready.then(reg => {
             reg.active?.postMessage({
                 type: 'SHOW_BACKUP_NOTIF',
-                body: `Aaj ka backup ho gaya (${dateStr}). Data ekdum safe hai!`,
+                body: `Backup completed (${dateStr}). Your data is safe.`,
                 icon: getSwIcon(),
             });
         });
@@ -2665,8 +2661,8 @@ self.addEventListener('notificationclick', e => {
     function createBackup(label) {
         let backups = getBackups();
         const now   = new Date();
-        const dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-        const timeStr = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+        const dateStr = now.toLocaleDateString('en-US', { day:'2-digit', month:'short', year:'numeric' });
+        const timeStr = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
         const name  = label || `Backup — ${dateStr}, ${timeStr}`;
 
         // Remove oldest if over limit
@@ -2685,7 +2681,7 @@ self.addEventListener('notificationclick', e => {
     // ── Manual backup button ──────────────────────────────────────────
     async function triggerManualBackup() {
         createBackup();
-        await customAlert('Backup le liya!\n\nYeh backup is device ke storage mein save hai.');
+        await customAlert('Backup saved!\n\nStored on this device.');
     }
 
     // ── Render saved backup list ──────────────────────────────────────
@@ -2695,14 +2691,12 @@ self.addEventListener('notificationclick', e => {
         const latestBox  = document.getElementById('latest-backup-box');
         const latestName = document.getElementById('latest-backup-name');
         const latestDate = document.getElementById('latest-backup-date');
-        const restoreBtn = document.getElementById('restore-latest-btn');
 
         if (!backups.length) {
             el.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:.82rem; padding:1rem; background:var(--bg); border-radius:10px;">
-                Abhi tak koi backup nahi hai.<br>Upar wala button dabao!
+                No backups yet.<br>Tap the button above to create one.
             </div>`;
             if (latestBox) latestBox.style.display = 'none';
-            if (restoreBtn) restoreBtn.style.display = 'none';
             return;
         }
 
@@ -2714,7 +2708,6 @@ self.addEventListener('notificationclick', e => {
         if (latestBox)  { latestBox.style.display  = 'block'; }
         if (latestName) latestName.textContent = latest.name;
         if (latestDate) latestDate.textContent = latest.date;
-        if (restoreBtn) restoreBtn.style.display = 'flex';
 
         el.innerHTML = sorted.map((b, i) => `
             <div style="display:flex; align-items:center; gap:.6rem;
@@ -2741,7 +2734,7 @@ self.addEventListener('notificationclick', e => {
     // ── Restore latest backup ─────────────────────────────────────────
     async function restoreLatestBackup() {
         const backups = getBackups();
-        if (!backups.length) { await customAlert('Koi backup nahi mila!'); return; }
+        if (!backups.length) { await customAlert('No backup found!'); return; }
         const latest = backups.sort((a,b) => b.ts - a.ts)[0];
         await doRestore(latest.data, latest.name);
     }
@@ -2750,13 +2743,13 @@ self.addEventListener('notificationclick', e => {
     async function restoreFromSlot(ts) {
         const backups = getBackups();
         const entry   = backups.find(b => b.ts === ts);
-        if (!entry) { await customAlert('Backup nahi mila!'); return; }
+        if (!entry) { await customAlert('Backup not found!'); return; }
         await doRestore(entry.data, entry.name);
     }
 
     // ── Common restore logic ──────────────────────────────────────────
     async function doRestore(jsonStr, label) {
-        if (!await customConfirm(`"${label}" se restore karo?\n\nCurrent data replace ho jaayega.`)) return;
+        if (!await customConfirm(`Restore from "${label}"?\n\nThis will replace your current data.`)) return;
         try {
             const parsed = JSON.parse(jsonStr);
             if (parsed.inventory && parsed.lists && parsed.settings) {
@@ -2767,9 +2760,9 @@ self.addEventListener('notificationclick', e => {
                 cart = []; inventoryFilter = '';
                 saveData(); init();
                 switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
-                await customAlert('Restore ho gaya!\n\nAapka data wapas aa gaya.');
-            } else { await customAlert('Yeh file sahi format mein nahi hai.'); }
-        } catch { await customAlert('File padhne mein kuch gadbad ho gayi.'); }
+                await customAlert('Restore complete!\n\nYour data is back.');
+            } else { await customAlert('This file is not a valid backup format.'); }
+        } catch { await customAlert('Could not read the file. Please try again.'); }
     }
 
     // ── Schedule auto backup at 7 AM daily ───────────────────────────
@@ -2783,7 +2776,7 @@ self.addEventListener('notificationclick', e => {
         // If it's past 7am today AND we haven't backed up today yet
         const alreadyRanToday = lastDate.toDateString() === now.toDateString() && lastRun >= today7am.getTime();
         if (now >= today7am && !alreadyRanToday) {
-            createBackup(`Auto — ${now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}`);
+            createBackup(`Auto — ${now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'})}`);
             localStorage.setItem(LAST_KEY, now.getTime().toString());
         }
 
@@ -2796,7 +2789,7 @@ self.addEventListener('notificationclick', e => {
     // ── Web mode: original simple backup/restore ──────────────────────
     async function downloadBackup() {
         const jsonStr  = JSON.stringify(appData, null, 2);
-        const filename = `QuotePad_Backup_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.json`;
+        const filename = `QuotePad_Backup_${new Date().toLocaleDateString('en-US').replace(/\//g,'-')}.json`;
         if (navigator.share && navigator.canShare) {
             try {
                 const file = new File([jsonStr], filename, { type: 'application/json' });
@@ -2821,7 +2814,7 @@ self.addEventListener('notificationclick', e => {
     function handleFileSelect(input) {
         const display = document.getElementById('file-name-display');
         if (display) {
-            display.innerText   = input.files?.[0] ? input.files[0].name : 'Koi file select nahi ki';
+            display.innerText   = input.files?.[0] ? input.files[0].name : 'No file selected';
             display.style.color = input.files?.[0] ? 'var(--accent)' : 'var(--muted)';
         }
     }
@@ -3121,14 +3114,14 @@ self.addEventListener('notificationclick', e => {
         const ws = XLSX.utils.aoa_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'QuotePad');
-        XLSX.writeFile(wb, `QuotePad_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.xlsx`);
+        XLSX.writeFile(wb, `QuotePad_${new Date().toLocaleDateString('en-US').replace(/\//g,'-')}.xlsx`);
     }
 
     // Price History — record on inventory rate change
     function recordPriceHistory(itemId, oldRate, newRate) {
         if (oldRate === newRate) return;
         if (!appData.priceHistory[itemId]) appData.priceHistory[itemId] = [];
-        appData.priceHistory[itemId].push({ date: new Date().toLocaleDateString('en-IN'), rate: newRate });
+        appData.priceHistory[itemId].push({ date: new Date().toLocaleDateString('en-US'), rate: newRate });
         if (appData.priceHistory[itemId].length > 10) appData.priceHistory[itemId].shift(); // keep last 10
     }
     async function showPriceHistory(itemId, itemName, el) {
