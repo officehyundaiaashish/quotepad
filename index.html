@@ -1808,7 +1808,7 @@ self.addEventListener('fetch', e => {
                         <td style="font-weight:500;">${item.name}</td>
                         <td>${item.unit}</td>
                         <td>${appData.currency}${item.rate}</td>
-                        <td style="text-align:center;">${trend}<button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .35rem;" onclick="showPriceHistory('${item.id}','${item.name.replace(/'/g,"\\'")}')">Log</button></td>
+                        <td style="text-align:center;">${trend}<button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .35rem;" data-id="${item.id}" data-n="${item.name.replace(/"/g,'&quot;')}" onclick="showPriceHistory(this.dataset.id, this.dataset.n)">Log</button></td>
                     </tr>`;
             }).join('');
     }
@@ -1879,7 +1879,7 @@ self.addEventListener('fetch', e => {
         }
         const item     = appData.inventory.find(i => i.id === id);
         const existing = cart.find(c => c.id === item.id);
-        if (existing) existing.qty += qty; else cart.push({ ...item, qty });
+        if (existing) existing.qty = Math.round((existing.qty + qty) * 100) / 100; else cart.push({ ...item, qty });
 
         // Reset form
         document.getElementById('item-select-value').value              = '';
@@ -1983,7 +1983,7 @@ self.addEventListener('fetch', e => {
                         onkeydown="handleRenameKey(event,'${list.id}')"
                         onblur="saveRename('${list.id}')">
                 </div>
-                <p class="text-sm-muted mb-2">${list.items.length} items${list.disc||list.gst ? ' &nbsp;·&nbsp; <span style="font-size:.72rem; background:#f0fdf4; color:#059669; border:1px solid #a7f3d0; border-radius:20px; padding:.1rem .45rem; font-weight:700;">' + (list.disc?'Disc '+list.disc+'%':'') + (list.disc&&list.gst?' + ':'') + (list.gst?'GST '+list.gst+'%':'') + '</span>' : ''} &nbsp;|&nbsp; <span style="color:var(--text); font-weight:600;">${appData.currency}${list.total.toFixed(2)}</span></p>
+                <p class="text-sm-muted mb-2">${list.items.length} items${!list.listOnly && (list.disc||list.gst) ? ' &nbsp;·&nbsp; <span style="font-size:.72rem; background:#f0fdf4; color:#059669; border:1px solid #a7f3d0; border-radius:20px; padding:.1rem .45rem; font-weight:700;">' + (list.disc?'Disc '+list.disc+'%':'') + (list.disc&&list.gst?' + ':'') + (list.gst?'GST '+list.gst+'%':'') + '</span>' : ''} &nbsp;|&nbsp; <span style="color:var(--text); font-weight:600;">${appData.currency}${list.total.toFixed(2)}</span></p>
                 <div style="display:flex; gap:.5rem; margin-top:auto;">
                     <button class="btn-outline" style="padding:.4rem; font-size:.85rem; flex:1;" onclick="loadList('${list.id}')">Load</button>
                     <button class="btn-outline" style="padding:.4rem; font-size:.85rem; flex:1; color:var(--text); border-color:var(--muted);" onclick="downloadHistoryPDF('${list.id}')">PDF</button>
@@ -2038,9 +2038,10 @@ self.addEventListener('fetch', e => {
         const name  = await askListName();
         if (name === null) return;
         const title = name || `List — ${new Date().toLocaleDateString()}`;
+        const isListOnly = appData.settings.listOnlyMode;
         const base  = cart.reduce((s, item) => s + item.rate * item.qty, 0);
-        const disc  = parseFloat(document.getElementById('discount-input')?.value) || 0;
-        const gst   = parseFloat(document.getElementById('gst-input')?.value)      || 0;
+        const disc  = isListOnly ? 0 : (parseFloat(document.getElementById('discount-input')?.value) || 0);
+        const gst   = isListOnly ? 0 : (parseFloat(document.getElementById('gst-input')?.value)      || 0);
         const after = base - (base * disc / 100);
         const total = after + (after * gst / 100);
         appData.lists.push({
@@ -2051,6 +2052,7 @@ self.addEventListener('fetch', e => {
             subtotal: +base.toFixed(2),
             disc,
             gst,
+            listOnly: isListOnly,
             total: +total.toFixed(2),
         });
         saveData(); renderHistory();
@@ -2058,7 +2060,8 @@ self.addEventListener('fetch', e => {
         cart = []; renderCart();
     }
 
-    function loadList(id) {
+    async function loadList(id) {
+        if (cart.length && !await customConfirm("Loading this list will replace your current cart. Continue?")) return;
         const list = appData.lists.find(l => l.id === id);
         cart = JSON.parse(JSON.stringify(list.items));
         document.getElementById('list-name-input').value = list.title || '';
@@ -2386,6 +2389,7 @@ self.addEventListener('fetch', e => {
                     cart = [];          // #12 fix: clear in-memory cart on restore
                     inventoryFilter = ''; // also reset search
                     saveData(); init();
+                    switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
                     await customAlert("Data Restored Successfully!");
                     fileInput.value = '';
                     document.getElementById('file-name-display').innerText = 'No file selected';
@@ -2582,6 +2586,7 @@ self.addEventListener('fetch', e => {
         }
 
         renderCart();
+        switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
         if (saveToInv && addedToInv > 0) {
             await customAlert(`✅ Done!\n\n${_excelParsed.length} items loaded into Cart\n${addedToInv} new item(s) added to Inventory`);
         }
