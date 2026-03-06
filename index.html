@@ -177,6 +177,15 @@ self.addEventListener('fetch', e => {
 
 // ── Listen for messages from main app ────────────────────────────
 self.addEventListener('message', e => {
+    if (e.data?.type === 'SHOW_WELCOME_NOTIF') {
+        self.registration.showNotification('Welcome to QuotePad', {
+            body: 'Your quotation maker is ready. Create your first quotation now.',
+            icon: e.data.icon || '',
+            badge: e.data.icon || '',
+            tag: 'qp-welcome',
+            silent: false,
+        });
+    }
     if (e.data?.type === 'SHOW_BACKUP_NOTIF') {
         self.registration.showNotification('QuotePad Backup', {
             body: e.data.body || 'Auto backup completed. Your data is safe.',
@@ -1425,118 +1434,101 @@ self.addEventListener('notificationclick', e => {
                 </div>
             </div>
 
-            <!-- AUTO BACKUP PANEL (shown only in PWA/app mode) -->
-            <div class="card animate-entry" id="auto-backup-card" style="animation-delay:.04s; display:none;">
-                <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1rem;">
+            <!-- UNIFIED DATA MANAGEMENT CARD -->
+            <div class="card animate-entry" id="data-mgmt-card" style="animation-delay:.04s;">
+
+                <!-- Header -->
+                <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem;">
                     <div style="width:38px; height:38px; background:linear-gradient(135deg,#10b981,#059669); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0015.586 5H6a2 2 0 00-2 2zm4-1v4h8V6"/></svg>
                     </div>
-                    <div>
-                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Auto Backup</div>
-                        <div style="font-size:.75rem; color:var(--muted);">Auto-saves every day at 7 AM</div>
+                    <div style="flex:1;">
+                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Data Management</div>
+                        <div style="font-size:.75rem; color:var(--muted);">Backup, restore and export your data</div>
                     </div>
-                    <div id="auto-backup-badge" style="margin-left:auto; font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:20px; background:#dcfce7; color:#166534;">ON</div>
+                    <div id="auto-backup-badge" style="display:none; font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:20px; background:#dcfce7; color:#166534;">Auto ON</div>
                 </div>
 
-                <!-- Location hint -->
-                <div style="background:linear-gradient(135deg,#f0fdf4,#d1fae5); border:1.5px solid #a7f3d0; border-radius:14px; padding:.85rem 1rem; margin-bottom:1rem;">
-                    <div style="display:flex; align-items:flex-start; gap:.6rem;">
-                        <svg width="20" height="20" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
-                        <div>
-                            <div style="font-size:.82rem; font-weight:700; color:#065f46; margin-bottom:.3rem;">Where are backups saved?</div>
-                            <div style="font-size:.78rem; color:#047857; line-height:1.7;">
-                                File Manager &rarr; Downloads &rarr; <span style="font-family:monospace; background:rgba(255,255,255,.8); padding:.1rem .4rem; border-radius:5px; font-weight:700;">QuotePad</span> folder
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Saved backups list -->
-                <div style="font-size:.8rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.5rem;">Saved Backups (max 10)</div>
-                <div id="auto-backup-list" style="display:flex; flex-direction:column; gap:.4rem; margin-bottom:.75rem;">
-                    <div style="text-align:center; color:var(--muted); font-size:.82rem; padding:1rem;">Loading backups...</div>
-                </div>
-
-                <button onclick="triggerManualBackup()" style="
-                    width:100%; display:flex; align-items:center; justify-content:center; gap:.5rem;
-                    background:linear-gradient(135deg,#10b981,#059669); color:#fff;
-                    border:none; border-radius:14px; padding:.75rem; font-size:.88rem; font-weight:700;
-                    box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; transition:transform .15s;">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Backup Now
-                </button>
-            </div>
-
-            <!-- RESTORE PANEL (PWA mode) -->
-            <div class="card animate-entry" id="pwa-restore-card" style="animation-delay:.08s; display:none;">
-                <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1rem;">
-                    <div style="width:38px; height:38px; background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                    </div>
-                    <div>
-                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Restore</div>
-                        <div style="font-size:.75rem; color:var(--muted);">One tap to restore — or pick a file manually</div>
-                    </div>
-                </div>
-
-                <!-- Latest backup + restore in one row -->
-                <div id="latest-backup-box" style="display:none; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:14px; padding:.85rem 1rem; margin-bottom:.75rem;">
-                    <div style="font-size:.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.35rem; display:flex; align-items:center; gap:.3rem;">
-                        <svg width="11" height="11" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Latest Backup
-                    </div>
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:.75rem;">
-                        <div style="min-width:0;">
-                            <div id="latest-backup-name" style="font-size:.85rem; font-weight:700; color:var(--accent-hover); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-                            <div id="latest-backup-date" style="font-size:.72rem; color:var(--muted); margin-top:.1rem;"></div>
-                        </div>
-                        <button id="restore-latest-btn" onclick="restoreLatestBackup()" style="
-                            flex-shrink:0; display:flex; align-items:center; gap:.35rem;
-                            background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
-                            border:none; border-radius:10px; padding:.5rem .85rem;
-                            font-size:.8rem; font-weight:700; cursor:pointer; white-space:nowrap;">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                            Restore
+                <!-- First-time hint (PWA only, dismissible) -->
+                <div id="backup-hint-bar" style="display:none; margin-bottom:1rem;">
+                    <div style="background:var(--bg); border:1px solid var(--border-light); border-left:3px solid var(--accent); border-radius:8px; padding:.6rem .85rem; display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem;">
+                        <p style="margin:0; font-size:.77rem; color:var(--muted); line-height:1.55;">
+                            A backup is saved automatically every day at 7 AM and stored on this device. To restore, tap <strong>Restore</strong> next to any backup in the list — the latest is always shown first. You can also restore from a file using <strong>Restore File</strong>.
+                        </p>
+                        <button onclick="dismissBackupHint()" style="flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--muted); padding:0; line-height:1; margin-top:1px;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- Browse manually -->
-                <div class="file-upload-wrapper">
-                    <input type="file" id="restore-file" accept=".json" class="file-upload-input" onchange="handleFileSelect(this)">
-                    <div class="file-upload-label" style="padding:.75rem; border-radius:12px;">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <span style="margin-top:.15rem; font-weight:600; font-size:.82rem;">Select a backup file manually</span>
+                <!-- PWA: location hint -->
+                <div id="pwa-location-hint" style="display:none; background:linear-gradient(135deg,#f0fdf4,#d1fae5); border:1.5px solid #a7f3d0; border-radius:12px; padding:.75rem 1rem; margin-bottom:1rem;">
+                    <div style="display:flex; align-items:center; gap:.5rem;">
+                        <svg width="16" height="16" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+                        <span style="font-size:.78rem; color:#047857; font-weight:600;">File Manager &rarr; Downloads &rarr; <span style="font-family:monospace; background:rgba(255,255,255,.8); padding:.05rem .35rem; border-radius:4px;">QuotePad</span> folder</span>
                     </div>
                 </div>
-                <div id="file-name-display" class="file-name" style="font-size:.75rem; margin:.35rem 0 .5rem; text-align:center;">No file selected</div>
-                <button class="btn-outline w-100" onclick="restoreBackup()" style="border-radius:12px; padding:.65rem;">Restore From This File</button>
-            </div>
 
-            <!-- WEBSITE MODE: original simple backup/restore -->
-            <div class="card animate-entry" id="web-backup-card" style="animation-delay:.05s;">
-                <h2>Data Management</h2>
-                <p class="text-sm-muted mb-4">Secure your Settings, Custom Units, Inventory, and Lists in a JSON file. 100% Offline.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <svg style="margin:0 auto .5rem; color:var(--accent);" width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        <h3>Backup Data</h3>
-                        <p class="text-xs-muted mb-2">Export to a secure JSON file.</p>
-                        <button onclick="downloadBackup()" class="w-100">Download</button>
+                <!-- PWA: saved backups list + latest restore -->
+                <div id="pwa-backup-section" style="display:none; margin-bottom:1rem;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem;">
+                        <span style="font-size:.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px;">Saved Backups</span>
+                        <span style="font-size:.7rem; color:var(--muted);">max 10 &middot; oldest auto-deleted</span>
                     </div>
-                    <div class="info-box">
-                        <h3>Restore Data</h3>
-                        <p class="text-xs-muted mb-1">Upload a previously saved backup.</p>
-                        <div class="file-upload-wrapper mb-1">
-                            <input type="file" id="restore-file-web" accept=".json" class="file-upload-input" onchange="handleFileSelectWeb(this)">
-                            <div class="file-upload-label" style="padding:1rem;">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                <span style="margin-top:.2rem; font-weight:500; font-size:.8rem;">Select JSON</span>
-                            </div>
+                    <div id="auto-backup-list" style="display:flex; flex-direction:column; gap:.35rem; margin-bottom:.75rem;">
+                        <div style="text-align:center; color:var(--muted); font-size:.82rem; padding:1rem;">Loading backups...</div>
+                    </div>
+                    <!-- Latest backup restore highlight -->
+                    <div id="latest-backup-box" style="display:none; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:12px; padding:.75rem 1rem;">
+                        <div style="font-size:.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.3rem; display:flex; align-items:center; gap:.3rem;">
+                            <svg width="10" height="10" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Latest Backup
                         </div>
-                        <div id="file-name-display-web" class="file-name" style="font-size:.7rem;">No file selected</div>
-                        <button class="btn-outline w-100" onclick="restoreBackupWeb()" style="margin-top:.5rem;">Restore</button>
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:.75rem;">
+                            <div style="min-width:0;">
+                                <div id="latest-backup-name" style="font-size:.85rem; font-weight:700; color:var(--accent-hover); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                                <div id="latest-backup-date" style="font-size:.72rem; color:var(--muted); margin-top:.1rem;"></div>
+                            </div>
+                            <button id="restore-latest-btn" onclick="restoreLatestBackup()" style="
+                                flex-shrink:0; display:flex; align-items:center; gap:.35rem;
+                                background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+                                border:none; border-radius:10px; padding:.45rem .8rem;
+                                font-size:.8rem; font-weight:700; cursor:pointer; white-space:nowrap;">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                                Restore
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Action row: Backup Now (PWA) or Download (web) + Restore from file -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:.65rem;">
+                    <button id="pwa-backup-btn" onclick="triggerManualBackup()" style="display:none;
+                        align-items:center; justify-content:center; gap:.4rem;
+                        background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+                        border:none; border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
+                        box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer;">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Backup Now
+                    </button>
+                    <button id="web-backup-btn" onclick="downloadBackup()" style="
+                        display:flex; align-items:center; justify-content:center; gap:.4rem;
+                        background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+                        border:none; border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
+                        box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer;">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download
+                    </button>
+                    <label style="display:flex; align-items:center; justify-content:center; gap:.4rem;
+                        background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+                        border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
+                        box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer; position:relative;">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                        Restore File
+                        <input type="file" id="restore-file" accept=".json" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="restoreFromFileInput(this)">
+                    </label>
+                </div>
+                <div id="file-name-display" style="font-size:.75rem; color:var(--muted); text-align:center; min-height:1rem; margin-top:.35rem;"></div>
+
             </div>
         </section>
         <!-- ABOUT -->
@@ -2550,14 +2542,27 @@ self.addEventListener('notificationclick', e => {
     // ── Init backup UI based on mode ──────────────────────────────────
     function initBackupUI() {
         const pwa = isPWA();
-        document.getElementById('auto-backup-card').style.display  = pwa ? 'block' : 'none';
-        document.getElementById('pwa-restore-card').style.display  = pwa ? 'block' : 'none';
-        document.getElementById('web-backup-card').style.display   = pwa ? 'none'  : 'block';
+        document.getElementById('auto-backup-badge').style.display    = pwa ? 'block'  : 'none';
+        document.getElementById('pwa-location-hint').style.display    = pwa ? 'block'  : 'none';
+        document.getElementById('pwa-backup-section').style.display   = pwa ? 'block'  : 'none';
+        document.getElementById('pwa-backup-btn').style.display       = pwa ? 'flex'   : 'none';
+        document.getElementById('web-backup-btn').style.display       = pwa ? 'none'   : 'flex';
+
+        // Show hint only in PWA, only until dismissed
+        const hintBar = document.getElementById('backup-hint-bar');
+        if (hintBar) hintBar.style.display = (pwa && !localStorage.getItem('gp_backupHintDismissed')) ? 'block' : 'none';
+
         if (pwa) {
             renderBackupList();
             scheduleAutoBackup();
             initNotifications();
         }
+    }
+
+    function dismissBackupHint() {
+        localStorage.setItem('gp_backupHintDismissed', '1');
+        const h = document.getElementById('backup-hint-bar');
+        if (h) h.style.display = 'none';
     }
 
     // ── NOTIFICATION SYSTEM (PWA only) ───────────────────────────────
@@ -2574,18 +2579,35 @@ self.addEventListener('notificationclick', e => {
         if (!('Notification' in window)) return;
         if (!('serviceWorker' in navigator)) return;
 
-        // Ask permission once — politely, not immediately
-        const alreadyAsked = localStorage.getItem(NOTIF_PERM_KEY);
-        if (!alreadyAsked && Notification.permission === 'default') {
-            // Wait 30s after install before asking — let user explore first
-            setTimeout(async () => {
-                const granted = await Notification.requestPermission();
-                localStorage.setItem(NOTIF_PERM_KEY, '1');
-                if (granted === 'granted') scheduleNextNudge();
-            }, 30000);
+        const WELCOME_KEY = 'gp_welcomeNotifSent';
+
+        if (Notification.permission === 'default' && !localStorage.getItem(NOTIF_PERM_KEY)) {
+            // First ever launch — ask immediately
+            const granted = await Notification.requestPermission();
+            localStorage.setItem(NOTIF_PERM_KEY, '1');
+            if (granted === 'granted') {
+                // Welcome fires right away
+                localStorage.setItem(WELCOME_KEY, '1');
+                sendWelcomeNotification();
+                scheduleNextNudge();
+            }
         } else if (Notification.permission === 'granted') {
+            // Already granted — send welcome only once ever
+            if (!localStorage.getItem(WELCOME_KEY)) {
+                localStorage.setItem(WELCOME_KEY, '1');
+                sendWelcomeNotification();
+            }
             scheduleNextNudge();
         }
+    }
+
+    function sendWelcomeNotification() {
+        navigator.serviceWorker.ready.then(reg => {
+            // Small delay to ensure SW is fully active after install
+            setTimeout(() => {
+                reg.active?.postMessage({ type: 'SHOW_WELCOME_NOTIF', icon: getSwIcon() });
+            }, 1500);
+        });
     }
 
     // ── Schedule next sarcastic nudge ────────────────────────────────
@@ -2657,99 +2679,102 @@ self.addEventListener('notificationclick', e => {
         localStorage.setItem(BACKUP_STORE, JSON.stringify(list));
     }
 
-    // ── Create one backup entry ───────────────────────────────────────
+    // ── Create one backup entry (label = auto-named string; omit for manual) ─
     function createBackup(label) {
         let backups = getBackups();
-        const now   = new Date();
+        const now     = new Date();
         const dateStr = now.toLocaleDateString('en-US', { day:'2-digit', month:'short', year:'numeric' });
         const timeStr = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-        const name  = label || `Backup — ${dateStr}, ${timeStr}`;
+        const name    = label || `Backup — ${dateStr}, ${timeStr}`;
 
-        // Remove oldest if over limit
+        // Keep max 10 — drop oldest first
         if (backups.length >= MAX_BACKUPS) {
             backups.sort((a,b) => a.ts - b.ts);
             backups.shift();
         }
-
         backups.push({ name, date: `${dateStr} ${timeStr}`, ts: now.getTime(), data: JSON.stringify(appData) });
         saveBackups(backups);
         renderBackupList();
-        // Notify only for auto backups (no label = auto)
-        if (!label) notifyBackupDone(dateStr);
+        // Notify via SW for auto backups only
+        if (label?.startsWith('Auto')) notifyBackupDone(dateStr);
     }
 
-    // ── Manual backup button ──────────────────────────────────────────
-    async function triggerManualBackup() {
-        createBackup();
-        await customAlert('Backup saved!\n\nStored on this device.');
-    }
+    // ── Manual "Backup Now" — silent, list refreshes ──────────────────
+    function triggerManualBackup() { createBackup(); }
 
-    // ── Render saved backup list ──────────────────────────────────────
+    // ── Render saved backup list in PWA section ───────────────────────
     function renderBackupList() {
-        const backups = getBackups();
-        const el      = document.getElementById('auto-backup-list');
+        const el         = document.getElementById('auto-backup-list');
         const latestBox  = document.getElementById('latest-backup-box');
         const latestName = document.getElementById('latest-backup-name');
         const latestDate = document.getElementById('latest-backup-date');
+        if (!el) return;
 
+        const backups = getBackups();
         if (!backups.length) {
-            el.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:.82rem; padding:1rem; background:var(--bg); border-radius:10px;">
-                No backups yet.<br>Tap the button above to create one.
-            </div>`;
+            el.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:1rem;background:var(--bg);border-radius:10px;">No backups yet. Tap Backup Now to create one.</div>`;
             if (latestBox) latestBox.style.display = 'none';
             return;
         }
 
-        // Sort newest first
         const sorted = [...backups].sort((a,b) => b.ts - a.ts);
         const latest = sorted[0];
+        if (latestBox)  latestBox.style.display  = 'block';
+        if (latestName) latestName.textContent   = latest.name;
+        if (latestDate) latestDate.textContent   = latest.date;
 
-        // Update latest backup highlight
-        if (latestBox)  { latestBox.style.display  = 'block'; }
-        if (latestName) latestName.textContent = latest.name;
-        if (latestDate) latestDate.textContent = latest.date;
+        const STAR = `<svg width="14" height="14" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>`;
+        const FILE = `<svg width="14" height="14" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
 
         el.innerHTML = sorted.map((b, i) => `
-            <div style="display:flex; align-items:center; gap:.6rem;
-                background:${i===0 ? 'var(--accent-light)' : 'var(--bg)'};
-                border:1.5px solid ${i===0 ? 'var(--accent)' : 'var(--border-light)'};
-                border-radius:12px; padding:.6rem .85rem;">
-                <span style="font-size:1rem;">${i===0
-                    ? `<svg width="15" height="15" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>`
-                    : `<svg width="15" height="15" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`
-                }</span>
-                <div style="flex:1; min-width:0;">
-                    <div style="font-size:.8rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.name}</div>
-                    <div style="font-size:.7rem; color:var(--muted);">${b.date}</div>
+            <div style="display:flex;align-items:center;gap:.6rem;
+                background:${i===0?'var(--accent-light)':'var(--bg)'};
+                border:1.5px solid ${i===0?'var(--accent)':'var(--border-light)'};
+                border-radius:12px;padding:.55rem .8rem;">
+                ${i===0 ? STAR : FILE}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:.8rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.name}</div>
+                    <div style="font-size:.68rem;color:var(--muted);">${b.date}</div>
                 </div>
-                <button onclick="restoreFromSlot(${b.ts})" style="
-                    flex-shrink:0; font-size:.7rem; font-weight:700;
-                    background:var(--accent); color:#fff; border:none;
-                    border-radius:8px; padding:.25rem .6rem; cursor:pointer;">
+                <button onclick="restoreFromSlot(${b.ts})" style="flex-shrink:0;font-size:.7rem;font-weight:700;
+                    background:${i===0?'var(--accent)':'var(--border)'};color:${i===0?'#fff':'var(--text)'};
+                    border:none;border-radius:8px;padding:.25rem .6rem;cursor:pointer;">
                     Restore
                 </button>
             </div>`).join('');
     }
 
-    // ── Restore latest backup ─────────────────────────────────────────
+    // ── Restore latest (the big Restore button in latest-backup-box) ──
     async function restoreLatestBackup() {
-        const backups = getBackups();
-        if (!backups.length) { await customAlert('No backup found!'); return; }
-        const latest = backups.sort((a,b) => b.ts - a.ts)[0];
-        await doRestore(latest.data, latest.name);
+        const sorted = getBackups().sort((a,b) => b.ts - a.ts);
+        if (!sorted.length) { await customAlert('No backup found.'); return; }
+        await doRestore(sorted[0].data, sorted[0].name);
     }
 
-    // ── Restore from a specific slot ─────────────────────────────────
+    // ── Restore from any slot in the list ────────────────────────────
     async function restoreFromSlot(ts) {
-        const backups = getBackups();
-        const entry   = backups.find(b => b.ts === ts);
-        if (!entry) { await customAlert('Backup not found!'); return; }
+        const entry = getBackups().find(b => b.ts === ts);
+        if (!entry) { await customAlert('Backup not found.'); return; }
         await doRestore(entry.data, entry.name);
     }
 
-    // ── Common restore logic ──────────────────────────────────────────
+    // ── Restore from a manually selected JSON file ────────────────────
+    async function restoreFromFileInput(input) {
+        const display = document.getElementById('file-name-display');
+        if (!input.files?.length) return;
+        if (display) { display.textContent = input.files[0].name; display.style.color = 'var(--accent)'; }
+        const reader = new FileReader();
+        reader.onload = async e => {
+            await doRestore(e.target.result, input.files[0].name);
+            input.value = '';
+            if (display) { display.textContent = ''; }
+        };
+        reader.readAsText(input.files[0]);
+    }
+
+    // ── Common restore logic (shows which backup is being restored) ───
     async function doRestore(jsonStr, label) {
-        if (!await customConfirm(`Restore from "${label}"?\n\nThis will replace your current data.`)) return;
+        if (!await customConfirm(`Restore from:\n"${label}"?\n\nThis will replace your current data.`)) return;
         try {
             const parsed = JSON.parse(jsonStr);
             if (parsed.inventory && parsed.lists && parsed.settings) {
@@ -2760,85 +2785,45 @@ self.addEventListener('notificationclick', e => {
                 cart = []; inventoryFilter = '';
                 saveData(); init();
                 switchTab('maker', document.querySelector('.desktop-nav .nav-btn'));
-                await customAlert('Restore complete!\n\nYour data is back.');
-            } else { await customAlert('This file is not a valid backup format.'); }
+                await customAlert(`Restore complete.\n\n"${label}" has been loaded.`);
+            } else { await customAlert('This file is not a valid backup.'); }
         } catch { await customAlert('Could not read the file. Please try again.'); }
     }
 
-    // ── Schedule auto backup at 7 AM daily ───────────────────────────
+    // ── Auto backup at 7 AM daily ─────────────────────────────────────
     function scheduleAutoBackup() {
-        const LAST_KEY = 'gp_lastAutoBackup';
-        const now      = new Date();
-        const today7am = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 0, 0);
-        const lastRun  = parseInt(localStorage.getItem(LAST_KEY) || '0');
-        const lastDate = new Date(lastRun);
+        const LAST_KEY  = 'gp_lastAutoBackup';
+        const now       = new Date();
+        const today7am  = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 0, 0);
+        const lastRun   = parseInt(localStorage.getItem(LAST_KEY) || '0');
+        const ranToday  = new Date(lastRun).toDateString() === now.toDateString() && lastRun >= today7am.getTime();
 
-        // If it's past 7am today AND we haven't backed up today yet
-        const alreadyRanToday = lastDate.toDateString() === now.toDateString() && lastRun >= today7am.getTime();
-        if (now >= today7am && !alreadyRanToday) {
-            createBackup(`Auto — ${now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'})}`);
+        if (now >= today7am && !ranToday) {
+            const label = `Auto — ${now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'})}`;
+            createBackup(label);
             localStorage.setItem(LAST_KEY, now.getTime().toString());
         }
-
-        // Schedule next check — time until next 7am
-        const tomorrow7am = new Date(today7am.getTime() + 24*60*60*1000);
-        const msUntilNext = (now < today7am ? today7am : tomorrow7am).getTime() - now.getTime();
-        setTimeout(() => { scheduleAutoBackup(); }, Math.min(msUntilNext, 60*60*1000)); // recheck max every 1hr
+        const tomorrow7am = new Date(today7am.getTime() + 86400000);
+        const msUntil     = (now < today7am ? today7am : tomorrow7am).getTime() - now.getTime();
+        setTimeout(scheduleAutoBackup, Math.min(msUntil, 3600000));
     }
 
-    // ── Web mode: original simple backup/restore ──────────────────────
+    // ── Web mode: download backup as JSON file ────────────────────────
     async function downloadBackup() {
         const jsonStr  = JSON.stringify(appData, null, 2);
         const filename = `QuotePad_Backup_${new Date().toLocaleDateString('en-US').replace(/\//g,'-')}.json`;
         if (navigator.share && navigator.canShare) {
             try {
-                const file = new File([jsonStr], filename, { type: 'application/json' });
-                if (navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'QuotePad Backup' }); return;
-                }
+                const file = new File([jsonStr], filename, { type:'application/json' });
+                if (navigator.canShare({ files:[file] })) { await navigator.share({ files:[file], title:'QuotePad Backup' }); return; }
             } catch(e) {}
         }
         try {
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url  = URL.createObjectURL(blob);
-            const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); URL.revokeObjectURL(url); return;
+            const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([jsonStr],{type:'application/json'})), download: filename });
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); return;
         } catch(e) {}
-        try {
-            await navigator.clipboard.writeText(jsonStr);
-            await customAlert("Download not supported here.\n\nData copied to clipboard — paste in any notes app and save as .json");
-        } catch(e) { await customAlert("Could not download. Please open in Chrome browser."); }
-    }
-
-    function handleFileSelect(input) {
-        const display = document.getElementById('file-name-display');
-        if (display) {
-            display.innerText   = input.files?.[0] ? input.files[0].name : 'No file selected';
-            display.style.color = input.files?.[0] ? 'var(--accent)' : 'var(--muted)';
-        }
-    }
-    function handleFileSelectWeb(input) {
-        const display = document.getElementById('file-name-display-web');
-        if (display) {
-            display.innerText   = input.files?.[0] ? `Selected: ${input.files[0].name}` : 'No file selected';
-            display.style.color = input.files?.[0] ? 'var(--accent)' : 'var(--muted)';
-        }
-    }
-
-    async function restoreBackup() {
-        const fileInput = document.getElementById('restore-file');
-        if (!fileInput || !fileInput.files.length) { await customAlert("Please select a JSON backup file first."); return; }
-        const reader = new FileReader();
-        reader.onload = async e => { await doRestore(e.target.result, fileInput.files[0].name); fileInput.value = ''; handleFileSelect(fileInput); };
-        reader.readAsText(fileInput.files[0]);
-    }
-    async function restoreBackupWeb() {
-        const fileInput = document.getElementById('restore-file-web');
-        if (!fileInput || !fileInput.files.length) { await customAlert("Please select a JSON backup file first."); return; }
-        const reader = new FileReader();
-        reader.onload = async e => { await doRestore(e.target.result, fileInput.files[0].name); fileInput.value = ''; handleFileSelectWeb(fileInput); };
-        reader.readAsText(fileInput.files[0]);
+        try { await navigator.clipboard.writeText(jsonStr); await customAlert('Copied to clipboard. Paste in any notes app and save as .json'); }
+        catch(e) { await customAlert('Could not download. Open in Chrome browser.'); }
     }
 
     // ── SECTION 11: EXCEL / CSV IMPORT ───────────────────────────────
