@@ -299,6 +299,24 @@ self.addEventListener('notificationclick', e => {
         body.dark .onboarding-hint      { box-shadow:0 10px 25px rgba(0,0,0,.5); }
         body.dark .info-box             { border-color:var(--border); }
 
+
+        /* ── GROUP CARDS ─────────────────────────────────────────────── */
+        .inv-group-card { border-radius:var(--radius); overflow:hidden; border:1.5px solid var(--border-light); margin-bottom:.75rem; background:var(--surface); box-shadow:var(--shadow); }
+        .inv-group-header { display:flex; align-items:center; justify-content:space-between; padding:.65rem 1rem; background:var(--accent); color:#fff; cursor:pointer; user-select:none; gap:.5rem; }
+        .inv-group-header.individual { background:var(--muted); }
+        .inv-group-header.master { background:#1e293b; }
+        .inv-group-title { font-size:.88rem; font-weight:700; letter-spacing:.3px; flex:1; }
+        .inv-group-count { font-size:.72rem; opacity:.85; white-space:nowrap; }
+        .inv-group-chevron { transition:transform .2s; flex-shrink:0; }
+        .inv-group-chevron.open { transform:rotate(180deg); }
+        .inv-group-body { display:none; }
+        .inv-group-body.open { display:block; }
+        /* Group picker dropdown */
+        .group-picker-wrap { display:flex; flex-direction:column; gap:.3rem; margin-top:.5rem; }
+        .group-picker-select { padding:.38rem .6rem; font-size:.85rem; border:1.5px solid var(--border); border-radius:7px; background:var(--solid); color:var(--text); cursor:pointer; }
+        .group-picker-select:focus { border-color:var(--accent); outline:none; }
+        .group-new-input-wrap { display:none; flex-direction:row; gap:.4rem; margin-top:.3rem; }
+        .group-new-input-wrap.show { display:flex; }
         /* ── RESET & BASE ───────────────────────────────────────────── */
         *, *::before, *::after {
             box-sizing: border-box; margin: 0; padding: 0;
@@ -1136,6 +1154,18 @@ self.addEventListener('notificationclick', e => {
                                     <button onclick="qaNewUnitCancel()" style="background:transparent;border:1.5px solid var(--border);color:var(--muted);"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
                                 </div>
                             </div>
+                            <!-- Group picker in quick add -->
+                            <div class="input-group" style="gap:.25rem; margin-top:.4rem;">
+                                <label>Group</label>
+                                <select id="qa-group-sel" class="group-picker-select" onchange="onQaGroupChange(this.value)">
+                                    <option value="">No Group (Individual)</option>
+                                </select>
+                                <div class="group-new-input-wrap" id="qa-newgroup-wrap">
+                                    <input type="text" id="qa-newgroup-input" placeholder="New group name..." style="flex:1; font-size:.82rem; height:34px;">
+                                    <button onclick="confirmNewGroupFromQa()" style="height:34px; padding:0 .7rem; font-size:.8rem; width:auto;">Create</button>
+                                    <button onclick="cancelNewGroupFromQa()" style="height:34px; padding:0 .5rem; width:34px; background:transparent; border:1.5px solid var(--border); color:var(--muted);">x</button>
+                                </div>
+                            </div>
                             <div class="qa-actions">
                                 <button class="qa-save" onclick="quickAddSave()">Save &amp; Select</button>
                                 <button class="qa-cancel" onclick="quickAddClose()" title="Cancel"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -1226,14 +1256,14 @@ self.addEventListener('notificationclick', e => {
                                     <label style="display:flex; align-items:center; gap:.6rem; padding:.6rem .75rem; background:var(--bg); border:1px solid var(--border-light); border-radius:8px; cursor:pointer; user-select:none;">
                                         <input type="checkbox" id="excel-save-inventory" onchange="toggleExcelGroupInput(this.checked)" style="width:16px; height:16px; accent-color:var(--accent); cursor:pointer; display:inline;">
                                         <div>
-                                            <div style="font-size:.83rem; font-weight:600; color:var(--text);">Also save to Inventory</div>
-                                            <div style="font-size:.72rem; color:var(--muted);">Items will be saved under a group in master inventory</div>
+                                            <div style="font-size:.83rem; font-weight:600; color:var(--text);">Save to Inventory</div>
+                                            <div style="font-size:.72rem; color:var(--muted);">Items get saved to inventory under the group name below.</div>
                                         </div>
                                     </label>
                                     <div id="excel-group-wrap" style="display:none; flex-direction:column; gap:.3rem; padding:.6rem .75rem; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:8px;">
                                         <label style="font-size:.75rem; font-weight:700; color:var(--accent-hover); text-transform:uppercase; letter-spacing:.4px;">Group Name</label>
                                         <input type="text" id="excel-group-name" placeholder="e.g. Vegetables, Hardware, Grocery…" style="padding:.4rem .6rem; font-size:.85rem; border:1.5px solid var(--border); border-radius:7px; background:var(--solid); color:var(--text); outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-                                        <div style="font-size:.7rem; color:var(--muted);">All imported items will be tagged under this group</div>
+                                        <div style="font-size:.7rem; color:var(--muted);">All items will be filed under this group.</div>
                                     </div>
                                     <button onclick="importExcelData()" style="width:100%; font-size:.9rem;">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="vertical-align:middle; margin-right:.3rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
@@ -1382,40 +1412,37 @@ self.addEventListener('notificationclick', e => {
                         <input type="number" id="new-item-rate" placeholder="e.g. 50" onkeypress="handleEnter(event, addNewItem)">
                     </div>
                 </div>
-                <button onclick="addNewItem()" class="w-100" style="margin-top:1rem;">Save to Master Inventory</button>
+                <!-- Group picker for manual add -->
+                <div class="group-picker-wrap" id="add-item-group-wrap">
+                    <label style="font-size:.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px;">Group</label>
+                    <select id="add-item-group-sel" class="group-picker-select" onchange="onAddGroupChange(this.value)">
+                        <option value="">No Group (Individual)</option>
+                    </select>
+                    <div class="group-new-input-wrap" id="add-item-newgroup-wrap">
+                        <input type="text" id="add-item-newgroup-input" placeholder="New group name…" style="flex:1; font-size:.85rem; height:36px;">
+                        <button onclick="confirmNewGroupFromAdd()" style="height:36px; padding:0 .8rem; font-size:.82rem; width:auto;">Create</button>
+                        <button onclick="cancelNewGroupFromAdd()" style="height:36px; padding:0 .6rem; width:36px; background:transparent; border:1.5px solid var(--border); color:var(--muted);">✕</button>
+                    </div>
+                </div>
+                <button onclick="addNewItem()" class="w-100" style="margin-top:.75rem;">Add Item</button>
             </div>
 
             <div class="card animate-entry" style="animation-delay:.2s;">
-                <h3>Current Master Inventory</h3>
-                <p class="text-sm-muted mb-2">Changes here will Auto-Update in your Cart and Saved History!</p>
-
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; flex-wrap:wrap; gap:.4rem;">
+                    <h3 style="margin:0;">Master Inventory</h3>
+                    <div class="inv-count" id="inv-count"></div>
+                </div>
+                <p class="text-sm-muted mb-2">Edits here reflect instantly in cart and history.</p>
                 <!-- Search bar -->
-                <div class="search-wrap">
+                <div class="search-wrap" style="margin-bottom:.75rem;">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/></svg>
-                    <input type="text" id="inv-search" class="search-input" placeholder="Search items..." oninput="filterInventory(this.value)">
+                    <input type="text" id="inv-search" class="search-input" placeholder="Search all items..." oninput="filterInventory(this.value)">
                     <button class="search-clear" id="search-clear-btn" onclick="clearSearch()" title="Clear"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
                 </div>
-                <div class="inv-count" id="inv-count"></div>
-
-                <div class="table-responsive">
-                    <table id="inventory-table">
-                        <thead>
-                            <tr>
-                                <th style="width:80px; text-align:center;">Action</th>
-                                <th>Item</th>
-                                <th>Unit</th>
-                                <th>Rate</th>
-                                <th style="width:60px; text-align:center;">History</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-body"></tbody>
-                    </table>
-                    <div class="scroll-hint">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-                        Swipe to see all columns
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                    </div>
-                </div>
+                <!-- Group cards container -->
+                <div id="inv-cards-container"></div>
+                <!-- hidden legacy table body — kept for compatibility -->
+                <table style="display:none"><tbody id="inventory-body"></tbody></table>
             </div>
         </section>
 
@@ -1966,61 +1993,189 @@ self.addEventListener('notificationclick', e => {
             document.getElementById('myCustomSelect').classList.remove('open');
     });
 
-    function renderInventoryTable() {
-        const filtered = inventoryFilter
-            ? appData.inventory.filter(i => i.name.toLowerCase().includes(inventoryFilter))
-            : appData.inventory;
+    // ── Inventory helper: get all unique groups ────────────────────
+    function getInvGroups() {
+        const groups = new Set();
+        appData.inventory.forEach(i => { if (i.group) groups.add(i.group); });
+        return [...groups].sort();
+    }
 
-        // Show item count
+    // ── Populate group pickers everywhere ──────────────────────────
+    function refreshGroupPickers() {
+        const groups = getInvGroups();
+        const makeOptions = (selId) => {
+            const sel = document.getElementById(selId);
+            if (!sel) return;
+            const cur = sel.value;
+            sel.innerHTML = `<option value="">No Group (Individual)</option>` +
+                groups.map(g => `<option value="${g}" ${cur===g?'selected':''}>${g}</option>`).join('') +
+                `<option value="__new__">+ New group</option>`;
+        };
+        makeOptions('add-item-group-sel');
+        makeOptions('qa-group-sel');
+    }
+
+    function onAddGroupChange(val) {
+        const wrap = document.getElementById('add-item-newgroup-wrap');
+        if (val === '__new__') { wrap.classList.add('show'); document.getElementById('add-item-newgroup-input').focus(); }
+        else wrap.classList.remove('show');
+    }
+    function confirmNewGroupFromAdd() {
+        const val = document.getElementById('add-item-newgroup-input').value.trim();
+        if (!val) return;
+        document.getElementById('add-item-newgroup-wrap').classList.remove('show');
+        // Add to select and select it
+        const sel = document.getElementById('add-item-group-sel');
+        let opt = [...sel.options].find(o => o.value === val);
+        if (!opt) { opt = new Option(val, val); sel.insertBefore(opt, sel.options[sel.options.length-1]); }
+        sel.value = val;
+        document.getElementById('add-item-newgroup-input').value = '';
+    }
+    function cancelNewGroupFromAdd() {
+        document.getElementById('add-item-newgroup-wrap').classList.remove('show');
+        document.getElementById('add-item-newgroup-input').value = '';
+        document.getElementById('add-item-group-sel').value = '';
+    }
+    function onQaGroupChange(val) {
+        const wrap = document.getElementById('qa-newgroup-wrap');
+        if (val === '__new__') { wrap.classList.add('show'); document.getElementById('qa-newgroup-input').focus(); }
+        else wrap.classList.remove('show');
+    }
+    function confirmNewGroupFromQa() {
+        const val = document.getElementById('qa-newgroup-input').value.trim();
+        if (!val) return;
+        document.getElementById('qa-newgroup-wrap').classList.remove('show');
+        const sel = document.getElementById('qa-group-sel');
+        let opt = [...sel.options].find(o => o.value === val);
+        if (!opt) { opt = new Option(val, val); sel.insertBefore(opt, sel.options[sel.options.length-1]); }
+        sel.value = val;
+        document.getElementById('qa-newgroup-input').value = '';
+    }
+    function cancelNewGroupFromQa() {
+        document.getElementById('qa-newgroup-wrap').classList.remove('show');
+        document.getElementById('qa-newgroup-input').value = '';
+        document.getElementById('qa-group-sel').value = '';
+    }
+
+    // ── Render single item row (reused across cards) ────────────────
+    function renderItemRow(item) {
+        const unitOpts = appData.units.map(u =>
+            `<option value="${u}" ${item.unit===u?'selected':''}>${u}</option>`).join('');
+        const hist = appData.priceHistory[item.id] || [];
+        const lastTwo = hist.slice(-2);
+        const trend = lastTwo.length < 2 ? '' : lastTwo[1].rate > lastTwo[0].rate
+            ? '<span class="ph-badge ph-up">▲</span>'
+            : lastTwo[1].rate < lastTwo[0].rate
+            ? '<span class="ph-badge ph-down">▼</span>'
+            : '<span class="ph-badge ph-same">—</span>';
+
+        if (editingItemId === item.id) {
+            return `<tr style="background:#e0f2fe !important;">
+                <td><div class="action-cell">
+                    <button class="btn-small" onclick="saveEditItem('${item.id}')" style="height:30px;">Save</button>
+                    <button class="btn-outline btn-small" onclick="cancelEdit()" style="height:30px;">✕</button>
+                </div></td>
+                <td><input type="text" id="edit-name-${item.id}" value="${item.name.replace(/"/g,'&quot;')}" style="padding:.4rem; font-size:.85rem; height:35px; width:100%;"></td>
+                <td><select id="edit-unit-${item.id}" style="padding:.4rem; font-size:.85rem; height:35px;">${unitOpts}</select></td>
+                <td><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:65px; padding:.4rem; height:35px;"></td>
+                <td></td>
+            </tr>`;
+        }
+        return `<tr>
+            <td><div class="action-cell">
+                <button class="btn-outline btn-small" onclick="startEditItem('${item.id}')">Edit</button>
+                <button class="btn-danger btn-small" onclick="deleteItem('${item.id}')">Del</button>
+            </div></td>
+            <td style="font-weight:500;">${item.name}</td>
+            <td>${item.unit}</td>
+            <td>${appData.currency}${item.rate}</td>
+            <td style="text-align:center;">${trend}<button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .35rem;" data-id="${item.id}" data-n="${item.name.replace(/"/g,'&quot;')}" onclick="showPriceHistory(this.dataset.id,this.dataset.n)">Log</button></td>
+        </tr>`;
+    }
+
+    // ── Build one group card HTML ───────────────────────────────────
+    function buildGroupCard(label, items, cardClass, isOpen) {
+        const open = isOpen ? 'open' : '';
+        const tableRows = items.map(renderItemRow).join('');
+        return `<div class="inv-group-card">
+            <div class="inv-group-header ${cardClass}" onclick="toggleInvCard(this)">
+                <span class="inv-group-title">${label}</span>
+                <span class="inv-group-count">${items.length} item${items.length!==1?'s':''}</span>
+                <svg class="inv-group-chevron ${open}" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+            <div class="inv-group-body ${open}">
+                <div class="table-responsive">
+                    <table id="inventory-table" style="width:100%;">
+                        <thead><tr>
+                            <th style="width:80px;text-align:center;">Action</th>
+                            <th>Item</th><th>Unit</th><th>Rate</th>
+                            <th style="width:60px;text-align:center;">History</th>
+                        </tr></thead>
+                        <tbody>${tableRows || `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1.5rem;">No items</td></tr>`}</tbody>
+                    </table>
+                    <div class="scroll-hint"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg> Swipe to see all <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function toggleInvCard(header) {
+        const chevron = header.querySelector('.inv-group-chevron');
+        const body    = header.nextElementSibling;
+        const open    = body.classList.toggle('open');
+        chevron.classList.toggle('open', open);
+    }
+
+    function renderInventoryTable() {
+        const container = document.getElementById('inv-cards-container');
+        if (!container) return;
+
+        const all      = appData.inventory;
+        const filter   = inventoryFilter;
+        const filtered = filter ? all.filter(i => i.name.toLowerCase().includes(filter)) : all;
+
+        // Count display
         const countEl = document.getElementById('inv-count');
-        if (countEl) {
-            countEl.textContent = inventoryFilter
-                ? `${filtered.length} of ${appData.inventory.length} items`
-                : `${appData.inventory.length} item${appData.inventory.length !== 1 ? 's' : ''}`;
+        if (countEl) countEl.textContent = filter
+            ? `${filtered.length} of ${all.length} items`
+            : `${all.length} item${all.length!==1?'s':''}`;
+
+        if (!all.length) {
+            container.innerHTML = `<div style="text-align:center;color:var(--muted);padding:2rem;font-size:.88rem;">No inventory items yet. Add your first item above!</div>`;
+            refreshGroupPickers();
+            return;
         }
 
-        document.getElementById('inventory-body').innerHTML =
-            filtered.length === 0
-            ? `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:2rem;">No items match "${inventoryFilter}"</td></tr>`
-            : filtered.map(item => {
-                if (editingItemId === item.id) {
-                    const opts = appData.units.map(u =>
-                        `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`
-                    ).join('');
-                    return `
-                        <tr style="background:#e0f2fe !important;">
-                            <td>
-                                <div class="action-cell">
-                                    <button class="btn-small" onclick="saveEditItem('${item.id}')" style="height:30px;">Save</button>
-                                    <button class="btn-outline btn-small" onclick="cancelEdit()" style="height:30px;"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                            <td><input type="text"   id="edit-name-${item.id}" value="${item.name}" style="padding:.4rem; font-size:.85rem; height:35px; width:100%;"></td>
-                            <td><select id="edit-unit-${item.id}" style="padding:.4rem; font-size:.85rem; height:35px;">${opts}</select></td>
-                            <td><input type="number" id="edit-rate-${item.id}" value="${item.rate}" style="width:65px; padding:.4rem; height:35px;"></td>
-                        </tr>`;
-                }
-                const hist = appData.priceHistory[item.id] || [];
-                const lastTwo = hist.slice(-2);
-                const trend = lastTwo.length < 2 ? '' : lastTwo[1].rate > lastTwo[0].rate
-                    ? '<span class="ph-badge ph-up">▲</span>'
-                    : lastTwo[1].rate < lastTwo[0].rate
-                    ? '<span class="ph-badge ph-down">▼</span>'
-                    : '<span class="ph-badge ph-same">—</span>';
-                return `
-                    <tr>
-                        <td>
-                            <div class="action-cell">
-                                <button class="btn-outline btn-small" onclick="startEditItem('${item.id}')">Edit</button>
-                                <button class="btn-danger  btn-small" onclick="deleteItem('${item.id}')">Del</button>
-                            </div>
-                        </td>
-                        <td style="font-weight:500;">${item.name}${item.group ? `<br><span style="font-size:.68rem; font-weight:600; background:var(--accent-light); color:var(--accent-hover); padding:.1rem .4rem; border-radius:8px; margin-top:.15rem; display:inline-block;">${item.group}</span>` : ''}</td>
-                        <td>${item.unit}</td>
-                        <td>${appData.currency}${item.rate}</td>
-                        <td style="text-align:center;">${trend}<button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .35rem;" data-id="${item.id}" data-n="${item.name.replace(/"/g,'&quot;')}" onclick="showPriceHistory(this.dataset.id, this.dataset.n)">Log</button></td>
-                    </tr>`;
-            }).join('');
+        // If searching — show flat master card only
+        if (filter) {
+            container.innerHTML = filtered.length
+                ? buildGroupCard(`Search results for "${filter}"`, filtered, 'master', true)
+                : `<div style="text-align:center;color:var(--muted);padding:2rem;">No items match "${filter}"</div>`;
+            refreshGroupPickers();
+            return;
+        }
+
+        // Normal view: Master card (all) + group cards + individual card
+        const groups    = getInvGroups();
+        const indiv     = all.filter(i => !i.group);
+        let html = '';
+
+        // 1. Master card — collapsed by default
+        html += buildGroupCard('Master Inventory (All)', all, 'master', false);
+
+        // 2. Each named group card — expanded
+        groups.forEach(g => {
+            const items = all.filter(i => i.group === g);
+            html += buildGroupCard(g, items, '', true);
+        });
+
+        // 3. Individual card — expanded
+        if (indiv.length) {
+            html += buildGroupCard('Individual', indiv, 'individual', true);
+        }
+
+        container.innerHTML = html;
+        refreshGroupPickers();
     }
 
     function startEditItem(id) { editingItemId = id; renderInventoryTable(); }
@@ -2053,16 +2208,23 @@ self.addEventListener('notificationclick', e => {
     }
 
     async function addNewItem() {
-        const name = document.getElementById('new-item-name').value.trim();
-        const unit = document.getElementById('new-item-unit').value;
-        const rate = parseFloat(document.getElementById('new-item-rate').value);
+        const name  = document.getElementById('new-item-name').value.trim();
+        const unit  = document.getElementById('new-item-unit').value;
+        const rate  = parseFloat(document.getElementById('new-item-rate').value);
+        const grpSel = document.getElementById('add-item-group-sel');
+        let   group  = grpSel ? grpSel.value : '';
+        if (group === '__new__') {
+            const nv = document.getElementById('add-item-newgroup-input').value.trim();
+            group = nv || '';
+        }
         if (!name || isNaN(rate) || rate < 0) {
             await customAlert("Please fill all fields correctly."); return;
         }
-        appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate });
+        appData.inventory.push({ id: 'item_' + Date.now(), name, unit, rate, group: group || '' });
         saveData();
         document.getElementById('new-item-name').value = '';
         document.getElementById('new-item-rate').value = '';
+        cancelNewGroupFromAdd();
         renderCustomDropdown(); renderInventoryTable();
         document.getElementById('new-item-name').focus();
     }
@@ -3263,6 +3425,9 @@ self.addEventListener('notificationclick', e => {
         renderQaChips();
         document.getElementById('qa-name').value = '';
         document.getElementById('qa-rate').value = '';
+        // Reset group picker
+        cancelNewGroupFromQa();
+        refreshGroupPickers();
         setTimeout(() => document.getElementById('qa-name').focus(), 50);
     }
 
@@ -3290,7 +3455,13 @@ self.addEventListener('notificationclick', e => {
             return;
         }
 
-        const newItem = { id:'item_'+Date.now(), name, unit, rate };
+        const grpSelQa = document.getElementById('qa-group-sel');
+        let qaGroup = grpSelQa ? grpSelQa.value : '';
+        if (qaGroup === '__new__') {
+            const nv = document.getElementById('qa-newgroup-input')?.value.trim();
+            qaGroup = nv || '';
+        }
+        const newItem = { id:'item_'+Date.now(), name, unit, rate, group: qaGroup || '' };
         appData.inventory.push(newItem);
         saveData();
         renderCustomDropdown();
