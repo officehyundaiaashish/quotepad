@@ -3222,6 +3222,15 @@ self.addEventListener('notificationclick', e => {
                 showCloudStatus('approved');
             } else {
                 showCloudStatus(data.status);
+                // App open pe notif — agar pehle pending tha aur ab change ho gaya aur user ne dekha nahi
+                const seenKey = 'gp_statusSeen_' + user.uid;
+                const lastSeen = localStorage.getItem(seenKey);
+                if (data.status !== 'pending' && lastSeen !== data.status) {
+                    localStorage.setItem(seenKey, data.status);
+                    showStatusChangeNotif(data.status);
+                } else if (data.status !== 'pending') {
+                    localStorage.setItem(seenKey, data.status);
+                }
             }
             if (data.status === 'approved') {
                 const lastEl = document.getElementById('cloud-last-backup');
@@ -3232,6 +3241,7 @@ self.addEventListener('notificationclick', e => {
         }
 
         // Real-time listener — status change hote hi UI update ho
+        let _lastKnownStatus = snap.exists() ? snap.data().status : null;
         onSnapshot(ref, docSnap => {
             if (!docSnap.exists()) return;
             const d = docSnap.data();
@@ -3242,6 +3252,11 @@ self.addEventListener('notificationclick', e => {
                     lastEl.textContent = 'Last backup: ' + d.lastBackup.toDate().toLocaleString();
                 }
             }
+            // Show notification if status changed from pending
+            if (_lastKnownStatus && _lastKnownStatus !== d.status) {
+                showStatusChangeNotif(d.status);
+            }
+            _lastKnownStatus = d.status;
         });
 
         // Admin panel
@@ -3249,6 +3264,39 @@ self.addEventListener('notificationclick', e => {
             document.getElementById('cloud-admin-panel').style.display = 'block';
             adminLoadUsers();
         }
+    }
+
+    function showStatusChangeNotif(status) {
+        const existing = document.getElementById('status-notif-overlay');
+        if (existing) existing.remove();
+
+        const map = {
+            approved: { icon: `<svg width="36" height="36" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`, title: 'Access Approved!', msg: 'Your cloud backup request has been approved. You can now backup and restore your data.', btnColor: '#059669', btnBg: '#dcfce7' },
+            rejected: { icon: `<svg width="36" height="36" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`, title: 'Request Rejected', msg: 'Your cloud backup request was not approved by the admin.', btnColor: '#dc2626', btnBg: '#fee2e2' },
+            blocked:  { icon: `<svg width="36" height="36" fill="none" stroke="#64748b" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>`, title: 'Access Blocked', msg: 'Your cloud backup access has been blocked by the admin.', btnColor: '#64748b', btnBg: '#f1f5f9' },
+        };
+        const info = map[status];
+        if (!info) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'status-notif-overlay';
+        overlay.style.cssText = `position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,.5);
+            backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+            display:flex;align-items:center;justify-content:center;padding:1.5rem;`;
+        overlay.innerHTML = `
+            <div style="background:var(--solid);border-radius:24px;padding:2rem 1.75rem;max-width:320px;width:100%;
+                text-align:center;box-shadow:0 24px 48px rgba(0,0,0,.3);border:1.5px solid var(--border);
+                animation:fadeSlideUp .3s var(--ease-spring) both;">
+                <div style="margin-bottom:1rem;">${info.icon}</div>
+                <div style="font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:.5rem;">${info.title}</div>
+                <div style="font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:1.5rem;">${info.msg}</div>
+                <button onclick="document.getElementById('status-notif-overlay').remove()"
+                    style="width:100%;padding:.75rem;border-radius:14px;border:none;
+                    background:${info.btnBg};color:${info.btnColor};font-size:.9rem;font-weight:700;cursor:pointer;">
+                    OK, Got it
+                </button>
+            </div>`;
+        document.body.appendChild(overlay);
     }
 
     function hideAllCloudStatus() {
@@ -3310,44 +3358,91 @@ self.addEventListener('notificationclick', e => {
     async function adminLoadUsers() {
         if (!fbCurrentUser || fbCurrentUser.email !== ADMIN_EMAIL_FB) return;
         try {
-            const { collection, getDocs } = window._fb;
-            const snap = await getDocs(collection(fbDb, 'requests'));
-            const users = [];
-            snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+            const { collection, getDocs, onSnapshot: _onSnap } = window._fb;
 
-            const list   = document.getElementById('admin-users-list');
-            const badge  = document.getElementById('admin-pending-badge');
-            const pending = users.filter(u => u.status === 'pending').length;
-            badge.textContent   = pending ? pending + ' pending' : '';
-            badge.style.display = pending ? 'block' : 'none';
-
-            if (!users.length) {
-                list.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:.75rem;">No requests yet.</div>`;
-                return;
+            // Real-time listener for new pending requests
+            if (!window._adminSnapUnsub) {
+                window._adminSnapUnsub = _onSnap(collection(fbDb, 'requests'), snap => {
+                    const pending = snap.docs.filter(d => d.data().status === 'pending' && d.data().email !== ADMIN_EMAIL_FB);
+                    const seenKey = 'gp_adminPendingSeen';
+                    const lastSeen = parseInt(localStorage.getItem(seenKey) || '0');
+                    if (pending.length > lastSeen) {
+                        localStorage.setItem(seenKey, pending.length);
+                        showAdminPendingNotif(pending.length);
+                    } else {
+                        localStorage.setItem(seenKey, pending.length);
+                    }
+                    // Re-render user list
+                    _renderAdminList(snap);
+                });
             }
-
-            const statusColor = { pending:'#d97706', approved:'#059669', rejected:'#dc2626', blocked:'#64748b' };
-            list.innerHTML = users.map(u => {
-                const sc = statusColor[u.status] || '#64748b';
-                const reqDate = u.requestedAt?.toDate ? u.requestedAt.toDate().toLocaleDateString() : '';
-                const lastBk  = u.lastBackup?.toDate  ? u.lastBackup.toDate().toLocaleString()    : '';
-                return `<div style="background:var(--bg);border:1px solid var(--border-light);border-radius:12px;padding:.7rem .85rem;">
-                    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:.82rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name||'Unknown'}</div>
-                            <div style="font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</div>
-                        </div>
-                        <span style="font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:20px;background:${sc}22;color:${sc};">${u.status}</span>
-                    </div>
-                    ${reqDate ? `<div style="font-size:.68rem;color:var(--muted);margin-bottom:.45rem;">Requested: ${reqDate}${lastBk?' &nbsp;·&nbsp; Last backup: '+lastBk:''}</div>` : ''}
-                    <div style="display:flex;gap:.4rem;">
-                        ${u.status!=='approved' ? `<button onclick="adminAct('approved','${u.id}')" style="flex:1;background:#dcfce7;color:#166534;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Approve</button>` : ''}
-                        ${u.status!=='rejected' ? `<button onclick="adminAct('rejected','${u.id}')" style="flex:1;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Reject</button>`  : ''}
-                        ${u.status!=='blocked'  ? `<button onclick="adminAct('blocked','${u.id}')"  style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Block</button>`   : ''}
-                    </div>
-                </div>`;
-            }).join('');
         } catch(e) { console.error('Admin load error', e); }
+    }
+
+    function showAdminPendingNotif(count) {
+        const existing = document.getElementById('admin-notif-overlay');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.id = 'admin-notif-overlay';
+        overlay.style.cssText = `position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,.5);
+            backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+            display:flex;align-items:center;justify-content:center;padding:1.5rem;`;
+        overlay.innerHTML = `
+            <div style="background:var(--solid);border-radius:24px;padding:2rem 1.75rem;max-width:320px;width:100%;
+                text-align:center;box-shadow:0 24px 48px rgba(0,0,0,.3);border:1.5px solid var(--border);
+                animation:fadeSlideUp .3s var(--ease-spring) both;">
+                <div style="margin-bottom:1rem;">
+                    <svg width="36" height="36" fill="none" stroke="#d97706" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </div>
+                <div style="font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:.5rem;">
+                    ${count} Pending Request${count > 1 ? 's' : ''}
+                </div>
+                <div style="font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:1.5rem;">
+                    ${count} user${count > 1 ? 's have' : ' has'} requested cloud backup access. Review in Data Management.
+                </div>
+                <button onclick="document.getElementById('admin-notif-overlay').remove()"
+                    style="width:100%;padding:.75rem;border-radius:14px;border:none;
+                    background:#fef3c7;color:#92400e;font-size:.9rem;font-weight:700;cursor:pointer;">
+                    OK, Will Review
+                </button>
+            </div>`;
+        document.body.appendChild(overlay);
+    }
+
+    function _renderAdminList(snap) {
+        const users = [];
+        snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+        const list   = document.getElementById('admin-users-list');
+        const badge  = document.getElementById('admin-pending-badge');
+        if (!list) return;
+        const pending = users.filter(u => u.status === 'pending').length;
+        badge.textContent   = pending ? pending + ' pending' : '';
+        badge.style.display = pending ? 'block' : 'none';
+        if (!users.length) {
+            list.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:.75rem;">No requests yet.</div>`;
+            return;
+        }
+        const statusColor = { pending:'#d97706', approved:'#059669', rejected:'#dc2626', blocked:'#64748b' };
+        list.innerHTML = users.map(u => {
+            const sc = statusColor[u.status] || '#64748b';
+            const reqDate = u.requestedAt?.toDate ? u.requestedAt.toDate().toLocaleDateString() : '';
+            const lastBk  = u.lastBackup?.toDate  ? u.lastBackup.toDate().toLocaleString()    : '';
+            return `<div style="background:var(--bg);border:1px solid var(--border-light);border-radius:12px;padding:.7rem .85rem;">
+                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:.82rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name||'Unknown'}</div>
+                        <div style="font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</div>
+                    </div>
+                    <span style="font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:20px;background:${sc}22;color:${sc};">${u.status}</span>
+                </div>
+                ${reqDate ? `<div style="font-size:.68rem;color:var(--muted);margin-bottom:.45rem;">Requested: ${reqDate}${lastBk?' &nbsp;·&nbsp; Last backup: '+lastBk:''}</div>` : ''}
+                <div style="display:flex;gap:.4rem;">
+                    ${u.status!=='approved' ? `<button onclick="adminAct('approved','${u.id}')" style="flex:1;background:#dcfce7;color:#166534;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Approve</button>` : ''}
+                    ${u.status!=='rejected' ? `<button onclick="adminAct('rejected','${u.id}')" style="flex:1;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Reject</button>`  : ''}
+                    ${u.status!=='blocked'  ? `<button onclick="adminAct('blocked','${u.id}')"  style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Block</button>`   : ''}
+                </div>
+            </div>`;
+        }).join('');
     }
 
     async function adminAct(newStatus, uid) {
