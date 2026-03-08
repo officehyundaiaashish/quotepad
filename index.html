@@ -23,7 +23,7 @@
         // Light mode: keep green (#10b981) during splash — will update to white after splash hides
     })();
     </script>
-    <title>QuotePad - Smart Quotation Maker</title>
+
     <link rel="manifest" id="pwa-manifest-link">
     <script>
     // ── PWA: Inline Manifest Generator ───────────────────────────────
@@ -1537,7 +1537,104 @@ self.addEventListener('notificationclick', e => {
                 </div>
             </div>
 
-            <!-- UNIFIED DATA MANAGEMENT CARD -->
+            <!-- CLOUD BACKUP CARD -->
+            <div class="card animate-entry" id="cloud-backup-card" style="animation-delay:.02s;">
+                <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem;">
+                    <div style="width:38px; height:38px; background:linear-gradient(135deg,#4285f4,#1a73e8); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:1rem; font-weight:700; color:var(--text);">Cloud Backup</div>
+                        <div style="font-size:.75rem; color:var(--muted);">Backup & restore via Google account</div>
+                    </div>
+                    <div id="cloud-status-badge" style="display:none; font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:20px;"></div>
+                </div>
+
+                <!-- Not logged in -->
+                <div id="cloud-login-section">
+                    <p style="font-size:.82rem; color:var(--muted); margin-bottom:1rem; line-height:1.55;">Login with Google to enable cloud backup. Your data stays private and secure.</p>
+                    <button onclick="cloudGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:.6rem;
+                        background:#fff; color:#3c4043; border:1.5px solid #dadce0; border-radius:12px;
+                        padding:.7rem; font-size:.88rem; font-weight:600; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.1);">
+                        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <!-- Logged in -->
+                <div id="cloud-user-section" style="display:none;">
+                    <!-- User info row -->
+                    <div style="display:flex; align-items:center; gap:.65rem; margin-bottom:1rem; background:var(--bg); border-radius:12px; padding:.65rem .85rem;">
+                        <img id="cloud-avatar" src="" style="width:34px; height:34px; border-radius:50%; object-fit:cover;" onerror="this.style.display='none'">
+                        <div style="flex:1; min-width:0;">
+                            <div id="cloud-user-name" style="font-size:.85rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                            <div id="cloud-user-email" style="font-size:.72rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                        </div>
+                        <button onclick="cloudLogout()" style="background:none; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:.72rem; padding:.3rem .55rem; cursor:pointer; flex-shrink:0;">Logout</button>
+                    </div>
+
+                    <!-- Pending -->
+                    <div id="cloud-pending-section" style="display:none;">
+                        <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7); border:1.5px solid #fcd34d; border-radius:12px; padding:.85rem 1rem; text-align:center;">
+                            <svg width="28" height="28" fill="none" stroke="#d97706" viewBox="0 0 24 24" stroke-width="2" style="margin-bottom:.4rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div style="font-size:.88rem; font-weight:700; color:#92400e; margin-bottom:.3rem;">Approval Pending</div>
+                            <div style="font-size:.75rem; color:#b45309; line-height:1.5;">Request sent to admin. You will be notified once approved.</div>
+                        </div>
+                    </div>
+
+                    <!-- Rejected -->
+                    <div id="cloud-rejected-section" style="display:none;">
+                        <div style="background:linear-gradient(135deg,#fef2f2,#fee2e2); border:1.5px solid #fca5a5; border-radius:12px; padding:.85rem 1rem; text-align:center;">
+                            <svg width="28" height="28" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-width="2" style="margin-bottom:.4rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div style="font-size:.88rem; font-weight:700; color:#991b1b; margin-bottom:.3rem;">Access Rejected</div>
+                            <div style="font-size:.75rem; color:#b91c1c; line-height:1.5;">Cloud backup access was not granted for this account.</div>
+                        </div>
+                    </div>
+
+                    <!-- Blocked -->
+                    <div id="cloud-blocked-section" style="display:none;">
+                        <div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9); border:1.5px solid #cbd5e1; border-radius:12px; padding:.85rem 1rem; text-align:center;">
+                            <svg width="28" height="28" fill="none" stroke="#64748b" viewBox="0 0 24 24" stroke-width="2" style="margin-bottom:.4rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            <div style="font-size:.88rem; font-weight:700; color:#475569; margin-bottom:.3rem;">Access Blocked</div>
+                            <div style="font-size:.75rem; color:#64748b; line-height:1.5;">Your cloud backup access has been blocked.</div>
+                        </div>
+                    </div>
+
+                    <!-- Approved — backup/restore -->
+                    <div id="cloud-approved-section" style="display:none;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin-bottom:.5rem;">
+                            <button onclick="cloudBackupNow()" style="display:flex; align-items:center; justify-content:center; gap:.4rem;
+                                background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+                                border:none; border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
+                                box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer;">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Backup
+                            </button>
+                            <button onclick="cloudRestoreNow()" style="display:flex; align-items:center; justify-content:center; gap:.4rem;
+                                background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+                                border:none; border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
+                                box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer;">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                                Restore
+                            </button>
+                        </div>
+                        <div id="cloud-last-backup" style="font-size:.72rem; color:var(--muted); text-align:center;"></div>
+                    </div>
+
+                    <!-- Admin panel — only for giriaashish02@gmail.com -->
+                    <div id="cloud-admin-panel" style="display:none; margin-top:1.25rem; border-top:1.5px solid var(--border); padding-top:1.25rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.85rem;">
+                            <div style="font-size:.85rem; font-weight:700; color:var(--text);">Admin Panel</div>
+                            <div id="admin-pending-badge" style="display:none; background:#ef4444; color:#fff; font-size:.68rem; font-weight:700; padding:.2rem .55rem; border-radius:20px;"></div>
+                        </div>
+                        <div id="admin-users-list" style="display:flex; flex-direction:column; gap:.5rem;">
+                            <div style="text-align:center; color:var(--muted); font-size:.82rem; padding:.75rem;">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="card animate-entry" id="data-mgmt-card" style="animation-delay:.04s;">
 
                 <!-- Header -->
@@ -1549,70 +1646,10 @@ self.addEventListener('notificationclick', e => {
                         <div style="font-size:1rem; font-weight:700; color:var(--text);">Data Management</div>
                         <div style="font-size:.75rem; color:var(--muted);">Backup, restore and export your data</div>
                     </div>
-                    <div id="auto-backup-badge" style="display:none; font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:20px; background:#dcfce7; color:#166534;">Auto ON</div>
                 </div>
 
-                <!-- First-time hint (PWA only, dismissible) -->
-                <div id="backup-hint-bar" style="display:none; margin-bottom:1rem;">
-                    <div style="background:var(--bg); border:1px solid var(--border-light); border-left:3px solid var(--accent); border-radius:8px; padding:.6rem .85rem; display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem;">
-                        <p style="margin:0; font-size:.77rem; color:var(--muted); line-height:1.55;">
-                            A backup is saved automatically every day at 7 AM and stored on this device. To restore, tap <strong>Restore</strong> next to any backup in the list — the latest is always shown first. You can also restore from a file using <strong>Restore File</strong>.
-                        </p>
-                        <button onclick="dismissBackupHint()" style="flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--muted); padding:0; line-height:1; margin-top:1px;">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- PWA: location hint -->
-                <div id="pwa-location-hint" style="display:none; background:linear-gradient(135deg,#f0fdf4,#d1fae5); border:1.5px solid #a7f3d0; border-radius:12px; padding:.75rem 1rem; margin-bottom:1rem;">
-                    <div style="display:flex; align-items:center; gap:.5rem;">
-                        <svg width="16" height="16" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
-                        <span style="font-size:.78rem; color:#047857; font-weight:600;">File Manager &rarr; Downloads &rarr; <span style="font-family:monospace; background:rgba(255,255,255,.8); padding:.05rem .35rem; border-radius:4px;">QuotePad</span> folder</span>
-                    </div>
-                </div>
-
-                <!-- PWA: saved backups list + latest restore -->
-                <div id="pwa-backup-section" style="display:none; margin-bottom:1rem;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem;">
-                        <span style="font-size:.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px;">Saved Backups</span>
-                        <span style="font-size:.7rem; color:var(--muted);">max 10 &middot; oldest auto-deleted</span>
-                    </div>
-                    <div id="auto-backup-list" style="display:flex; flex-direction:column; gap:.35rem; margin-bottom:.75rem;">
-                        <div style="text-align:center; color:var(--muted); font-size:.82rem; padding:1rem;">Loading backups...</div>
-                    </div>
-                    <!-- Latest backup restore highlight -->
-                    <div id="latest-backup-box" style="display:none; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:12px; padding:.75rem 1rem;">
-                        <div style="font-size:.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.3rem; display:flex; align-items:center; gap:.3rem;">
-                            <svg width="10" height="10" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Latest Backup
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:.75rem;">
-                            <div style="min-width:0;">
-                                <div id="latest-backup-name" style="font-size:.85rem; font-weight:700; color:var(--accent-hover); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-                                <div id="latest-backup-date" style="font-size:.72rem; color:var(--muted); margin-top:.1rem;"></div>
-                            </div>
-                            <button id="restore-latest-btn" onclick="restoreLatestBackup()" style="
-                                flex-shrink:0; display:flex; align-items:center; gap:.35rem;
-                                background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
-                                border:none; border-radius:10px; padding:.45rem .8rem;
-                                font-size:.8rem; font-weight:700; cursor:pointer; white-space:nowrap;">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                                Restore
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action row: Backup Now (PWA) or Download (web) + Restore from file -->
+                <!-- Action row: Download + Restore from file -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:.65rem;">
-                    <button id="pwa-backup-btn" onclick="triggerManualBackup()" style="display:none;
-                        align-items:center; justify-content:center; gap:.4rem;
-                        background:linear-gradient(135deg,#10b981,#059669); color:#fff;
-                        border:none; border-radius:14px; padding:.75rem .5rem; font-size:.85rem; font-weight:700;
-                        box-shadow:0 2px 6px rgba(0,0,0,.12); cursor:pointer;">
-                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Backup Now
-                    </button>
                     <button id="web-backup-btn" onclick="downloadBackup()" style="
                         display:flex; align-items:center; justify-content:center; gap:.4rem;
                         background:linear-gradient(135deg,#10b981,#059669); color:#fff;
@@ -1871,6 +1908,7 @@ self.addEventListener('notificationclick', e => {
         checkFirstTime();
         initBackupUI();
         checkDraftRecovery();
+        initCloudBackup();
     }
 
     // Splash — show every time, 1.8s visible then smooth fade
@@ -3082,43 +3120,239 @@ self.addEventListener('notificationclick', e => {
     }
 
 
-    // ── SECTION 10: DATA BACKUP / RESTORE ────────────────────────────
+    // ── SECTION 9.5: CLOUD BACKUP (Firebase) ────────────────────────
 
-    const MAX_BACKUPS   = 10;
-    const BACKUP_STORE  = 'gp_autoBackups';   // localStorage key → array of {name, date, ts, data}
+    const ADMIN_EMAIL_FB = 'giriaashish02@gmail.com';
+    let fbApp = null, fbAuth = null, fbDb = null, fbCurrentUser = null;
 
-    // PWA / standalone detection
-    function isPWA() {
-        return window.navigator.standalone === true ||
-               window.matchMedia('(display-mode: standalone)').matches ||
-               window.matchMedia('(display-mode: fullscreen)').matches;
+    async function initFirebase() {
+        if (fbApp) return;
+        const { initializeApp }          = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+        const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        const { getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyBY_cG_ZIIG32v9j-0eG1rLqIBibbMGH6E",
+            authDomain:        "quotepad-7642a.firebaseapp.com",
+            projectId:         "quotepad-7642a",
+            storageBucket:     "quotepad-7642a.firebasestorage.app",
+            messagingSenderId: "3876015496",
+            appId:             "1:3876015496:web:384a4a0d25a54e9edc3e3d"
+        };
+
+        fbApp  = initializeApp(firebaseConfig);
+        fbAuth = getAuth(fbApp);
+        fbDb   = getFirestore(fbApp);
+
+        window._fb = { doc, getDoc, setDoc, collection, getDocs, updateDoc, serverTimestamp };
+
+        onAuthStateChanged(fbAuth, async user => {
+            fbCurrentUser = user;
+            if (user) {
+                document.getElementById('cloud-login-section').style.display = 'none';
+                document.getElementById('cloud-user-section').style.display  = 'block';
+                document.getElementById('cloud-user-name').textContent       = user.displayName || '';
+                document.getElementById('cloud-user-email').textContent      = user.email || '';
+                document.getElementById('cloud-avatar').src                  = user.photoURL || '';
+                await cloudHandleUserLogin(user);
+            } else {
+                document.getElementById('cloud-login-section').style.display = 'block';
+                document.getElementById('cloud-user-section').style.display  = 'none';
+                document.getElementById('cloud-status-badge').style.display  = 'none';
+                document.getElementById('cloud-admin-panel').style.display   = 'none';
+                hideAllCloudStatus();
+            }
+        });
+    }
+
+    async function cloudGoogleLogin() {
+        await initFirebase();
+        const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        try {
+            await signInWithPopup(fbAuth, new GoogleAuthProvider());
+        } catch(e) { showCloudToast('Login failed. Try again.', true); }
+    }
+
+    async function cloudLogout() {
+        if (!fbAuth) return;
+        const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        await signOut(fbAuth);
+    }
+
+    async function cloudHandleUserLogin(user) {
+        const { doc, getDoc, setDoc, serverTimestamp } = window._fb;
+        const ref = doc(fbDb, 'requests', user.uid);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+            // First time — create request
+            await setDoc(ref, {
+                uid:         user.uid,
+                email:       user.email,
+                name:        user.displayName || '',
+                status:      'pending',
+                requestedAt: serverTimestamp(),
+            });
+            showCloudStatus('pending');
+        } else {
+            const data = snap.data();
+            showCloudStatus(data.status);
+            if (data.status === 'approved') {
+                const lastEl = document.getElementById('cloud-last-backup');
+                if (lastEl && data.lastBackup?.toDate) {
+                    lastEl.textContent = 'Last backup: ' + data.lastBackup.toDate().toLocaleString();
+                }
+            }
+        }
+
+        // Admin panel
+        if (user.email === ADMIN_EMAIL_FB) {
+            document.getElementById('cloud-admin-panel').style.display = 'block';
+            adminLoadUsers();
+        }
+    }
+
+    function hideAllCloudStatus() {
+        ['pending','rejected','blocked','approved'].forEach(s => {
+            const el = document.getElementById('cloud-' + s + '-section');
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    function showCloudStatus(status) {
+        hideAllCloudStatus();
+        const el = document.getElementById('cloud-' + status + '-section');
+        if (el) el.style.display = 'block';
+        const badge = document.getElementById('cloud-status-badge');
+        const map = {
+            pending:  { text:'Pending',  bg:'#fef3c7', color:'#92400e' },
+            approved: { text:'Active',   bg:'#dcfce7', color:'#166534' },
+            rejected: { text:'Rejected', bg:'#fee2e2', color:'#991b1b' },
+            blocked:  { text:'Blocked',  bg:'#f1f5f9', color:'#475569' },
+        };
+        if (map[status]) {
+            badge.textContent      = map[status].text;
+            badge.style.background = map[status].bg;
+            badge.style.color      = map[status].color;
+            badge.style.display    = 'block';
+        }
+    }
+
+    async function cloudBackupNow() {
+        if (!fbCurrentUser || !fbDb) return;
+        showCloudToast('Saving to cloud...');
+        try {
+            const { doc, setDoc, serverTimestamp } = window._fb;
+            await setDoc(doc(fbDb, 'backups', fbCurrentUser.uid), {
+                data:      JSON.stringify(appData),
+                savedAt:   serverTimestamp(),
+                email:     fbCurrentUser.email,
+            });
+            await setDoc(doc(fbDb, 'requests', fbCurrentUser.uid), { lastBackup: serverTimestamp() }, { merge: true });
+            showCloudToast('Cloud backup saved!');
+            document.getElementById('cloud-last-backup').textContent = 'Last backup: ' + new Date().toLocaleString();
+        } catch(e) { showCloudToast('Backup failed. Try again.', true); }
+    }
+
+    async function cloudRestoreNow() {
+        if (!fbCurrentUser || !fbDb) return;
+        if (!await customConfirm('Restore from cloud? This will replace your current data.')) return;
+        showCloudToast('Fetching from cloud...');
+        try {
+            const { doc, getDoc } = window._fb;
+            const snap = await getDoc(doc(fbDb, 'backups', fbCurrentUser.uid));
+            if (!snap.exists()) { showCloudToast('No cloud backup found.', true); return; }
+            await doRestore(snap.data().data, 'Cloud Restore');
+            showCloudToast('Restored successfully!');
+        } catch(e) { showCloudToast('Restore failed.', true); }
+    }
+
+    async function adminLoadUsers() {
+        if (!fbCurrentUser || fbCurrentUser.email !== ADMIN_EMAIL_FB) return;
+        try {
+            const { collection, getDocs } = window._fb;
+            const snap = await getDocs(collection(fbDb, 'requests'));
+            const users = [];
+            snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+
+            const list   = document.getElementById('admin-users-list');
+            const badge  = document.getElementById('admin-pending-badge');
+            const pending = users.filter(u => u.status === 'pending').length;
+            badge.textContent   = pending ? pending + ' pending' : '';
+            badge.style.display = pending ? 'block' : 'none';
+
+            if (!users.length) {
+                list.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:.75rem;">No requests yet.</div>`;
+                return;
+            }
+
+            const statusColor = { pending:'#d97706', approved:'#059669', rejected:'#dc2626', blocked:'#64748b' };
+            list.innerHTML = users.map(u => {
+                const sc = statusColor[u.status] || '#64748b';
+                const reqDate = u.requestedAt?.toDate ? u.requestedAt.toDate().toLocaleDateString() : '';
+                const lastBk  = u.lastBackup?.toDate  ? u.lastBackup.toDate().toLocaleString()    : '';
+                return `<div style="background:var(--bg);border:1px solid var(--border-light);border-radius:12px;padding:.7rem .85rem;">
+                    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:.82rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name||'Unknown'}</div>
+                            <div style="font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</div>
+                        </div>
+                        <span style="font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:20px;background:${sc}22;color:${sc};">${u.status}</span>
+                    </div>
+                    ${reqDate ? `<div style="font-size:.68rem;color:var(--muted);margin-bottom:.45rem;">Requested: ${reqDate}${lastBk?' &nbsp;·&nbsp; Last backup: '+lastBk:''}</div>` : ''}
+                    <div style="display:flex;gap:.4rem;">
+                        ${u.status!=='approved' ? `<button onclick="adminAct('approved','${u.id}')" style="flex:1;background:#dcfce7;color:#166534;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Approve</button>` : ''}
+                        ${u.status!=='rejected' ? `<button onclick="adminAct('rejected','${u.id}')" style="flex:1;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Reject</button>`  : ''}
+                        ${u.status!=='blocked'  ? `<button onclick="adminAct('blocked','${u.id}')"  style="flex:1;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;">Block</button>`   : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        } catch(e) { console.error('Admin load error', e); }
+    }
+
+    async function adminAct(newStatus, uid) {
+        try {
+            const { doc, updateDoc } = window._fb;
+            await updateDoc(doc(fbDb, 'requests', uid), { status: newStatus });
+            showCloudToast('Done!');
+            adminLoadUsers();
+        } catch(e) { showCloudToast('Error. Try again.', true); }
+    }
+
+    function showCloudToast(msg, isError = false) {
+        let t = document.getElementById('cloud-toast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'cloud-toast';
+            t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+                z-index:9999;border-radius:12px;padding:.6rem 1.1rem;font-size:.82rem;font-weight:700;
+                color:#fff;pointer-events:none;transition:opacity .3s;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.2);`;
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.background = isError ? '#ef4444' : '#10b981';
+        t.style.opacity = '1';
+        clearTimeout(t._tid);
+        t._tid = setTimeout(() => t.style.opacity = '0', 2500);
+    }
+
+    function initCloudBackup() {
+        // Auto-init Firebase when backup tab is opened
+        document.querySelectorAll('.nav-btn, .desktop-nav .nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.view === 'backup' && !fbApp) initFirebase();
+            });
+        });
+        // Init now if already on backup tab
+        if (document.getElementById('backup-view')?.classList.contains('active')) initFirebase();
     }
 
     // ── Init backup UI based on mode ──────────────────────────────────
     function initBackupUI() {
-        const pwa = isPWA();
-        document.getElementById('auto-backup-badge').style.display    = pwa ? 'block'  : 'none';
-        document.getElementById('pwa-location-hint').style.display    = pwa ? 'block'  : 'none';
-        document.getElementById('pwa-backup-section').style.display   = pwa ? 'block'  : 'none';
-        document.getElementById('pwa-backup-btn').style.display       = pwa ? 'flex'   : 'none';
-        document.getElementById('web-backup-btn').style.display       = pwa ? 'none'   : 'flex';
-
-        // Show hint only in PWA, only until dismissed
-        const hintBar = document.getElementById('backup-hint-bar');
-        if (hintBar) hintBar.style.display = (pwa && !localStorage.getItem('gp_backupHintDismissed')) ? 'block' : 'none';
-
-        if (pwa) {
-            renderBackupList();
-            scheduleAutoBackup();
-            initNotifications();
-        }
+        // Nothing PWA-specific needed anymore
     }
 
-    function dismissBackupHint() {
-        localStorage.setItem('gp_backupHintDismissed', '1');
-        const h = document.getElementById('backup-hint-bar');
-        if (h) h.style.display = 'none';
-    }
+    function dismissBackupHint() {}
 
     // ── NOTIFICATION SYSTEM (PWA only) ───────────────────────────────
 
@@ -3212,107 +3446,7 @@ self.addEventListener('notificationclick', e => {
         });
     }
 
-    // ── Called after auto backup completes ───────────────────────────
-    function notifyBackupDone(dateStr) {
-        if (!isPWA()) return;
-        if (Notification.permission !== 'granted') return;
-        navigator.serviceWorker.ready.then(reg => {
-            reg.active?.postMessage({
-                type: 'SHOW_BACKUP_NOTIF',
-                body: `Backup completed (${dateStr}). Your data is safe.`,
-                icon: getSwIcon(),
-            });
-        });
-    }
-
-    // ── Read/write backup list from localStorage ──────────────────────
-    function getBackups() {
-        try { return JSON.parse(localStorage.getItem(BACKUP_STORE)) || []; }
-        catch { return []; }
-    }
-    function saveBackups(list) {
-        localStorage.setItem(BACKUP_STORE, JSON.stringify(list));
-    }
-
-    // ── Create one backup entry (label = auto-named string; omit for manual) ─
-    function createBackup(label) {
-        let backups = getBackups();
-        const now     = new Date();
-        const dateStr = now.toLocaleDateString('en-US', { day:'2-digit', month:'short', year:'numeric' });
-        const timeStr = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-        const name    = label || `Backup — ${dateStr}, ${timeStr}`;
-
-        // Keep max 10 — drop oldest first
-        if (backups.length >= MAX_BACKUPS) {
-            backups.sort((a,b) => a.ts - b.ts);
-            backups.shift();
-        }
-        backups.push({ name, date: `${dateStr} ${timeStr}`, ts: now.getTime(), data: JSON.stringify(appData) });
-        saveBackups(backups);
-        renderBackupList();
-        // Notify via SW for auto backups only
-        if (label?.startsWith('Auto')) notifyBackupDone(dateStr);
-    }
-
-    // ── Manual "Backup Now" — silent, list refreshes ──────────────────
-    function triggerManualBackup() { createBackup(); }
-
-    // ── Render saved backup list in PWA section ───────────────────────
-    function renderBackupList() {
-        const el         = document.getElementById('auto-backup-list');
-        const latestBox  = document.getElementById('latest-backup-box');
-        const latestName = document.getElementById('latest-backup-name');
-        const latestDate = document.getElementById('latest-backup-date');
-        if (!el) return;
-
-        const backups = getBackups();
-        if (!backups.length) {
-            el.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:1rem;background:var(--bg);border-radius:10px;">No backups yet. Tap Backup Now to create one.</div>`;
-            if (latestBox) latestBox.style.display = 'none';
-            return;
-        }
-
-        const sorted = [...backups].sort((a,b) => b.ts - a.ts);
-        const latest = sorted[0];
-        if (latestBox)  latestBox.style.display  = 'block';
-        if (latestName) latestName.textContent   = latest.name;
-        if (latestDate) latestDate.textContent   = latest.date;
-
-        const STAR = `<svg width="14" height="14" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>`;
-        const FILE = `<svg width="14" height="14" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
-
-        el.innerHTML = sorted.map((b, i) => `
-            <div style="display:flex;align-items:center;gap:.6rem;
-                background:${i===0?'var(--accent-light)':'var(--bg)'};
-                border:1.5px solid ${i===0?'var(--accent)':'var(--border-light)'};
-                border-radius:12px;padding:.55rem .8rem;">
-                ${i===0 ? STAR : FILE}
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:.8rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.name}</div>
-                    <div style="font-size:.68rem;color:var(--muted);">${b.date}</div>
-                </div>
-                <button onclick="restoreFromSlot(${b.ts})" style="flex-shrink:0;font-size:.7rem;font-weight:700;
-                    background:${i===0?'var(--accent)':'var(--border)'};color:${i===0?'#fff':'var(--text)'};
-                    border:none;border-radius:8px;padding:.25rem .6rem;cursor:pointer;">
-                    Restore
-                </button>
-            </div>`).join('');
-    }
-
-    // ── Restore latest (the big Restore button in latest-backup-box) ──
-    async function restoreLatestBackup() {
-        const sorted = getBackups().sort((a,b) => b.ts - a.ts);
-        if (!sorted.length) { await customAlert('No backup found.'); return; }
-        await doRestore(sorted[0].data, sorted[0].name);
-    }
-
-    // ── Restore from any slot in the list ────────────────────────────
-    async function restoreFromSlot(ts) {
-        const entry = getBackups().find(b => b.ts === ts);
-        if (!entry) { await customAlert('Backup not found.'); return; }
-        await doRestore(entry.data, entry.name);
-    }
-
+    // ── Restore from a manually selected JSON file ────────────────────
     // ── Restore from a manually selected JSON file ────────────────────
     async function restoreFromFileInput(input) {
         const display = document.getElementById('file-name-display');
@@ -3345,23 +3479,6 @@ self.addEventListener('notificationclick', e => {
         } catch { await customAlert('Could not read the file. Please try again.'); }
     }
 
-    // ── Auto backup at 7 AM daily ─────────────────────────────────────
-    function scheduleAutoBackup() {
-        const LAST_KEY  = 'gp_lastAutoBackup';
-        const now       = new Date();
-        const today7am  = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 0, 0);
-        const lastRun   = parseInt(localStorage.getItem(LAST_KEY) || '0');
-        const ranToday  = new Date(lastRun).toDateString() === now.toDateString() && lastRun >= today7am.getTime();
-
-        if (now >= today7am && !ranToday) {
-            const label = `Auto — ${now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'})}`;
-            createBackup(label);
-            localStorage.setItem(LAST_KEY, now.getTime().toString());
-        }
-        const tomorrow7am = new Date(today7am.getTime() + 86400000);
-        const msUntil     = (now < today7am ? today7am : tomorrow7am).getTime() - now.getTime();
-        setTimeout(scheduleAutoBackup, Math.min(msUntil, 3600000));
-    }
 
     // ── Web mode: download backup as JSON file ────────────────────────
     async function downloadBackup() {
