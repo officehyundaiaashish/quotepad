@@ -2397,14 +2397,28 @@ self.addEventListener('notificationclick', e => {
         { id:'i11', name:'तेल',                 unit:'Piece',  rate:10  },
     ];
 
-    let appData = JSON.parse(localStorage.getItem('gp_appData')) || {
-        inventory: DEFAULT_INVENTORY,
-        lists:     [],
-        settings:  { listOnlyMode: false, theme: 'light', disc: '', gst: '' },
-        units:     DEFAULT_UNITS,
-        currency:  '\u20b9',
-        priceHistory: {},
-    };
+    let appData;
+    try {
+        appData = JSON.parse(localStorage.getItem('gp_appData')) || {
+            inventory: DEFAULT_INVENTORY,
+            lists:     [],
+            settings:  { listOnlyMode: false, theme: 'light', disc: '', gst: '' },
+            units:     DEFAULT_UNITS,
+            currency:  '\u20b9',
+            priceHistory: {},
+        };
+    } catch (e) {
+        console.warn('QuotePad: localStorage data was corrupt, resetting.', e);
+        localStorage.removeItem('gp_appData');
+        appData = {
+            inventory: DEFAULT_INVENTORY,
+            lists:     [],
+            settings:  { listOnlyMode: false, theme: 'light', disc: '', gst: '' },
+            units:     DEFAULT_UNITS,
+            currency:  '\u20b9',
+            priceHistory: {},
+        };
+    }
     // migration guards
     if (!appData.units)              appData.units              = DEFAULT_UNITS;
     if (!appData.currency)           appData.currency           = '\u20b9';
@@ -4477,7 +4491,7 @@ self.addEventListener('notificationclick', e => {
   <div style="page-break-inside:avoid; break-inside:avoid;">
   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; border:1.5px solid ${accentBorder}; border-top:none; border-radius:0 0 8px 8px;"><tfoot>
     <tr style="background:${accent};">
-      <td colspan="${isListOnly ? 2 : 3}" style="padding:13px 12px; font-size:11px; font-weight:700; color:#fff; text-align:right;">${disc||gst?`Subtotal ${sym}${base.toFixed(2)}${disc?` · Disc ${disc}%`:''}${gst?` · GST ${gst}%`:''}<br>`:''}Grand Total</td>
+      <td colspan="${isListOnly ? 2 : 3}" style="padding:13px 12px; font-size:11px; font-weight:700; color:#fff; text-align:right;">${disc||gst?('Subtotal '+sym+base.toFixed(2)+(disc?' · Disc '+disc+'%':'')+(gst?' · GST '+gst+'%':'')+'<br>'):''}Grand Total</td>
       <td style="padding:13px 12px; font-size:15px; font-weight:800; color:#fff; text-align:right;">${sym}${total.toFixed(2)}</td>
     </tr>
   </tfoot></table>
@@ -4526,7 +4540,7 @@ self.addEventListener('notificationclick', e => {
   <div style="padding:0 22px; page-break-inside:avoid; break-inside:avoid;">
   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; border:1.5px solid #e2e8f0; border-top:none; border-radius:0 0 8px 8px;"><tfoot>
     <tr style="background:#1e293b;">
-      <td colspan="${isListOnly ? 2 : 3}" style="padding:13px 12px; font-size:11px; font-weight:700; color:#94a3b8; text-align:right;">${disc||gst?`Subtotal ${sym}${base.toFixed(2)}${disc?` · Disc ${disc}%`:''}${gst?` · GST ${gst}%`:''}<br>`:''}Grand Total</td>
+      <td colspan="${isListOnly ? 2 : 3}" style="padding:13px 12px; font-size:11px; font-weight:700; color:#94a3b8; text-align:right;">${disc||gst?('Subtotal '+sym+base.toFixed(2)+(disc?' · Disc '+disc+'%':'')+(gst?' · GST '+gst+'%':'')+'<br>'):''}Grand Total</td>
       <td style="padding:13px 12px; font-size:15px; font-weight:800; color:${accent}; text-align:right;">${sym}${total.toFixed(2)}</td>
     </tr>
   </tfoot></table>
@@ -4621,7 +4635,7 @@ self.addEventListener('notificationclick', e => {
   <div style="padding:0 24px; page-break-inside:avoid; break-inside:avoid;">
   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; border:1.5px solid #e2e8f0; border-top:none;"><tfoot>
     <tr style="background:#1e293b;">
-      <td colspan="${isListOnly ? 2 : 3}" style="padding:14px 12px; font-size:11px; font-weight:700; color:#94a3b8; text-align:right;">${disc||gst?`Subtotal ${sym}${base.toFixed(2)}${disc?` · Disc ${disc}%`:''}${gst?` · GST ${gst}%`:''}<br>`:''}Grand Total</td>
+      <td colspan="${isListOnly ? 2 : 3}" style="padding:14px 12px; font-size:11px; font-weight:700; color:#94a3b8; text-align:right;">${disc||gst?('Subtotal '+sym+base.toFixed(2)+(disc?' · Disc '+disc+'%':'')+(gst?' · GST '+gst+'%':'')+'<br>'):''}Grand Total</td>
       <td style="padding:14px 12px; font-size:17px; font-weight:900; color:${accent}; text-align:right;">${sym}${total.toFixed(2)}</td>
     </tr>
   </tfoot></table>
@@ -4673,7 +4687,7 @@ self.addEventListener('notificationclick', e => {
   <div style="page-break-inside:avoid; break-inside:avoid;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff; border-radius:10px; overflow:hidden; margin-bottom:12px;"><tfoot>
     <tr style="background:linear-gradient(135deg, ${accent} 0%, #1e293b 100%);">
-      <td colspan="${isListOnly ? 2 : 3}" style="padding:14px 12px; font-size:11px; font-weight:700; color:rgba(255,255,255,.7); text-align:right;">${disc||gst?`Subtotal ${sym}${base.toFixed(2)}${disc?` · Disc ${disc}%`:''}${gst?` · GST ${gst}%`:''}<br>`:''}Grand Total</td>
+      <td colspan="${isListOnly ? 2 : 3}" style="padding:14px 12px; font-size:11px; font-weight:700; color:rgba(255,255,255,.7); text-align:right;">${disc||gst?('Subtotal '+sym+base.toFixed(2)+(disc?' · Disc '+disc+'%':'')+(gst?' · GST '+gst+'%':'')+'<br>'):''}Grand Total</td>
       <td style="padding:14px 12px; font-size:17px; font-weight:900; color:#fff; text-align:right;">${sym}${total.toFixed(2)}</td>
     </tr>
   </tfoot></table>
@@ -4682,6 +4696,7 @@ self.addEventListener('notificationclick', e => {
   </tr></table>
   </div>
 </div>`;
+    }
 
     async function renderPDF(htmlString, filename) {
         showPDFOverlay();
