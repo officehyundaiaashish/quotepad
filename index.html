@@ -1295,7 +1295,7 @@ self.addEventListener('notificationclick', e => {
             <div id="dialog-title"   class="dialog-title">Notice</div>
             <div id="dialog-message" class="dialog-message">Message</div>
             <div class="dialog-actions">
-                <button id="dialog-cancel"  class="btn-outline" style="border:none; color:var(--muted);">Cancel</button>
+                <button id="dialog-cancel" style="background:#fff; color:#374151; border:1.5px solid #d1d5db; border-radius:12px; padding:.6rem 1.2rem; font-size:.9rem; font-weight:600; cursor:pointer;">Cancel</button>
                 <button id="dialog-confirm">OK</button>
             </div>
         </div>
@@ -1697,6 +1697,15 @@ self.addEventListener('notificationclick', e => {
                         <label style="margin-left:.5rem;">GST%</label>
                         <input class="tax-input" id="gst-input" type="number" min="0" max="100" step="0.1" placeholder="0" oninput="recalcTax()">
                         <span class="tax-result" id="tax-result"></span>
+                    </div>
+                    <!-- GST Number field -->
+                    <div class="no-print" id="gst-number-row" style="display:none; margin-top:.5rem;">
+                        <input id="gst-number-input" type="text" placeholder="GST Number (optional)"
+                            style="width:100%; padding:.5rem .75rem; border:1.5px solid var(--border); border-radius:10px;
+                            font-size:.85rem; background:var(--solid); color:var(--text); outline:none; box-sizing:border-box;"
+                            onfocus="this.style.borderColor='var(--accent)'"
+                            onblur="this.style.borderColor='var(--border)'"
+                            oninput="saveGSTNumber()">
                     </div>
                 </div>
 
@@ -2210,13 +2219,25 @@ self.addEventListener('notificationclick', e => {
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                                 Upload Logo
                             </button>
-                            <button onclick="removeLogo()" style="width:100%;background:transparent;color:#ef4444;border:1.5px solid #fca5a5;">
+                            <button onclick="removeLogo()" style="width:100%;background:#ef4444;color:#fff;border:none;">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 Remove Logo
                             </button>
                         </div>
                     </div>
                     <div style="font-size:.75rem;color:var(--muted);margin-top:.75rem;">Recommended: Square image, PNG/JPG, max 500KB</div>
+                    <!-- Company / Occupation Name -->
+                    <div style="margin-top:1rem;">
+                        <label style="font-size:.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:.4rem;">Company / Occupation Name <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+                        <input id="pdf-company-name" type="text" placeholder="e.g. Sharma Traders, Dr. Ravi Clinic..."
+                            value=""
+                            style="width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:10px;
+                            font-size:.88rem;background:var(--solid);color:var(--text);outline:none;box-sizing:border-box;"
+                            onfocus="this.style.borderColor='var(--accent)'"
+                            onblur="this.style.borderColor='var(--border)'"
+                            oninput="saveCompanyName()">
+                        <div style="font-size:.72rem;color:var(--muted);margin-top:.35rem;">If set, replaces "QuotePad" branding in PDF header. Footer still shows QuotePad.</div>
+                    </div>
                 </div>
 
                 <!-- PDF Templates -->
@@ -2642,6 +2663,7 @@ self.addEventListener('notificationclick', e => {
         emptyState.style.display = 'none';
         const recent = [...appData.lists].reverse().slice(0, 5);
         container.innerHTML = recent.map(list => buildListCardHTML(list, sym)).join('');
+        setTimeout(initSwipeDelete, 50);
     }
 
     function buildListCardHTML(list, sym, idPrefix) {
@@ -2661,8 +2683,16 @@ self.addEventListener('notificationclick', e => {
             </tr>`).join('');
 
         return `
-        <div data-list-id="${list.id}" style="background:var(--solid); border:1.5px solid var(--border-light); border-radius:16px;
-            margin-bottom:.75rem; overflow:hidden; box-shadow:var(--shadow); transition:box-shadow .3s, border-color .3s;">
+        <div class="swipe-card-wrapper" data-list-id="${list.id}" style="position:relative;margin-bottom:.75rem;border-radius:16px;overflow:hidden;">
+            <!-- Red delete bg revealed on swipe -->
+            <div class="swipe-delete-bg" style="position:absolute;inset:0;background:#ef4444;display:flex;align-items:center;justify-content:flex-end;padding-right:1.25rem;border-radius:16px;z-index:0;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:.25rem;">
+                    <svg width="22" height="22" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    <span style="color:#fff;font-size:.65rem;font-weight:700;">Delete</span>
+                </div>
+            </div>
+            <!-- Swipeable card -->
+            <div class="swipe-card" data-list-id="${list.id}" style="position:relative;z-index:1;background:var(--solid);border:1.5px solid var(--border-light);border-radius:16px;box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .3s;">
             <div onclick="toggleListPreview('${idPrefix}-${list.id}')"
                 style="display:flex; align-items:center; gap:.85rem; padding:1rem 1.1rem; cursor:pointer;"
                 onpointerdown="this.style.background='var(--accent-light)'" onpointerup="this.style.background=''" onpointerleave="this.style.background=''">
@@ -2739,7 +2769,91 @@ self.addEventListener('notificationclick', e => {
                     </button>
                 </div>
             </div>
-        </div>`;
+        </div></div>`;
+    }
+
+    // ── SWIPE TO DELETE ──────────────────────────────────────────────
+
+    function initSwipeDelete() {
+        document.querySelectorAll('.swipe-card').forEach(card => {
+            if (card._swipeInit) return;
+            card._swipeInit = true;
+
+            let startX = 0, curX = 0, dragging = false;
+            const THRESHOLD = 80; // px to trigger delete
+
+            function onStart(e) {
+                startX = e.touches ? e.touches[0].clientX : e.clientX;
+                curX = 0;
+                dragging = true;
+                card.style.transition = 'none';
+            }
+
+            function onMove(e) {
+                if (!dragging) return;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                curX = x - startX;
+                if (curX > 0) curX = 0; // only left swipe
+                card.style.transform = 'translateX(' + curX + 'px)';
+                // Prevent page scroll while swiping
+                if (Math.abs(curX) > 10 && e.cancelable) e.preventDefault();
+            }
+
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                card.style.transition = 'transform .2s ease';
+                if (curX < -THRESHOLD) {
+                    // snap to show delete bg fully
+                    card.style.transform = 'translateX(-80px)';
+                    const listId = card.dataset.listId;
+                    // Confirm delete after short delay
+                    setTimeout(() => confirmSwipeDelete(listId, card), 300);
+                } else {
+                    card.style.transform = 'translateX(0)';
+                }
+            }
+
+            card.addEventListener('touchstart', onStart, { passive: true });
+            card.addEventListener('touchmove',  onMove,  { passive: false });
+            card.addEventListener('touchend',   onEnd);
+        });
+    }
+
+    async function confirmSwipeDelete(listId, cardEl) {
+        const list = appData.lists.find(l => l.id === listId);
+        if (!list) { resetSwipeCard(cardEl); return; }
+
+        const confirmed = await customConfirm(
+            'Delete "' + list.title + '"?',
+            'This action cannot be undone.',
+            'Delete', 'Cancel'
+        );
+        if (confirmed) {
+            const wrapper = cardEl.closest('.swipe-card-wrapper');
+            if (wrapper) {
+                wrapper.style.transition = 'opacity .2s, max-height .3s';
+                wrapper.style.opacity = '0';
+                wrapper.style.maxHeight = '0';
+                wrapper.style.marginBottom = '0';
+                wrapper.style.overflow = 'hidden';
+                setTimeout(() => {
+                    appData.lists = appData.lists.filter(l => l.id !== listId);
+                    saveData();
+                    renderDashboard();
+                    renderHistory();
+                    refreshMoreTab();
+                }, 300);
+            }
+        } else {
+            resetSwipeCard(cardEl);
+        }
+    }
+
+    function resetSwipeCard(cardEl) {
+        if (!cardEl) return;
+        cardEl.style.transition = 'transform .2s ease';
+        cardEl.style.transform = 'translateX(0)';
     }
 
     // ── SEARCH SCREEN ────────────────────────────────────────────────
@@ -3752,6 +3866,8 @@ self.addEventListener('notificationclick', e => {
             : `<tr><th class="no-print" style="width:36px;"></th><th>Item</th><th>Rate</th><th style="text-align:center;">Qty</th><th>Total</th></tr>`;
         totalRow.style.display = isListOnly ? 'none' : 'flex';
         if (taxRow) taxRow.style.display = (!isListOnly && cart.length) ? 'flex' : 'none';
+        const gstNumRow = document.getElementById('gst-number-row');
+        if (gstNumRow) gstNumRow.style.display = (!isListOnly && cart.length) ? 'block' : 'none';
 
         if (!cart.length) {
             tbody.innerHTML = `<tr><td colspan="${isListOnly ? 4 : 5}" style="text-align:center; color:#64748b; padding:3rem 1rem;">No items yet. Add something from above!</td></tr>`;
@@ -4368,6 +4484,8 @@ self.addEventListener('notificationclick', e => {
         const template    = appData.pdfSettings.template    || 'classic';
         const accent      = appData.pdfSettings.accentColor || '#10b981';
         const logoSrc     = appData.pdfSettings.logo        || null;
+        const companyName = appData.pdfSettings.companyName || '';
+        const gstNumber   = (document.getElementById('gst-number-input')?.value || appData.pdfSettings.gstNumber || '').trim();
 
         // Derive a slightly darker shade for table headers / footer
         // Simple approach: use the accent as-is for header, use it for borders too
@@ -4469,6 +4587,23 @@ self.addEventListener('notificationclick', e => {
             ? `<img src="${logoSrc}" style="height:48px; max-width:120px; object-fit:contain; border-radius:6px; margin-bottom:6px; display:block;">`
             : '';
 
+        // ── Branding: if user has company name or logo, replace QuotePad header branding ──
+        const hasCustomBrand = !!(companyName || logoSrc);
+        const gstBadge = gstNumber ? `<div style="font-size:10px; color:rgba(255,255,255,.75); margin-top:3px; letter-spacing:.3px;">GST: <span style="font-weight:700; color:#fff;">${gstNumber}</span></div>` : '';
+        const gstBadgeDark = gstNumber ? `<div style="font-size:10px; color:#64748b; margin-top:3px;">GST: <span style="font-weight:700; color:#475569;">${gstNumber}</span></div>` : '';
+        // Header branding block (white text for dark backgrounds)
+        const brandHeaderHTML = hasCustomBrand
+            ? `${logoHTML}<div style="color:#fff; font-size:22px; font-weight:900; letter-spacing:0.3px; line-height:1.2;">${companyName || ''}</div>${gstBadge}`
+            : `${logoHTML}<div style="color:#fff; font-size:24px; font-weight:800; letter-spacing:0.5px; line-height:1.2;">${cartIcon} QuotePad</div>`;
+        // Header branding for dark text templates (minimal)
+        const brandHeaderDarkHTML = hasCustomBrand
+            ? `${logoHTML}<div style="font-size:22px; font-weight:900; color:#0f172a; line-height:1.2;">${companyName || ''}</div>${gstBadgeDark}`
+            : `${logoHTML}<div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px;">QuotePad</div>`;
+        // Footer always shows QuotePad
+        const footerBrand = `Generated by <span style="color:${accent}; font-weight:700;">QuotePad</span>`;
+        // GST number row for footer
+        const gstNumHTML = gstNumber ? `<div style="font-size:10px; color:#94a3b8; margin-top:2px;">GST No: <span style="font-weight:700; color:#475569;">${gstNumber}</span></div>` : '';
+
         // ── Cart icon (base64 svg) ─────────────────────────────────────
         const cartIcon = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyOCcgaGVpZ2h0PScyOCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmZmZmYnIHN0cm9rZS13aWR0aD0nMi4yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnPjxwYXRoIGQ9J00zIDNoMmwuNCAyTTcgMTNoMTBsNC04SDUuNE03IDEzTDUuNCA1TTcgMTNsLTIuMjkzIDIuMjkzYy0uNjMuNjMtLjE4NCAxLjcwNy43MDcgMS43MDdIMTdtMCAwYTIgMiAwIDEwMCA0IDIgMiAwIDAwMC00em0tOCAyYTIgMiAwIDExLTQgMCAyIDIgMCAwMTQgMHonLz48L3N2Zz4=" width="28" height="28" style="vertical-align:middle; margin-top:-2px;">`;
 
@@ -4485,8 +4620,7 @@ self.addEventListener('notificationclick', e => {
     <tr><td style="padding:18px 22px;">
       <table width="100%" cellpadding="0" cellspacing="0"><tr>
         <td>
-          ${logoHTML}
-          <div style="color:#fff; font-size:24px; font-weight:800; letter-spacing:0.5px; line-height:1.2;">${cartIcon} QuotePad</div>
+          ${brandHeaderHTML}
           ${titleLine ? `<div style="color:#fff; font-size:20px; font-weight:800; margin-top:6px;">${titleLine}</div>` : ''}
           <div style="color:rgba(255,255,255,.78); font-size:11.5px; margin-top:4px;">${isListOnly ? 'Shopping List' : 'Quotation / Estimate'}</div>
         </td>
@@ -4518,7 +4652,8 @@ self.addEventListener('notificationclick', e => {
     </tr>
   </tfoot></table>
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px; border-top:1.5px dashed ${accentBorder};"><tr>
-    <td style="padding-top:12px; font-size:10.5px; color:#94a3b8;">Generated by <span style="color:${accent}; font-weight:700;">QuotePad</span> &mdash; Smart Quotation Maker</td>
+    <td style="padding-top:12px; font-size:10.5px; color:#94a3b8;">${footerBrand} &mdash; Smart Quotation Maker</td>
+    </tr><tr><td colspan="2">${gstNumHTML}</td>
     <td style="padding-top:12px; font-size:10.5px; color:#94a3b8; text-align:right;">${date} &bull; ${time}</td>
   </tr></table>
   </div>
@@ -4530,7 +4665,7 @@ self.addEventListener('notificationclick', e => {
             return `<div style="${fontFamily} background:#ffffff; width:680px; color:#0f172a; overflow:hidden; border:2px solid #e2e8f0; border-radius:12px;">${fontImport}
 
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#1e293b;"><tr>
-    <td style="padding:7px 22px;"><span style="color:${accent}; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;">QuotePad</span></td>
+    <td style="padding:7px 22px;"><span style="color:${accent}; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;">${companyName || 'QuotePad'}</span>${gstNumber ? `<span style="color:#64748b; font-size:10px; margin-left:8px;">GST: ${gstNumber}</span>` : ''}</td>
     <td style="padding:7px 22px; text-align:right;"><span style="color:#94a3b8; font-size:10px;">${date} &bull; ${time}</span></td>
   </tr></table>
 
@@ -4567,7 +4702,7 @@ self.addEventListener('notificationclick', e => {
     </tr>
   </tfoot></table>
   <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1.5px solid #e2e8f0; margin-top:14px;"><tr>
-    <td style="padding-top:10px; font-size:10px; color:#94a3b8;">Generated by <span style="color:${accent}; font-weight:700;">QuotePad</span></td>
+    <td style="padding-top:10px; font-size:10px; color:#94a3b8;">${footerBrand}${gstNumHTML}</td>
     <td style="padding-top:10px; font-size:10px; color:#94a3b8; text-align:right;">${date} &bull; ${time}</td>
   </tr></table>
   </div>
@@ -4581,8 +4716,7 @@ self.addEventListener('notificationclick', e => {
 
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px; border-left:4px solid ${accent}; padding-left:14px;"><tr>
     <td>
-      ${logoHTML}
-      <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px;">QuotePad</div>
+      ${brandHeaderDarkHTML}
       <div style="font-size:26px; font-weight:900; color:#0f172a; line-height:1.1;">${titleLine || (isListOnly ? 'Shopping List' : 'Quotation')}</div>
       <div style="font-size:11px; color:#94a3b8; margin-top:5px;">${isListOnly ? 'Purchase / Shopping List' : 'Quotation / Estimate'} &bull; ${date} &bull; ${time}</div>
     </td>
@@ -4609,7 +4743,7 @@ self.addEventListener('notificationclick', e => {
     <td style="padding:12px 8px; font-size:18px; font-weight:900; color:${accent}; text-align:right;">${sym}${total.toFixed(2)}</td>
   </tr></table>
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px; border-top:1px solid #e2e8f0;"><tr>
-    <td style="padding-top:10px; font-size:10px; color:#cbd5e1;">Generated by <span style="color:${accent}; font-weight:600;">QuotePad</span></td>
+    <td style="padding-top:10px; font-size:10px; color:#cbd5e1;">${footerBrand}${gstNumHTML}</td>
     <td style="padding-top:10px; font-size:10px; color:#cbd5e1; text-align:right;">${date}</td>
   </tr></table>
   </div>
@@ -4623,8 +4757,8 @@ self.addEventListener('notificationclick', e => {
   <!-- Dark full-width header -->
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#1e293b; margin-bottom:0;"><tr>
     <td style="padding:22px 24px; vertical-align:middle;">
-      ${logoHTML}
-      <div style="color:#fff; font-size:26px; font-weight:900; line-height:1.1;">${titleLine || (isListOnly ? 'Shopping List' : 'Quotation')}</div>
+      ${brandHeaderHTML}
+      <div style="color:#fff; font-size:26px; font-weight:900; line-height:1.1; margin-top:4px;">${titleLine || (isListOnly ? 'Shopping List' : 'Quotation')}</div>
       <div style="color:#94a3b8; font-size:11px; margin-top:4px; text-transform:uppercase; letter-spacing:.8px;">${isListOnly ? 'Shopping List' : 'Quotation / Estimate'}</div>
     </td>
     <td style="padding:22px 24px; text-align:right; vertical-align:middle;">
@@ -4662,7 +4796,8 @@ self.addEventListener('notificationclick', e => {
     </tr>
   </tfoot></table>
   <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1.5px solid #e2e8f0; margin-top:14px;"><tr>
-    <td style="padding-top:10px; font-size:10px; color:#94a3b8;">Generated by <span style="color:${accent}; font-weight:700;">QuotePad</span> &mdash; Smart Quotation Maker</td>
+    <td style="padding-top:10px; font-size:10px; color:#94a3b8;">${footerBrand} &mdash; Smart Quotation Maker${gstNumHTML}</td>
+    </tr><tr><td colspan="2">${gstNumHTML}</td>
     <td style="padding-top:10px; font-size:10px; color:#94a3b8; text-align:right;">${date} &bull; ${time}</td>
   </tr></table>
   </div>
@@ -4671,13 +4806,13 @@ self.addEventListener('notificationclick', e => {
         }
 
         // ── 5. CREATIVE TEMPLATE (gradient header, rounded card look) ──
+        if (template === 'creative') {
         return `<div style="${fontFamily} background:#f8fafc; padding:16px; width:680px; color:#0f172a; overflow:hidden;">${fontImport}
 
   <!-- Gradient header card -->
   <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg, ${accent} 0%, #1e293b 100%); border-radius:14px; margin-bottom:16px;"><tr>
     <td style="padding:22px 24px; vertical-align:middle;">
-      ${logoHTML}
-      <div style="color:#fff; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; opacity:.8; margin-bottom:4px;">QuotePad</div>
+      ${hasCustomBrand ? brandHeaderHTML : '<div style="color:#fff; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; opacity:.8; margin-bottom:4px;">QuotePad</div>'}
       <div style="color:#fff; font-size:24px; font-weight:900; line-height:1.2;">${titleLine || (isListOnly ? 'Shopping List' : 'Quotation')}</div>
       <div style="color:rgba(255,255,255,.7); font-size:11px; margin-top:5px;">${isListOnly ? 'Shopping List' : 'Quotation / Estimate'}</div>
     </td>
@@ -4714,10 +4849,15 @@ self.addEventListener('notificationclick', e => {
     </tr>
   </tfoot></table>
   <table width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td style="padding-top:6px; font-size:10px; color:#94a3b8; text-align:center;">Generated by <span style="color:${accent}; font-weight:700;">QuotePad</span> &mdash; Smart Quotation Maker &bull; ${date}</td>
+    <td style="padding-top:6px; font-size:10px; color:#94a3b8; text-align:center;">${footerBrand} &mdash; Smart Quotation Maker &bull; ${date}${gstNumHTML}</td>
   </tr></table>
   </div>
 </div>`;
+        }
+
+        // Fallback: classic
+        appData.pdfSettings.template = 'classic';
+        return buildPDFHTML(items, isListOnly, titleLine, dateLine, discIn, gstIn);
     }
 
     async function renderPDF(htmlString, filename) {
@@ -4726,7 +4866,6 @@ self.addEventListener('notificationclick', e => {
     }
 
     function showPDFPreview(htmlString, filename) {
-        // Remove any existing preview
         const existing = document.getElementById('pdf-preview-overlay');
         if (existing) existing.remove();
 
@@ -4734,33 +4873,56 @@ self.addEventListener('notificationclick', e => {
         overlay.id = 'pdf-preview-overlay';
         overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;padding-top:max(0px,env(safe-area-inset-top));';
 
-        // Store html for download
         window._currentPDFHtml = htmlString;
         window._currentPDFFilename = filename;
 
+        const isMobile = window.innerWidth < 768;
+
         overlay.innerHTML = `
-            <div style="display:flex;align-items:center;padding:.85rem 1.25rem;border-bottom:1px solid var(--border-light);flex-shrink:0;gap:.75rem;">
-                <button onclick="closePDFPreview()" style="width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;">
+            <div style="display:flex;align-items:center;padding:.7rem 1rem;border-bottom:1px solid var(--border-light);flex-shrink:0;gap:.6rem;">
+                <button onclick="closePDFPreview()" style="width:32px;height:32px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <span style="font-size:1rem;font-weight:700;color:var(--text);flex:1;">Preview</span>
-                <button onclick="downloadPDFNow()" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:10px;border:none;background:#10b981;color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Download PDF
+                <span style="font-size:.95rem;font-weight:700;color:var(--text);flex:1;">Preview</span>
+                <button onclick="downloadPDFNow()" style="display:flex;align-items:center;gap:.35rem;padding:.45rem .85rem;border-radius:10px;border:none;background:#10b981;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    ${isMobile ? 'Save' : 'Download PDF'}
                 </button>
-                <button onclick="sharePDFNow()" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:10px;border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                <button onclick="sharePDFNow()" style="display:flex;align-items:center;gap:.35rem;padding:.45rem .85rem;border-radius:10px;border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     Share
                 </button>
             </div>
-            <div style="flex:1;overflow:auto;background:#d1d5db;padding:1rem;display:flex;justify-content:center;align-items:flex-start;">
-                <div id="pdf-html-preview" style="width:100%;max-width:700px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.18);overflow-x:auto;overflow-y:visible;">
+            <div style="flex:1;${isMobile ? 'overflow:hidden;' : 'overflow:auto;'} background:#e5e7eb;display:flex;justify-content:center;align-items:flex-start;${isMobile ? '' : 'padding:1rem;'}">
+                <div id="pdf-html-preview" style="${isMobile
+                    ? 'width:100%;height:100%;overflow:auto;background:#fff;transform-origin:top left;'
+                    : 'width:100%;max-width:700px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.18);overflow:visible;'}">
                     ${htmlString}
                 </div>
             </div>
         `;
 
         document.body.appendChild(overlay);
+
+        // Mobile: scale PDF content to fit screen width — no scroll needed
+        if (isMobile) {
+            const previewEl = document.getElementById('pdf-html-preview');
+            requestAnimationFrame(() => {
+                const inner = previewEl.firstElementChild;
+                if (!inner) return;
+                const naturalW = inner.scrollWidth || 680;
+                const screenW  = window.innerWidth;
+                const scale    = screenW / naturalW;
+                if (scale < 1) {
+                    inner.style.transformOrigin = 'top left';
+                    inner.style.transform = 'scale(' + scale + ')';
+                    inner.style.width = naturalW + 'px';
+                    previewEl.style.width  = screenW + 'px';
+                    previewEl.style.height = (inner.scrollHeight * scale) + 'px';
+                    previewEl.style.overflow = 'hidden';
+                }
+            });
+        }
     }
 
     function closePDFPreview() {
@@ -6304,6 +6466,7 @@ self.addEventListener('notificationclick', e => {
         }
 
         listEl.innerHTML = lists.map(list => buildListCardHTML(list, sym, 'bp')).join('');
+        setTimeout(initSwipeDelete, 50);
     }
 
     // Card subtitle update
@@ -6425,6 +6588,12 @@ self.addEventListener('notificationclick', e => {
         
         // Show logo preview
         const preview = document.getElementById('pdf-logo-preview');
+        // Load company name
+        const cnEl = document.getElementById('pdf-company-name');
+        if (cnEl) cnEl.value = appData.pdfSettings.companyName || '';
+        // Load GST number
+        const gnEl = document.getElementById('gst-number-input');
+        if (gnEl) gnEl.value = appData.pdfSettings.gstNumber || '';
         if (appData.pdfSettings.logo) {
             preview.innerHTML = `<img src="${appData.pdfSettings.logo}" style="width:100%;height:100%;object-fit:contain;">`;
         } else {
@@ -6479,6 +6648,18 @@ self.addEventListener('notificationclick', e => {
         saveData();
         refreshPDFSettingsUI();
         document.getElementById('pdf-logo-input').value = '';
+    }
+
+    function saveCompanyName() {
+        if (!appData.pdfSettings) appData.pdfSettings = {};
+        appData.pdfSettings.companyName = document.getElementById('pdf-company-name').value.trim();
+        saveData();
+    }
+
+    function saveGSTNumber() {
+        if (!appData.pdfSettings) appData.pdfSettings = {};
+        appData.pdfSettings.gstNumber = document.getElementById('gst-number-input')?.value.trim() || '';
+        saveData();
     }
 
     // ── BOOT ─────────────────────────────────────────────────────────
