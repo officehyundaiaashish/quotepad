@@ -284,6 +284,7 @@ self.addEventListener('notificationclick', e => {
         body.dark .custom-option:hover,
         body.dark .custom-option.selected       { background:var(--accent); color:#fff; }
         body.dark .nav-btn:hover        { background:#1a3d2e; }
+        body.dark .top-bar              { border-bottom-color: #0d1f1a; }
         body.dark #cart-table th,
         body.dark #inventory-table th   { background:#0d2b1f; }
         body.dark #cart-table      tbody tr:nth-child(even),
@@ -359,7 +360,7 @@ self.addEventListener('notificationclick', e => {
             overscroll-behavior: none;
         }
         html.dark-html { background: #0d1f1a; }
-        html.app-ready { background: #ffffff; }
+        html.app-ready { background: #f0fdf4; }
         html.app-ready.dark-html { background: #0d1f1a; }
 
         body {
@@ -752,7 +753,7 @@ self.addEventListener('notificationclick', e => {
             padding-left:  max(1.5rem, env(safe-area-inset-left));
             padding-right: max(1.5rem, env(safe-area-inset-right));
             position: sticky; top: 0; z-index: 10;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #ffffff;
         }
         .logo { font-size:1.25rem; font-weight:700; color:var(--accent); margin-right:auto; display:flex; align-items:center; gap:.5rem; }
         .desktop-nav { display:flex; gap:.5rem; }
@@ -4556,7 +4557,7 @@ self.addEventListener('notificationclick', e => {
         const tableRows = items.map((item, i) => {
             const bg  = i % 2 === 0 ? rowEven : rowOdd;
             const amt = (item.rate * item.qty).toFixed(2);
-            return `<tr style="background:${bg};">
+            return `<tr style="background:${bg}; page-break-inside:avoid;">
                 <td style="padding:9px 12px; border:1px solid ${rowBorder}; font-size:12.5px; font-weight:500; color:#0f172a;">${item.name}${item.note?`<div style="font-size:10px;color:#94a3b8;">${item.note}</div>`:''}</td>
                 ${isListOnly ? '' : `<td style="padding:9px 12px; border:1px solid ${rowBorder}; font-size:12.5px; text-align:right; color:${accent}; font-weight:600;">${sym}${item.rate} / ${item.unit}</td>`}
                 <td style="padding:9px 12px; border:1px solid ${rowBorder}; font-size:12.5px; text-align:center; font-weight:700; color:#0f172a;">${item.qty} ${item.unit}</td>
@@ -4990,14 +4991,19 @@ self.addEventListener('notificationclick', e => {
         if (typeof html2pdf !== 'undefined') {
             try {
                 const el = document.getElementById('pdf-html-preview');
+                // Clone and scale to A4 width for perfect fit
+                const clone = el.cloneNode(true);
+                clone.style.cssText = 'width:794px;background:#fff;padding:0;margin:0;transform:none;';
+                document.body.appendChild(clone);
                 await html2pdf().set({
-                    margin:      [8, 8, 15, 8],
+                    margin:      [10, 10, 10, 10],
                     filename,
                     image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', windowWidth: 700 },
+                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0 },
                     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] },
-                }).from(el).save();
+                    pagebreak:   { mode: ['css', 'legacy'], before: '.page-break-before', avoid: ['tr', 'thead', 'tfoot', '.no-break'] },
+                }).from(clone).save();
+                document.body.removeChild(clone);
             } catch(e) {
                 await customAlert('PDF download failed. Try Share instead.');
             }
@@ -5018,13 +5024,18 @@ self.addEventListener('notificationclick', e => {
         if (typeof html2pdf !== 'undefined') {
             try {
                 const el = document.getElementById('pdf-html-preview');
+                const clone = el.cloneNode(true);
+                clone.style.cssText = 'width:794px;background:#fff;padding:0;margin:0;transform:none;';
+                document.body.appendChild(clone);
                 const blob = await html2pdf().set({
-                    margin:      [8, 8, 15, 8],
+                    margin:      [10, 10, 10, 10],
                     filename,
                     image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 700 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0 },
                     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                }).from(el).output('blob');
+                    pagebreak:   { mode: ['css', 'legacy'], before: '.page-break-before', avoid: ['tr', 'thead', 'tfoot', '.no-break'] },
+                }).from(clone).output('blob');
+                document.body.removeChild(clone);
 
                 const file = new File([blob], filename, { type: 'application/pdf' });
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
