@@ -1709,8 +1709,8 @@ self.addEventListener('notificationclick', e => {
                         padding:.85rem; font-size:.95rem; font-weight:700;
                         box-shadow:0 2px 6px rgba(0,0,0,.12);
                         transition:transform .15s, box-shadow .15s; cursor:pointer; width:100%;">
-                        <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-4 7 4V5a2 2 0 00-2-2H7a2 2 0 00-2 2z"/></svg>
-                        Create List
+                        <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        Save
                     </button>
                     <!-- Clear List — subtle dashed -->
                     <button onclick="clearCart()" style="
@@ -4753,8 +4753,8 @@ self.addEventListener('notificationclick', e => {
                     Share
                 </button>
             </div>
-            <div style="flex:1;overflow:auto;background:#d1d5db;padding:1rem;display:flex;justify-content:center;">
-                <div id="pdf-html-preview" style="width:100%;max-width:700px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.18);overflow:hidden;">
+            <div style="flex:1;overflow:auto;background:#d1d5db;padding:1rem;display:flex;justify-content:center;align-items:flex-start;">
+                <div id="pdf-html-preview" style="width:100%;max-width:700px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.18);overflow-x:auto;overflow-y:visible;">
                     ${htmlString}
                 </div>
             </div>
