@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>QuotePad</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#10b981" id="theme-color-meta">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar-meta">
@@ -9,6 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="QuotePad">
     <link rel="apple-touch-icon" id="apple-touch-icon">
+    <link rel="icon" id="favicon-icon" type="image/png">
     <!-- Instantly apply saved theme before render to prevent flash & fix status bar -->
     <script>
     (function(){
@@ -133,6 +135,9 @@
         // Also set apple touch icon
         const appleIcon = document.getElementById('apple-touch-icon');
         if (appleIcon) appleIcon.href = icon192;
+        // Set favicon for browser tab
+        const favicon = document.getElementById('favicon-icon');
+        if (favicon) favicon.href = icon192;
     })();
 
     // ── PWA: Service Worker Registration ─────────────────────────────
