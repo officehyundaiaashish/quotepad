@@ -727,6 +727,21 @@ self.addEventListener('notificationclick', e => {
         #qa-new-unit-wrap button {
             height:30px; padding:0 .6rem; font-size:.78rem; width:auto; border-radius:8px;
         }
+        /* ── CUSTOM SCROLLBAR (desktop only) ───────────────────────── */
+        @media (min-width: 768px) {
+            * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+            *:hover { scrollbar-color: var(--border) transparent; }
+            ::-webkit-scrollbar { width: 5px; height: 5px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb {
+                background: transparent;
+                border-radius: 99px;
+                transition: background .3s;
+            }
+            *:hover::-webkit-scrollbar-thumb { background: var(--border); }
+            ::-webkit-scrollbar-thumb:hover { background: var(--muted) !important; }
+        }
+
         /* ── TOP BAR ────────────────────────────────────────────────── */
         .top-bar {
             background: var(--bg);
@@ -737,7 +752,7 @@ self.addEventListener('notificationclick', e => {
             padding-left:  max(1.5rem, env(safe-area-inset-left));
             padding-right: max(1.5rem, env(safe-area-inset-right));
             position: sticky; top: 0; z-index: 10;
-            border-bottom: 1px solid var(--bg);
+            border-bottom: 1px solid var(--border-light);
         }
         .logo { font-size:1.25rem; font-weight:700; color:var(--accent); margin-right:auto; display:flex; align-items:center; gap:.5rem; }
         .desktop-nav { display:flex; gap:.5rem; }
