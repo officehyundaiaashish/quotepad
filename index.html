@@ -284,6 +284,7 @@ self.addEventListener('notificationclick', e => {
         body.dark .custom-option:hover,
         body.dark .custom-option.selected       { background:var(--accent); color:#fff; }
         body.dark .nav-btn:hover        { background:#1a3d2e; }
+        body.dark .top-bar              { background: #0d1f1a; }
         body.dark #cart-table th,
         body.dark #inventory-table th   { background:#0d2b1f; }
         body.dark #cart-table      tbody tr:nth-child(even),
@@ -4989,19 +4990,24 @@ self.addEventListener('notificationclick', e => {
 
         if (typeof html2pdf !== 'undefined') {
             try {
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;';
-                wrapper.innerHTML = htmlString;
-                document.body.appendChild(wrapper);
+                const el = document.getElementById('pdf-html-preview');
+                const inner = el.firstElementChild || el;
+                // Reset any mobile scaling temporarily
+                const prevTransform = inner.style.transform;
+                const prevWidth = inner.style.width;
+                inner.style.transform = 'none';
+                inner.style.width = '680px';
                 await html2pdf().set({
-                    margin:      [10, 10, 10, 10],
+                    margin:      [8, 8, 8, 8],
                     filename,
                     image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', windowWidth: 794 },
+                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff' },
                     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:   { mode: ['css', 'legacy'], avoid: ['tr', 'thead', 'tfoot'] },
-                }).from(wrapper).save();
-                document.body.removeChild(wrapper);
+                }).from(inner).save();
+                // Restore
+                inner.style.transform = prevTransform;
+                inner.style.width = prevWidth;
             } catch(e) {
                 await customAlert('PDF download failed. Try Share instead.');
             }
@@ -5021,19 +5027,22 @@ self.addEventListener('notificationclick', e => {
 
         if (typeof html2pdf !== 'undefined') {
             try {
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;';
-                wrapper.innerHTML = htmlString;
-                document.body.appendChild(wrapper);
+                const el = document.getElementById('pdf-html-preview');
+                const inner = el.firstElementChild || el;
+                const prevTransform = inner.style.transform;
+                const prevWidth = inner.style.width;
+                inner.style.transform = 'none';
+                inner.style.width = '680px';
                 const blob = await html2pdf().set({
-                    margin:      [10, 10, 10, 10],
+                    margin:      [8, 8, 8, 8],
                     filename,
                     image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 794 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
                     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:   { mode: ['css', 'legacy'], avoid: ['tr', 'thead', 'tfoot'] },
-                }).from(wrapper).output('blob');
-                document.body.removeChild(wrapper);
+                }).from(inner).output('blob');
+                inner.style.transform = prevTransform;
+                inner.style.width = prevWidth;
 
                 const file = new File([blob], filename, { type: 'application/pdf' });
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
