@@ -4587,6 +4587,9 @@ self.addEventListener('notificationclick', e => {
             ? `<img src="${logoSrc}" style="height:48px; max-width:120px; object-fit:contain; border-radius:6px; margin-bottom:6px; display:block;">`
             : '';
 
+        // ── Cart icon (base64 svg) ─────────────────────────────────────
+        const cartIcon = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyOCcgaGVpZ2h0PScyOCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmZmZmYnIHN0cm9rZS13aWR0aD0nMi4yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnPjxwYXRoIGQ9J00zIDNoMmwuNCAyTTcgMTNoMTBsNC04SDUuNE03IDEzTDUuNCA1TTcgMTNsLTIuMjkzIDIuMjkzYy0uNjMuNjMtLjE4NCAxLjcwNy43MDcgMS43MDdIMTdtMCAwYTIgMiAwIDEwMCA0IDIgMiAwIDAwMC00em0tOCAyYTIgMiAwIDExLTQgMCAyIDIgMCAwMTQgMHonLz48L3N2Zz4=" width="28" height="28" style="vertical-align:middle; margin-top:-2px;">`;
+
         // ── Branding: if user has company name or logo, replace QuotePad header branding ──
         const hasCustomBrand = !!(companyName || logoSrc);
         const gstBadge = gstNumber ? `<div style="font-size:10px; color:rgba(255,255,255,.75); margin-top:3px; letter-spacing:.3px;">GST: <span style="font-weight:700; color:#fff;">${gstNumber}</span></div>` : '';
@@ -4604,10 +4607,6 @@ self.addEventListener('notificationclick', e => {
         // GST number row for footer
         const gstNumHTML = gstNumber ? `<div style="font-size:10px; color:#94a3b8; margin-top:2px;">GST No: <span style="font-weight:700; color:#475569;">${gstNumber}</span></div>` : '';
 
-        // ── Cart icon (base64 svg) ─────────────────────────────────────
-        const cartIcon = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyOCcgaGVpZ2h0PScyOCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmZmZmYnIHN0cm9rZS13aWR0aD0nMi4yJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnPjxwYXRoIGQ9J00zIDNoMmwuNCAyTTcgMTNoMTBsNC04SDUuNE03IDEzTDUuNCA1TTcgMTNsLTIuMjkzIDIuMjkzYy0uNjMuNjMtLjE4NCAxLjcwNy43MDcgMS43MDdIMTdtMCAwYTIgMiAwIDEwMCA0IDIgMiAwIDAwMC00em0tOCAyYTIgMiAwIDExLTQgMCAyIDIgMCAwMTQgMHonLz48L3N2Zz4=" width="28" height="28" style="vertical-align:middle; margin-top:-2px;">`;
-
-        // ── CLASSIC TEMPLATE (colored header, same as before but accent-aware) ──
         // ── SHARED FONT IMPORT ─────────────────────────────────────────
         const fontImport = `<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap');</style>`;
         const fontFamily = `font-family:'Noto Sans Devanagari','Noto Sans',Arial,sans-serif;`;
