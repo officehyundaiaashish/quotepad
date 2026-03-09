@@ -21,8 +21,9 @@
             document.documentElement.classList.add('dark-html');
             document.querySelector('meta[name="theme-color"]').content = '#0d1f1a';
             document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content = 'black-translucent';
+        } else {
+            document.querySelector('meta[name="theme-color"]').content = '#ffffff';
         }
-        // Light mode: keep green (#10b981) during splash — will update to white after splash hides
     })();
     </script>
 
@@ -356,7 +357,7 @@ self.addEventListener('notificationclick', e => {
 
         /* html must also carry the bg — browser uses html for overscroll flash color */
         html {
-            background: #10b981; /* Match splash accent — eliminates thin line between browser bar and splash */
+            background: #ffffff;
             overscroll-behavior: none;
         }
         html.dark-html { background: #0d1f1a; }
