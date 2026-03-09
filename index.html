@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>QuotePad</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#10b981" id="theme-color-meta">
+    <meta name="theme-color" content="#f0fdf4" id="theme-color-meta">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -729,7 +729,7 @@ self.addEventListener('notificationclick', e => {
         }
         /* ── TOP BAR ────────────────────────────────────────────────── */
         .top-bar {
-            background: var(--solid);
+            background: var(--bg);
             display: flex; align-items: center;
             padding: 1rem 1.5rem;
             /* Safe area for notch / Dynamic Island */
@@ -737,7 +737,7 @@ self.addEventListener('notificationclick', e => {
             padding-left:  max(1.5rem, env(safe-area-inset-left));
             padding-right: max(1.5rem, env(safe-area-inset-right));
             position: sticky; top: 0; z-index: 10;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--bg);
         }
         .logo { font-size:1.25rem; font-weight:700; color:var(--accent); margin-right:auto; display:flex; align-items:center; gap:.5rem; }
         .desktop-nav { display:flex; gap:.5rem; }
@@ -2500,7 +2500,7 @@ self.addEventListener('notificationclick', e => {
         } else {
             icon.innerHTML  = `<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;
             label.innerText = 'Dark';
-            meta.content    = '#ffffff';
+            meta.content    = '#f0fdf4';
             apple.content   = 'default';
         }
     }
@@ -2545,7 +2545,7 @@ self.addEventListener('notificationclick', e => {
             const isDark = document.body.classList.contains('dark');
             const themeMeta = document.querySelector('meta[name="theme-color"]');
             const appleBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-            if (themeMeta) themeMeta.content = isDark ? '#0d1f1a' : '#ffffff';
+            if (themeMeta) themeMeta.content = isDark ? '#0d1f1a' : '#f0fdf4';
             if (appleBarMeta) appleBarMeta.content = isDark ? 'black-translucent' : 'default';
             document.documentElement.classList.add('app-ready'); // restore html bg
             setTimeout(() => splash.remove(), 500);
