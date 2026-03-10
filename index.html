@@ -330,13 +330,13 @@ self.addEventListener('notificationclick', e => {
         .group-picker-select { padding:.38rem .6rem; font-size:.85rem; border:1.5px solid var(--border); border-radius:7px; background:var(--solid); color:var(--text); cursor:pointer; }
         .group-picker-select:focus { border-color:var(--accent); outline:none; }
         /* Custom group dropdown */
-        .grp-dd-wrap { position:relative; user-select:none; }
+        .grp-dd-wrap { position:relative; user-select:none; overflow:visible; }
         .grp-dd-trigger { display:flex; align-items:center; justify-content:space-between; padding:.38rem .6rem; font-size:.85rem; border:1.5px solid var(--border); border-radius:7px; background:var(--solid); color:var(--text); cursor:pointer; transition:border-color .15s; min-height:34px; }
         .grp-dd-trigger:hover { border-color:var(--accent); background:var(--accent-light); }
         .grp-dd-wrap.open .grp-dd-trigger { border-color:var(--accent); background:var(--accent); color:#fff; border-radius:7px 7px 0 0; }
         .grp-dd-wrap.open .grp-dd-trigger .grp-dd-arrow { border-color:#fff #fff transparent transparent; transform:rotate(-45deg); margin-top:3px; }
         .grp-dd-arrow { width:7px; height:7px; border-top:2px solid var(--muted); border-right:2px solid var(--muted); transform:rotate(135deg); transition:transform .15s; flex-shrink:0; margin-top:-2px; }
-        .grp-dd-opts { position:absolute; top:100%; left:0; right:0; z-index:200; background:var(--solid); border:1.5px solid var(--accent); border-top:none; border-radius:0 0 8px 8px; max-height:180px; overflow-y:auto; opacity:0; visibility:hidden; pointer-events:none; transform:translateY(-4px); transition:all .12s var(--ease-spring); box-shadow:0 8px 16px rgba(16,185,129,.12); }
+        .grp-dd-opts { position:absolute; top:100%; left:0; right:0; z-index:500; background:var(--solid); border:1.5px solid var(--accent); border-top:none; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; -webkit-overflow-scrolling:touch; opacity:0; visibility:hidden; pointer-events:none; transform:translateY(-4px); transition:all .12s var(--ease-spring); box-shadow:0 8px 16px rgba(16,185,129,.12); }
         .grp-dd-wrap.open .grp-dd-opts { opacity:1; visibility:visible; pointer-events:all; transform:translateY(0); }
         .grp-dd-opt { padding:.5rem .7rem; font-size:.85rem; color:var(--text); background:var(--solid); cursor:pointer; border-bottom:1px solid var(--border-light); transition:all .08s; }
         .grp-dd-opt:last-child { border-bottom:none; }
@@ -443,10 +443,18 @@ self.addEventListener('notificationclick', e => {
         .note-input-inline { flex:1; font-size:.72rem; color:var(--muted); border:none; border-bottom:1px dashed var(--border); background:transparent; outline:none; padding:.05rem 0; min-width:0; }
         .note-input-inline::placeholder { color:var(--accent); opacity:.5; font-style:italic; }
         .note-input-inline:focus { border-bottom-color:var(--accent); color:var(--text); }
-        .ph-badge { display:inline-block; font-size:.68rem; padding:.1rem .45rem; border-radius:20px; font-weight:700; margin:1px; }
-        .ph-up   { background:#dcfce7; color:#166534; }
-        .ph-down { background:#fee2e2; color:#991b1b; }
-        .ph-same { background:#f1f5f9; color:#64748b; }
+        .ph-badge {
+            display: inline-flex; align-items: center; gap: .28rem;
+            font-size: .72rem; font-weight: 700; white-space: nowrap;
+            padding: .22rem .55rem; border-radius: 20px;
+            letter-spacing: .01em;
+        }
+        .ph-up   { background: #dcfce7; color: #15803d; }
+        .ph-down { background: #fee2e2; color: #b91c1c; }
+        .ph-same { background: #f1f5f9; color: #64748b; }
+        body.dark .ph-up   { background: #14532d; color: #4ade80; }
+        body.dark .ph-down { background: #450a0a; color: #f87171; }
+        body.dark .ph-same { background: #1e293b; color: #94a3b8; }
         .currency-pill { display:inline-block; padding:.3rem .75rem; border:1.5px solid var(--border); border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:600; margin:.25rem; transition:all .12s var(--ease-smooth); }
         .currency-pill.active, .currency-pill:hover { border-color:var(--accent); background:var(--accent); color:#fff; }
         .wa-btn { background:#25D366; border:none; color:#fff; display:flex; align-items:center; justify-content:center; gap:.4rem; }
@@ -756,7 +764,7 @@ self.addEventListener('notificationclick', e => {
             padding-top: max(1rem, env(safe-area-inset-top));
             padding-left:  max(1.5rem, env(safe-area-inset-left));
             padding-right: max(1.5rem, env(safe-area-inset-right));
-            position: sticky; top: 0; z-index: 10;
+            position: sticky; top: 0; z-index: 60;
             border-bottom: 1px solid var(--border-light);
         }
         .logo { font-size:1.25rem; font-weight:700; color:var(--accent); margin-right:auto; display:flex; align-items:center; gap:.5rem; }
@@ -1366,6 +1374,109 @@ self.addEventListener('notificationclick', e => {
         </button>
     </header>
 
+    <!-- ── SEARCH BAR (fixed, shown only on search screen) ──────────── -->
+    <div id="search-bar-fixed" style="display:none; position:fixed; left:0; right:0; z-index:50;
+        background:var(--bg); border-bottom:1px solid var(--border-light);
+        box-shadow:0 4px 16px rgba(0,0,0,.09);
+        padding:.75rem max(1.5rem, env(safe-area-inset-right)) .6rem max(1.5rem, env(safe-area-inset-left));">
+
+        <div style="max-width:900px; margin:0 auto;">
+            <div style="display:flex; align-items:center; gap:.5rem;">
+                <!-- Search Input -->
+                <div style="position:relative; flex:1;">
+                    <svg width="16" height="16" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2.2"
+                        style="position:absolute; left:.75rem; top:50%; transform:translateY(-50%); pointer-events:none;">
+                        <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input id="search-screen-input" type="text" placeholder="Search by name or amount..."
+                        oninput="renderSearchResults()"
+                        style="width:100%; padding:.65rem .75rem .65rem 2.4rem;
+                        border:1.5px solid var(--border); border-radius:12px;
+                        font-size:.95rem; background:var(--solid); color:var(--text);
+                        outline:none; box-sizing:border-box;"
+                        onfocus="this.style.borderColor='var(--accent)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    <button id="search-clear-x" onclick="clearSearchScreen()"
+                        style="display:none; position:absolute; right:.6rem; top:50%; transform:translateY(-50%);
+                        background:none; border:none; cursor:pointer; color:var(--muted); padding:.2rem; line-height:1;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Filter Button -->
+                <div style="position:relative;">
+                    <button id="srch-filter-btn" onclick="toggleSearchFilterMenu()" title="Filter"
+                        style="width:40px; height:40px; padding:0; border-radius:10px;
+                        background:var(--solid); border:1.5px solid var(--border);
+                        color:var(--muted); display:flex; align-items:center; justify-content:center;
+                        cursor:pointer; flex-shrink:0; transition:all .15s;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                        </svg>
+                    </button>
+                    <!-- Filter Menu -->
+                    <div id="srch-filter-menu" style="display:none; position:absolute; top:calc(100% + 6px); right:0;
+                        background:var(--solid); border:1.5px solid var(--border); border-radius:14px;
+                        box-shadow:0 8px 24px rgba(0,0,0,.15); min-width:195px; z-index:200;
+                        overflow:hidden; max-height:360px; flex-direction:column;">
+                        <div style="padding:.6rem .85rem; font-size:.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; border-bottom:1px solid var(--border-light); flex-shrink:0;">Filter By</div>
+                        <div style="flex-shrink:0;">
+                            <div id="srch-filter-all"   class="srch-menu-opt" onclick="setSearchFilter('all')"   style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg> All Lists
+                            </div>
+                            <div id="srch-filter-quote" class="srch-menu-opt" onclick="setSearchFilter('quote')" style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                                <svg width="14" height="14" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> Quotes Only
+                            </div>
+                            <div id="srch-filter-list"  class="srch-menu-opt" onclick="setSearchFilter('list')"  style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                                <svg width="14" height="14" fill="none" stroke="#0369a1" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> Shopping Lists
+                            </div>
+                        </div>
+                        <div id="srch-filter-months-wrap" style="border-top:1px solid var(--border-light); overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1;"></div>
+                    </div>
+                </div>
+
+                <!-- Sort Button -->
+                <div style="position:relative;">
+                    <button id="srch-sort-btn" onclick="toggleSearchSortMenu()" title="Sort"
+                        style="width:40px; height:40px; padding:0; border-radius:10px;
+                        background:var(--solid); border:1.5px solid var(--border);
+                        color:var(--muted); display:flex; align-items:center; justify-content:center;
+                        cursor:pointer; flex-shrink:0; transition:all .15s;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+                        </svg>
+                    </button>
+                    <!-- Sort Menu -->
+                    <div id="srch-sort-menu" style="display:none; position:absolute; top:calc(100% + 6px); right:0;
+                        background:var(--solid); border:1.5px solid var(--border); border-radius:14px;
+                        box-shadow:0 8px 24px rgba(0,0,0,.15); min-width:190px; z-index:200; overflow:hidden;">
+                        <div style="padding:.6rem .85rem; font-size:.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; border-bottom:1px solid var(--border-light);">Sort By</div>
+                        <div id="srch-sort-newest"  class="srch-menu-opt" onclick="setSearchSort('newest')"  style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg> Newest First
+                        </div>
+                        <div id="srch-sort-oldest"  class="srch-menu-opt" onclick="setSearchSort('oldest')"  style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg> Oldest First
+                        </div>
+                        <div id="srch-sort-high"    class="srch-menu-opt" onclick="setSearchSort('high')"    style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;border-top:1px solid var(--border-light);transition:background .1s;">
+                            <svg width="14" height="14" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Highest Amount
+                        </div>
+                        <div id="srch-sort-low"     class="srch-menu-opt" onclick="setSearchSort('low')"     style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;transition:background .1s;">
+                            <svg width="14" height="14" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Lowest Amount
+                        </div>
+                        <div id="srch-sort-alpha"   class="srch-menu-opt" onclick="setSearchSort('alpha')"   style="display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;font-size:.85rem;font-weight:600;color:var(--text);cursor:pointer;border-top:1px solid var(--border-light);transition:background .1s;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg> A to Z
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Result count + filter badge -->
+            <div style="display:flex; align-items:center; gap:.5rem; margin-top:.45rem;">
+                <div id="search-result-count" style="font-size:.75rem; color:var(--muted);"></div>
+                <span id="srch-filter-badge" style="display:none; font-size:.68rem; font-weight:700; padding:.1rem .5rem; border-radius:20px; background:var(--accent); color:#fff;"></span>
+            </div>
+        </div>
+    </div>
+
     <!-- ── MAIN ───────────────────────────────────────────────────── -->
     <main class="main-content">
 
@@ -1437,34 +1548,10 @@ self.addEventListener('notificationclick', e => {
         </section>
 
         <!-- SEARCH SCREEN -->
-        <section id="search-view" class="view-section">
-            <!-- Search bar (sticky under header) -->
-            <div style="position:sticky; top:0; z-index:5; background:var(--bg); padding:.75rem 0 .6rem;">
-                <div style="position:relative;">
-                    <svg width="16" height="16" fill="none" stroke="var(--muted)" viewBox="0 0 24 24" stroke-width="2.2"
-                        style="position:absolute; left:.75rem; top:50%; transform:translateY(-50%); pointer-events:none;">
-                        <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
-                    </svg>
-                    <input id="search-screen-input" type="text" placeholder="Search by name or amount..."
-                        oninput="renderSearchResults()"
-                        style="width:100%; padding:.65rem .75rem .65rem 2.4rem;
-                        border:1.5px solid var(--border); border-radius:12px;
-                        font-size:.95rem; background:var(--solid); color:var(--text);
-                        outline:none; box-sizing:border-box; box-shadow:var(--shadow);"
-                        onfocus="this.style.borderColor='var(--accent)'"
-                        onblur="this.style.borderColor='var(--border)'">
-                    <button id="search-clear-x" onclick="clearSearchScreen()"
-                        style="display:none; position:absolute; right:.6rem; top:50%; transform:translateY(-50%);
-                        background:none; border:none; cursor:pointer; color:var(--muted); padding:.2rem; line-height:1;">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <!-- Result count -->
-                <div id="search-result-count" style="font-size:.75rem; color:var(--muted); margin-top:.5rem; padding-left:.25rem;"></div>
-            </div>
+        <section id="search-view" class="view-section" style="padding-top:0;">
 
             <!-- Results -->
-            <div id="search-results-container" style="padding-bottom:5rem;">
+            <div id="search-results-container" style="padding-bottom:5rem; padding-top:.5rem;">
                 <!-- filled by JS -->
             </div>
         </section>
@@ -1482,6 +1569,20 @@ self.addEventListener('notificationclick', e => {
                         <div class="maker-banner-sub">Pick items → set quantity → export or save anytime</div>
                     </div>
                 </div>
+
+                <!-- Rename bar — shown only in edit mode -->
+                <div id="maker-rename-bar" style="display:none; align-items:center; gap:.5rem;
+                    background:var(--accent-light); border:1.5px solid var(--accent);
+                    border-radius:10px; padding:.55rem .75rem; margin-bottom:.75rem;">
+                    <svg width="14" height="14" fill="none" stroke="var(--accent-hover)" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 13l-4 1 1-4L15.232 5.232a2 2 0 012.828 0l.708.708a2 2 0 010 2.828L9 13z"/>
+                    </svg>
+                    <input id="maker-rename-input" type="text" placeholder="List name..."
+                        style="flex:1; border:none; background:transparent; font-size:.9rem; font-weight:700;
+                        color:var(--text); outline:none; padding:0;"
+                        oninput="document.getElementById('list-name-input').value=this.value">
+                </div>
+
 
 
                 <!-- Hidden list name input (used by save/PDF only) -->
@@ -2616,6 +2717,11 @@ self.addEventListener('notificationclick', e => {
     }
 
     function switchTab(tabId, btnElement) {
+        // Hide fixed search bar whenever switching tabs
+        const bar = document.getElementById('search-bar-fixed');
+        if (bar) bar.style.display = 'none';
+        document.querySelector('.main-content').style.paddingTop = '';
+
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(`${tabId}-view`).classList.add('active');
@@ -2830,51 +2936,8 @@ self.addEventListener('notificationclick', e => {
 
     // ── SWIPE TO DELETE ──────────────────────────────────────────────
 
-    function initSwipeDelete() {
-        document.querySelectorAll('.swipe-card').forEach(card => {
-            if (card._swipeInit) return;
-            card._swipeInit = true;
-
-            let startX = 0, curX = 0, dragging = false;
-            const THRESHOLD = 80; // px to trigger delete
-
-            function onStart(e) {
-                startX = e.touches ? e.touches[0].clientX : e.clientX;
-                curX = 0;
-                dragging = true;
-                card.style.transition = 'none';
-            }
-
-            function onMove(e) {
-                if (!dragging) return;
-                const x = e.touches ? e.touches[0].clientX : e.clientX;
-                curX = x - startX;
-                if (curX > 0) curX = 0; // only left swipe
-                card.style.transform = 'translateX(' + curX + 'px)';
-                // Prevent page scroll while swiping
-                if (Math.abs(curX) > 10 && e.cancelable) e.preventDefault();
-            }
-
-            function onEnd() {
-                if (!dragging) return;
-                dragging = false;
-                card.style.transition = 'transform .2s ease';
-                if (curX < -THRESHOLD) {
-                    // snap to show delete bg fully
-                    card.style.transform = 'translateX(-80px)';
-                    const listId = card.dataset.listId;
-                    // Confirm delete after short delay
-                    setTimeout(() => confirmSwipeDelete(listId, card), 300);
-                } else {
-                    card.style.transform = 'translateX(0)';
-                }
-            }
-
-            card.addEventListener('touchstart', onStart, { passive: true });
-            card.addEventListener('touchmove',  onMove,  { passive: false });
-            card.addEventListener('touchend',   onEnd);
-        });
-    }
+    // Swipe-to-delete temporarily disabled
+    function initSwipeDelete() { /* disabled */ }
 
     async function confirmSwipeDelete(listId, cardEl) {
         const list = appData.lists.find(l => l.id === listId);
@@ -2913,20 +2976,182 @@ self.addEventListener('notificationclick', e => {
     }
 
     // ── SEARCH SCREEN ────────────────────────────────────────────────
+
+    // Filter & Sort state
+    let _srchFilter = 'all';   // 'all' | 'quote' | 'list' | 'month'
+    let _srchSort   = 'newest'; // 'newest' | 'oldest' | 'high' | 'low' | 'alpha'
+
+    function toggleSearchFilterMenu() {
+        const menu = document.getElementById('srch-filter-menu');
+        const sortMenu = document.getElementById('srch-sort-menu');
+        if (sortMenu) sortMenu.style.display = 'none';
+        if (menu) {
+            const isOpen = menu.style.display === 'flex';
+            menu.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) refreshFilterMonths();
+        }
+    }
+    // Build dynamic month list from all saved lists
+    function refreshFilterMonths() {
+        const wrap = document.getElementById('srch-filter-months-wrap');
+        if (!wrap) return;
+
+        const MONTH_NAMES = ['January','February','March','April','May','June',
+                             'July','August','September','October','November','December'];
+
+        // Collect unique year-month combos, sorted newest first
+        const seen = new Map();
+        const now = new Date();
+        ;(appData.lists || []).forEach(l => {
+            try {
+                const d = new Date(l.date);
+                if (isNaN(d)) return;
+                const key = `${d.getFullYear()}-${d.getMonth()}`; // e.g. "2025-3"
+                if (!seen.has(key)) {
+                    seen.set(key, { year: d.getFullYear(), month: d.getMonth(),
+                        label: MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear(),
+                        isCurrentMonth: d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+                    });
+                }
+            } catch {}
+        });
+
+        // Sort newest first
+        const months = [...seen.values()].sort((a, b) =>
+            (b.year * 12 + b.month) - (a.year * 12 + a.month)
+        );
+
+        if (!months.length) {
+            wrap.innerHTML = `<div style="padding:.6rem .85rem; font-size:.78rem; color:var(--muted);">No months found</div>`;
+            return;
+        }
+
+        const calIcon = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`;
+
+        wrap.innerHTML = months.map(m => {
+            const key = `month:${m.year}-${m.month}`;
+            const isActive = _srchFilter === key;
+            const label = m.isCurrentMonth ? 'This Month (' + MONTH_NAMES[m.month] + ')' : m.label;
+            return `<div id="srch-filter-dyn-${m.year}-${m.month}"
+                onclick="setSearchFilter('${key}')"
+                style="display:flex;align-items:center;gap:.6rem;padding:.55rem .85rem;font-size:.84rem;font-weight:600;
+                color:${isActive ? 'var(--accent-hover)' : 'var(--text)'};
+                background:${isActive ? 'var(--accent-light)' : 'transparent'};
+                cursor:pointer;transition:background .1s; border-bottom:1px solid var(--border-light);">
+                ${calIcon} ${label}
+            </div>`;
+        }).join('');
+    }
+
+
+    function toggleSearchSortMenu() {
+        const menu = document.getElementById('srch-sort-menu');
+        const filterMenu = document.getElementById('srch-filter-menu');
+        if (filterMenu) filterMenu.style.display = 'none';
+        if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    function setSearchFilter(val) {
+        _srchFilter = val;
+        document.getElementById('srch-filter-menu').style.display = 'none';
+
+        // Highlight static options
+        ['all','quote','list'].forEach(k => {
+            const el = document.getElementById('srch-filter-' + k);
+            if (el) {
+                el.style.background = k === val ? 'var(--accent-light)' : '';
+                el.style.color      = k === val ? 'var(--accent-hover)' : 'var(--text)';
+            }
+        });
+        // Refresh dynamic month highlights
+        refreshFilterMonths();
+
+        // Update filter btn color
+        const btn = document.getElementById('srch-filter-btn');
+        if (btn) {
+            btn.style.background  = val !== 'all' ? 'var(--accent)' : 'var(--solid)';
+            btn.style.color       = val !== 'all' ? '#fff'           : 'var(--muted)';
+            btn.style.borderColor = val !== 'all' ? 'var(--accent)'  : 'var(--border)';
+        }
+
+        // Update badge
+        const badge = document.getElementById('srch-filter-badge');
+        let badgeLabel = '';
+        if (val === 'quote')       badgeLabel = 'Quotes';
+        else if (val === 'list')   badgeLabel = 'Lists';
+        else if (val.startsWith('month:')) {
+            const MONTH_NAMES = ['January','February','March','April','May','June',
+                                 'July','August','September','October','November','December'];
+            const [, ym] = val.split(':');
+            const [yr, mn] = ym.split('-').map(Number);
+            const now = new Date();
+            badgeLabel = (mn === now.getMonth() && yr === now.getFullYear())
+                ? 'This Month'
+                : MONTH_NAMES[mn] + ' ' + yr;
+        }
+        if (badge) {
+            badge.textContent    = badgeLabel;
+            badge.style.display  = badgeLabel ? 'inline-block' : 'none';
+        }
+        renderSearchResults();
+    }
+    function setSearchSort(val) {
+        _srchSort = val;
+        document.getElementById('srch-sort-menu').style.display = 'none';
+        // Highlight active option
+        ['newest','oldest','high','low','alpha'].forEach(k => {
+            const el = document.getElementById('srch-sort-' + k);
+            if (el) el.style.background = k === val ? 'var(--accent-light)' : '';
+            if (el) el.style.color = k === val ? 'var(--accent-hover)' : 'var(--text)';
+        });
+        // Update sort btn color
+        const btn = document.getElementById('srch-sort-btn');
+        if (btn) {
+            btn.style.background  = val !== 'newest' ? 'var(--accent)' : 'var(--solid)';
+            btn.style.color       = val !== 'newest' ? '#fff' : 'var(--muted)';
+            btn.style.borderColor = val !== 'newest' ? 'var(--accent)' : 'var(--border)';
+        }
+        renderSearchResults();
+    }
+    // Close filter/sort menus on outside click
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#srch-filter-btn') && !e.target.closest('#srch-filter-menu'))
+            { const m = document.getElementById('srch-filter-menu'); if(m) m.style.display='none'; }
+        if (!e.target.closest('#srch-sort-btn') && !e.target.closest('#srch-sort-menu'))
+            { const m = document.getElementById('srch-sort-menu'); if(m) m.style.display='none'; }
+    }, true);
+
     function openSearchScreen() {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('search-view').classList.add('active');
         document.getElementById('search-screen-input').value = '';
         document.getElementById('search-result-count').textContent = '';
+
+        // Show fixed search bar below the top-bar
+        const bar = document.getElementById('search-bar-fixed');
+        const topBar = document.querySelector('.top-bar');
+        const topBarH = topBar ? topBar.offsetHeight : 0;
+        bar.style.top = topBarH + 'px';
+        bar.style.display = 'block';
+        // Push main-content down by bar height
+        requestAnimationFrame(() => {
+            const barH = bar.offsetHeight;
+            document.querySelector('.main-content').style.paddingTop = barH + 'px';
+        });
+
+        _srchFilter = 'all';
+        _srchSort   = 'newest';
         renderSearchResults();
-        setTimeout(() => document.getElementById('search-screen-input').focus(), 100);
         scrollToTop();
-        // Push state so back button works
         history.pushState({ screen: 'search' }, '');
     }
 
     function closeSearch() {
+        // Hide fixed search bar, restore main-content padding
+        const bar = document.getElementById('search-bar-fixed');
+        if (bar) bar.style.display = 'none';
+        document.querySelector('.main-content').style.paddingTop = '';
+
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById('dashboard-view').classList.add('active');
         document.querySelectorAll('.mobile-nav .nav-btn')[0]?.classList.add('active');
@@ -2968,16 +3193,41 @@ self.addEventListener('notificationclick', e => {
         if (clearX) clearX.style.display = raw.length ? 'block' : 'none';
 
         const sym  = appData.currency;
-        const all  = [...appData.lists].reverse();
+        let all    = [...appData.lists].reverse();
+
+        // ── Apply Filter ──────────────────────────────────────────────
+        if (_srchFilter === 'quote') {
+            all = all.filter(l => !l.listOnly);
+        } else if (_srchFilter === 'list') {
+            all = all.filter(l => !!l.listOnly);
+        } else if (_srchFilter.startsWith('month:')) {
+            const [, ym] = _srchFilter.split(':');
+            const [yr, mn] = ym.split('-').map(Number);
+            all = all.filter(l => {
+                try { const d = new Date(l.date); return d.getMonth() === mn && d.getFullYear() === yr; }
+                catch { return false; }
+            });
+        }
+
+        // ── Apply Sort ────────────────────────────────────────────────
+        if (_srchSort === 'oldest') {
+            all = all.reverse();
+        } else if (_srchSort === 'high') {
+            all = all.sort((a, b) => (b.total || 0) - (a.total || 0));
+        } else if (_srchSort === 'low') {
+            all = all.sort((a, b) => (a.total || 0) - (b.total || 0));
+        } else if (_srchSort === 'alpha') {
+            all = all.sort((a, b) => a.title.localeCompare(b.title));
+        }
+        // 'newest' is default (already reversed above)
 
         // Smart search — match name OR amount
         const results = query ? all.filter(l => {
             const nameMatch   = l.title.toLowerCase().includes(query);
-            const totalStr    = l.total.toFixed(2);          // "1250.00"
-            const totalRound  = String(Math.round(l.total)); // "1250"
-            const totalFloor  = String(Math.floor(l.total)); // "1250"
+            const totalStr    = (l.total||0).toFixed(2);
+            const totalRound  = String(Math.round(l.total||0));
+            const totalFloor  = String(Math.floor(l.total||0));
             const amountMatch = totalStr.includes(query) || totalRound.includes(query) || totalFloor.includes(query);
-            // Also search individual item names inside the list
             const itemMatch   = l.items.some(i => i.name.toLowerCase().includes(query));
             return nameMatch || amountMatch || itemMatch;
         }) : all;
@@ -2988,7 +3238,7 @@ self.addEventListener('notificationclick', e => {
                 ? `${results.length} result${results.length > 1 ? 's' : ''} found`
                 : 'No results found';
         } else {
-            countEl.textContent = `${all.length} total list${all.length !== 1 ? 's' : ''}`;
+            countEl.textContent = `${results.length} list${results.length !== 1 ? 's' : ''}`;
         }
 
         const container = document.getElementById('search-results-container');
@@ -3146,6 +3396,15 @@ self.addEventListener('notificationclick', e => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.desktop-nav .nav-btn')[1]?.classList.add('active');
         document.getElementById('maker-view').classList.add('active');
+
+        // Show rename bar in edit mode
+        const renameBar = document.getElementById('maker-rename-bar');
+        const renameInput = document.getElementById('maker-rename-input');
+        if (renameBar && renameInput) {
+            renameBar.style.display = 'flex';
+            renameInput.value = list.title || '';
+        }
+
         scrollToTop();
     }
 
@@ -3458,11 +3717,11 @@ self.addEventListener('notificationclick', e => {
             const curVal = document.getElementById(hiddenId)?.value || '';
 
             optsEl.innerHTML =
+                `<div class="grp-dd-opt new-opt" data-val="__new__" onclick="grpDdNew('${ddId}')">+ New Group</div>` +
                 `<div class="grp-dd-opt${curVal===''?' selected':''}" data-val="" onclick="grpDdPick('${ddId}','','No Group (Individual)')">No Group (Individual)</div>` +
                 groups.map(g =>
                     `<div class="grp-dd-opt${curVal===g?' selected':''}" data-val="${g}" onclick="grpDdPick('${ddId}','${g.replace(/'/g,"\\'")}','${g.replace(/'/g,"\\'")}')">${g}</div>`
-                ).join('') +
-                `<div class="grp-dd-opt new-opt" data-val="__new__" onclick="grpDdNew('${ddId}')">+ New group</div>`;
+                ).join('');
         });
     }
 
@@ -3547,11 +3806,29 @@ self.addEventListener('notificationclick', e => {
             `<option value="${u}" ${item.unit===u?'selected':''}>${u}</option>`).join('');
         const hist = appData.priceHistory[item.id] || [];
         const lastTwo = hist.slice(-2);
-        const trend = lastTwo.length < 2 ? '' : lastTwo[1].rate > lastTwo[0].rate
-            ? '<span class="ph-badge ph-up">▲</span>'
-            : lastTwo[1].rate < lastTwo[0].rate
-            ? '<span class="ph-badge ph-down">▼</span>'
-            : '<span class="ph-badge ph-same">—</span>';
+        let trend = '';
+        if (lastTwo.length >= 2) {
+            const oldRate = lastTwo[0].rate;
+            const newRate = lastTwo[1].rate;
+            const pct = oldRate > 0 ? Math.abs(((newRate - oldRate) / oldRate) * 100).toFixed(1) : null;
+            const pctStr = pct !== null ? pct + '%' : '';
+            if (newRate > oldRate) {
+                trend = `<span class="ph-badge ph-up">
+                    <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg>
+                    ${pctStr}
+                </span>`;
+            } else if (newRate < oldRate) {
+                trend = `<span class="ph-badge ph-down">
+                    <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+                    ${pctStr}
+                </span>`;
+            } else {
+                trend = `<span class="ph-badge ph-same">
+                    <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                    —
+                </span>`;
+            }
+        }
 
         if (editingItemId === item.id) {
             return `<tr style="background:#e0f2fe !important;">
@@ -3573,7 +3850,12 @@ self.addEventListener('notificationclick', e => {
             <td style="font-weight:500;">${item.name}</td>
             <td>${item.unit}</td>
             <td>${appData.currency}${item.rate}</td>
-            <td style="text-align:center;">${trend}<button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .35rem;" data-id="${item.id}" data-n="${item.name.replace(/"/g,'&quot;')}" onclick="showPriceHistory(this.dataset.id,this.dataset.n)">Log</button></td>
+            <td style="text-align:center; vertical-align:middle; white-space:nowrap;">
+                <div style="display:inline-flex; flex-direction:column; align-items:center; gap:.3rem;">
+                    ${trend}
+                    <button class="btn-outline btn-small" style="font-size:.65rem; padding:.15rem .45rem;" data-id="${item.id}" data-n="${item.name.replace(/"/g,'&quot;')}" onclick="showPriceHistory(this.dataset.id,this.dataset.n)">Log</button>
+                </div>
+            </td>
         </tr>`;
     }
 
@@ -3598,7 +3880,7 @@ self.addEventListener('notificationclick', e => {
                         <thead><tr>
                             <th style="width:80px;text-align:center;">Action</th>
                             <th>Item</th><th>Unit</th><th>Rate</th>
-                            <th style="width:60px;text-align:center;">History</th>
+                            <th style="width:75px;text-align:center;">History</th>
                         </tr></thead>
                         <tbody>${tableRows || `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1.5rem;">No items</td></tr>`}</tbody>
                     </table>
@@ -4428,11 +4710,13 @@ self.addEventListener('notificationclick', e => {
         const total = after + (after * gst / 100);
 
         if (editingListId) {
-            // Update existing list — no name dialog needed
+            // Update existing list — sync title from rename input if user changed it
+            const renameVal = document.getElementById('maker-rename-input')?.value.trim();
             const idx = appData.lists.findIndex(l => l.id === editingListId);
             if (idx >= 0) {
                 appData.lists[idx] = {
                     ...appData.lists[idx],
+                    title:    renameVal || appData.lists[idx].title,
                     items:    [...cart],
                     subtotal: +base.toFixed(2),
                     disc, gst,
@@ -4461,6 +4745,10 @@ self.addEventListener('notificationclick', e => {
 
         saveData(); renderHistory(); renderDashboard();
         cart = []; clearDraft(); renderCart();
+
+        // Hide rename bar
+        const renameBar = document.getElementById('maker-rename-bar');
+        if (renameBar) renameBar.style.display = 'none';
 
         // Go to dashboard and highlight the saved/updated entry
         const highlightId = editingListId
